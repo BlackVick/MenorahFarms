@@ -8,6 +8,8 @@ import android.net.Uri;
 import android.os.Build;
 
 import com.crashlytics.android.Crashlytics;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
@@ -16,6 +18,7 @@ import net.danlew.android.joda.JodaTimeAndroid;
 
 import co.paystack.android.PaystackSdk;
 import io.fabric.sdk.android.Fabric;
+import io.paperdb.Paper;
 
 /**
  * Created by Scarecrow on 6/18/2018.
@@ -32,6 +35,13 @@ public class ApplicationClass extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        /*---   PAPER   ---*/
+        Paper.init(getApplicationContext());
+
+        /*---   FACEBOOK   ---*/
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        AppEventsLogger.activateApp(this);
 
         /*---   PAYSTACK   ---*/
         PaystackSdk.initialize(getApplicationContext());

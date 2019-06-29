@@ -31,7 +31,7 @@
     </style>
 
     <style name="LoginBackground" parent="AppTheme">
-        <item name="android:windowBackground">@color/white</item>
+        <item name="android:windowBackground">@drawable/menorah_background</item>
         <item name="colorPrimary">@color/colorPrimaryDark</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>

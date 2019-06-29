@@ -5,9 +5,12 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blackviking.menorahfarms.Common.Common;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -15,6 +18,10 @@ import com.facebook.FacebookException;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -22,20 +29,48 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.rengwuxian.materialedittext.MaterialEditText;
 
 import java.util.Arrays;
 
+import dmax.dialog.SpotsDialog;
+
 public class SignUp extends AppCompatActivity {
 
-    FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    CallbackManager mCallbackManager;
-    LoginButton loginButton;
-    ImageView facebookSignIn, googleSignIn;
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    private CallbackManager mCallbackManager;
+    private ImageView facebookSignIn, googleSignIn;
+    private MaterialEditText registerFirstName, registerLastName, registerEmail, registerPassword;
+    private Button signupButton;
+    private TextView loginLink;
+    private int RC_SIGN_IN = 2;
+    private GoogleApiClient mGoogleApiClient;
+    private android.app.AlertDialog mDialog;
+    private boolean isPasswordVisible = false;
+    private FirebaseDatabase db = FirebaseDatabase.getInstance();
+    private DatabaseReference userRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
+
+        /*---   FIREBASE   ---*/
+        userRef = db.getReference("Users");
+
+
+        /*---   WIDGETS   ---*/
+        facebookSignIn = (ImageView)findViewById(R.id.btn_fb_signUp);
+        googleSignIn = (ImageView)findViewById(R.id.googleSignIn);
+        registerFirstName = (MaterialEditText)findViewById(R.id.registerFirstName);
+        registerLastName = (MaterialEditText)findViewById(R.id.registerLastName);
+        registerEmail = (MaterialEditText)findViewById(R.id.registerEmail);
+        registerPassword = (MaterialEditText)findViewById(R.id.registerPassword);
+        signupButton = (Button)findViewById(R.id.signUpButton);
+        loginLink = (TextView)findViewById(R.id.loginLink);
+
 
 
         mCallbackManager = CallbackManager.Factory.create();
@@ -43,7 +78,6 @@ public class SignUp extends AppCompatActivity {
                 new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
-                        Toast.makeText(SignUp.this, ""+loginResult, Toast.LENGTH_SHORT).show();
                         handleFacebookAccessToken(loginResult.getAccessToken());
 
                     }
@@ -59,11 +93,61 @@ public class SignUp extends AppCompatActivity {
                     }
                 });
 
-        facebookSignIn = (ImageView)findViewById(R.id.btn_fb_login);
+
         facebookSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LoginManager.getInstance().logInWithReadPermissions(SignUp.this, Arrays.asList("email", "public_profile"));
+                if (Common.isConnectedToInternet(getBaseContext())) {
+
+                    mDialog = new SpotsDialog(SignUp.this, "Processing . . .");
+                    mDialog.setCancelable(false);
+                    mDialog.setCanceledOnTouchOutside(false);
+                    mDialog.show();
+                    LoginManager.getInstance().logInWithReadPermissions(SignUp.this, Arrays.asList("email", "public_profile"));
+
+                } else {
+
+                    Common.showErrorDialog(SignUp.this, "No Internet Access !");
+
+                }
+            }
+        });
+
+
+
+        /*---   GOOGLE INIT   ---*/
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
+                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                        Toast.makeText(SignUp.this, "Unknown Error Occurred", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
+        googleSignIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (Common.isConnectedToInternet(getBaseContext())) {
+
+                    mDialog = new SpotsDialog(SignUp.this, "Processing . . .");
+                    mDialog.setCancelable(false);
+                    mDialog.setCanceledOnTouchOutside(false);
+                    mDialog.show();
+                    //signInWithGoogle();
+
+                } else {
+
+                    Common.showErrorDialog(SignUp.this, "No Internet Access !");
+
+                }
             }
         });
 

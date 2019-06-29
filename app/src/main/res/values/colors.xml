@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
+    <color name="colorPrimary">#12AA58</color>
+    <color name="colorPrimaryDark">#0E753F</color>
+    <color name="colorAccent">#005026</color>
+    <color name="bottomNavIconColor">#12AA58</color>
+    <color name="buttonBackgroundStart">#248A0B</color>
+    <color name="buttonBackgroundMid">#3CBC4B</color>
+    <color name="buttonBackgroundEnd">#45C781</color>
     <color name="backgroundColor">#D6F6BC</color>
     <color name="black">#ff000000</color>
     <color name="offBlack">#212121</color>
@@ -10,7 +14,7 @@
     <color name="overlayBackground">#CE000000</color>
     <color name="overlayActionBar">#4f0e0d0e</color>
     <color name="white">#ffffff</color>
-    <color name="offWhite">#dad7d7</color>
+    <color name="offWhite">#F5EFEF</color>
     <color name="transparentWhite">#B4FFFFFF</color>
     <color name="thickTransparentWhite">#E8FAF9F9</color>
     <color name="transparent">#00000000</color>

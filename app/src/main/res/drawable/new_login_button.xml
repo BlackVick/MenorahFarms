@@ -9,10 +9,15 @@
 
         <shape android:shape="rectangle">
 
-            <solid android:color="@color/colorPrimaryDark"/>
+            <gradient
+                android:angle="0"
+                android:endColor="@color/buttonBackgroundEnd"
+                android:centerColor="@color/buttonBackgroundMid"
+                android:startColor="@color/buttonBackgroundStart"/>
+
 
             <corners
-                android:radius="30dp"/>
+                android:radius="10dp"/>
 
 
         </shape>

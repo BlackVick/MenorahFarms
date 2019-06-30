@@ -31,6 +31,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -38,8 +39,11 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
@@ -56,7 +60,7 @@ public class SignIn extends AppCompatActivity {
     private TextView registerLink, recoverPassword;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference userRef;
+    private DatabaseReference userRef, authed;
     private CallbackManager mCallbackManager;
     private int RC_SIGN_IN = 1;
     private GoogleApiClient mGoogleApiClient;
@@ -70,6 +74,7 @@ public class SignIn extends AppCompatActivity {
 
         /*---   FIREBASE   ---*/
         userRef = db.getReference("Users");
+        authed = db.getReference("AuthedUsers");
 
 
         /*---   WIDGETS   ---*/
@@ -110,7 +115,7 @@ public class SignIn extends AppCompatActivity {
 
                 if (Common.isConnectedToInternet(getBaseContext())) {
 
-                    mDialog = new SpotsDialog(SignIn.this, "Processing . . .");
+                    mDialog = new SpotsDialog(SignIn.this, "Please Wait . . .");
                     mDialog.setCancelable(false);
                     mDialog.setCanceledOnTouchOutside(false);
                     mDialog.show();
@@ -148,7 +153,7 @@ public class SignIn extends AppCompatActivity {
 
                 if (Common.isConnectedToInternet(getBaseContext())) {
 
-                    mDialog = new SpotsDialog(SignIn.this, "Processing . . .");
+                    mDialog = new SpotsDialog(SignIn.this, "Please Wait . . .");
                     mDialog.setCancelable(false);
                     mDialog.setCanceledOnTouchOutside(false);
                     mDialog.show();
@@ -171,7 +176,7 @@ public class SignIn extends AppCompatActivity {
             public void onClick(View v) {
                 if (Common.isConnectedToInternet(getBaseContext())) {
 
-                    mDialog = new SpotsDialog(SignIn.this, "Processing . . .");
+                    mDialog = new SpotsDialog(SignIn.this, "Please Wait . . .");
                     mDialog.setCancelable(false);
                     mDialog.setCanceledOnTouchOutside(false);
                     mDialog.show();
@@ -194,7 +199,7 @@ public class SignIn extends AppCompatActivity {
             public void onClick(View v) {
                 if (Common.isConnectedToInternet(getBaseContext())) {
 
-                    mDialog = new SpotsDialog(SignIn.this, "Processing . . .");
+                    mDialog = new SpotsDialog(SignIn.this, "Please Wait . . .");
                     mDialog.setCancelable(false);
                     mDialog.setCanceledOnTouchOutside(false);
                     mDialog.show();
@@ -308,33 +313,12 @@ public class SignIn extends AppCompatActivity {
 
         if (mAuth.getCurrentUser() != null) {
 
-            /*currentUid = mAuth.getCurrentUser().getUid();
-
-            progressBar.setVisibility(View.GONE);
-
-            *//*---   LOCAL   ---*//*
-            Paper.book().write(Common.USER_ID, currentUid);
-
-            FirebaseMessaging.getInstance().subscribeToTopic(currentUid);
-            Paper.book().write(Common.NOTIFICATION_STATE, "true");
-
-            Paper.book().write(Common.isSubServiceRunning, false);
-            Intent intent = new Intent(getApplicationContext(), CheckSubStatusService.class);
-            startService(intent);
-
-            FirebaseMessaging.getInstance().subscribeToTopic(Common.FEED_NOTIFICATION_TOPIC+currentUid);
-            Paper.book().write(Common.MY_FEED_NOTIFICATION_STATE, "true");
-
-            Intent signInIntent = new Intent(Login.this, Home.class);
-            startActivity(signInIntent);
-            finish();
-            overridePendingTransition(R.anim.slide_left, R.anim.slide_left);*/
-
             updateUI(mAuth.getCurrentUser());
 
         } else {
 
             Common.showErrorDialog(SignIn.this, "Process Failed");
+            mAuth.signOut();
             mDialog.dismiss();
 
         }
@@ -388,11 +372,35 @@ public class SignIn extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
 
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
+                            final FirebaseUser user = mAuth.getCurrentUser();
+
+                            authed.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                    if (dataSnapshot.child(user.getUid()).exists()){
+
+                                        updateUI(user);
+
+                                    } else {
+
+                                        Common.showErrorDialog(SignIn.this, "This Account Does Not Exist Yet, Please Sign Up And Try Again Later");
+                                        mDialog.dismiss();
+
+                                    }
+
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
 
                         } else {
 
+                            mDialog.dismiss();
+                            mAuth.signOut();
                             Toast.makeText(SignIn.this, "Authentication Failed.", Toast.LENGTH_SHORT).show();
 
                         }
@@ -409,19 +417,42 @@ public class SignIn extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Toast.makeText(SignIn.this, "Sign In Successful", Toast.LENGTH_SHORT).show();
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
+
+                            final FirebaseUser user = mAuth.getCurrentUser();
+
+                            authed.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                    if (dataSnapshot.child(user.getUid()).exists()){
+
+                                        updateUI(user);
+
+                                    } else {
+
+                                        Common.showErrorDialog(SignIn.this, "This Account Does Not Exist Yet, Please Sign Up And Try Again Later");
+                                        mDialog.dismiss();
+                                        mAuth.signOut();
+
+                                    }
+
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
                         } else {
-                            // If sign in fails, display a message to the user.
+
+                            mDialog.dismiss();
                             Toast.makeText(SignIn.this, ""+task.getException(), Toast.LENGTH_SHORT).show();
                             Toast.makeText(SignIn.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
-                            updateUI(null);
+
                         }
 
-                        // ...
                     }
                 });
     }
@@ -455,7 +486,15 @@ public class SignIn extends AppCompatActivity {
     private void updateUI(FirebaseUser user) {
 
         if (user != null){
-            Toast.makeText(this, "Go To DashBoard", Toast.LENGTH_SHORT).show();
+
+            String currentUid = user.getUid();
+
+            Paper.book().write(Common.USER_ID, currentUid);
+
+            Intent goToHome = new Intent(SignIn.this, Home.class);
+            goToHome.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(goToHome);
+            finish();
         }
 
     }

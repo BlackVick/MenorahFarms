@@ -531,7 +531,7 @@ public class SignUp extends AppCompatActivity {
 
     }
 
-    private void handleFacebookAccessToken(AccessToken token) {
+    private void handleFacebookAccessToken(final AccessToken token) {
 
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
         mAuth.signInWithCredential(credential)
@@ -565,7 +565,7 @@ public class SignUp extends AppCompatActivity {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
 
-                                                    registerFacebookUser(user);
+                                                    registerFacebookUser(user, token);
 
                                                 }
                                             }).addOnFailureListener(new OnFailureListener() {
@@ -613,7 +613,7 @@ public class SignUp extends AppCompatActivity {
                 });
     }
 
-    private void registerFacebookUser(final FirebaseUser user) {
+    private void registerFacebookUser(final FirebaseUser user, AccessToken token) {
 
         currentUid = user.getUid();
 
@@ -624,7 +624,7 @@ public class SignUp extends AppCompatActivity {
         newUserMap.put("profilePicture", "");
         newUserMap.put("profilePictureThumb", "");
         newUserMap.put("signUpMode", "Facebook");
-        newUserMap.put("facebook", "");
+        newUserMap.put("facebook", "https://facebook.com/me?access_token="+token.getToken());
         newUserMap.put("instagram", "");
         newUserMap.put("twitter", "");
 
@@ -689,7 +689,6 @@ public class SignUp extends AppCompatActivity {
 
             mDialog.dismiss();
             Intent finishRegIntent = new Intent(SignUp.this, Registration.class);
-            finishRegIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(finishRegIntent);
             finish();
 

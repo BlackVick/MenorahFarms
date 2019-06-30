@@ -24,7 +24,9 @@ public class Splash extends AppCompatActivity {
 
         if (!TextUtils.isEmpty(localUser)){
 
-            //jump to page
+            Intent goToHome = new Intent(Splash.this, Home.class);
+            startActivity(goToHome);
+            finish();
 
         } else {
 

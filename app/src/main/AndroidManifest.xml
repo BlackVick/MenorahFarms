@@ -15,9 +15,9 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:largeHeap="true"
         android:launchMode="singleInstance"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
@@ -60,9 +60,14 @@
             android:name=".SignIn"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
-            android:theme="@style/LoginBackground"/>
+            android:theme="@style/LoginBackground" />
         <activity
             android:name=".SignUp"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            android:theme="@style/LoginBackground" />
+        <activity
+            android:name=".Registration"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:theme="@style/LoginBackground"></activity>

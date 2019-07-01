@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:id="@+id/frame"
         android:layout_above="@+id/navLayout"
-        android:layout_marginBottom="5dp"/>
+        android:animateLayoutChanges="true"/>
 
     <include layout="@layout/snippet_for_bottom_nav"/>
 

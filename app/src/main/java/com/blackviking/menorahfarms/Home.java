@@ -137,7 +137,7 @@ public class Home extends AppCompatActivity {
         accountText.setTextColor(getResources().getColor(R.color.black));
     }
 
-    private void setFragment(Fragment fragment) {
+    public void setFragment(Fragment fragment) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.frame, fragment);
         fragmentTransaction.commitAllowingStateLoss();

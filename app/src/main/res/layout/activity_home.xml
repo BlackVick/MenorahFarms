@@ -5,15 +5,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Home"
-    android:background="@drawable/menorah_background">
+    tools:context=".Home">
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/frame"
-        android:layout_above="@+id/navLayout"
-        android:animateLayoutChanges="true"/>
+        android:layout_above="@+id/navLayout"/>
 
     <include layout="@layout/snippet_for_bottom_nav"/>
 

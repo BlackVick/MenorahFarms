@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeFragments.DashboardFragment">
+    tools:context=".HomeFragments.DashboardFragment"
+    android:background="@drawable/menorah_background">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -47,7 +48,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Hello, Ayodeji"
+                android:text=""
                 android:textSize="23sp"
                 android:textColor="@color/white"
                 android:id="@+id/userWelcome"/>
@@ -55,13 +56,13 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Running Sponsor Cycle : 7"
+                android:text=""
                 android:textSize="14sp"
                 android:textColor="@color/white"
                 android:id="@+id/userSponsorCycle"
                 android:layout_marginTop="6dp"/>
 
-            <TextView
+            <!--<TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Sponsorship History"
@@ -72,7 +73,7 @@
                 android:padding="1dp"
                 android:drawableEnd="@drawable/ic_menorah_forward_icon_black"
                 android:drawablePadding="10dp"
-                android:gravity="center_vertical"/>
+                android:gravity="center_vertical"/>-->
 
         </LinearLayout>
 
@@ -125,12 +126,13 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="No"
+                    android:text=""
                     android:textColor="@color/black"
                     android:textSize="15sp"
-                    android:padding="1dp"/>
+                    android:padding="1dp"
+                    android:id="@+id/totalReturns"/>
 
-                <TextView
+                <!--<TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="View History"
@@ -139,7 +141,7 @@
                     android:drawableEnd="@drawable/ic_menorah_forward_icon_green"
                     android:drawablePadding="10dp"
                     android:padding="1dp"
-                    android:gravity="center_vertical"/>
+                    android:gravity="center_vertical"/>-->
 
             </LinearLayout>
 
@@ -162,12 +164,13 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Not Available"
+                    android:text=""
                     android:textColor="@color/black"
                     android:textSize="15sp"
-                    android:padding="1dp"/>
+                    android:padding="1dp"
+                    android:id="@+id/nextEndOfCycleDate"/>
 
-                <TextView
+                <!--<TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="View Sponsorships"
@@ -176,7 +179,7 @@
                     android:drawableEnd="@drawable/ic_menorah_forward_icon_green"
                     android:drawablePadding="10dp"
                     android:padding="1dp"
-                    android:gravity="center_vertical"/>
+                    android:gravity="center_vertical"/>-->
 
             </LinearLayout>
 
@@ -188,17 +191,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/statisticsLayout"
-        android:elevation="6dp"
+        android:elevation="8dp"
         android:background="@drawable/login_back_from_bottom">
 
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scrollbars="none">
+            android:scrollbars="none"
+            android:padding="10dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <RelativeLayout
@@ -209,6 +213,7 @@
                     android:layout_marginEnd="15dp"
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="10dp"
+                    android:elevation="8dp"
                     android:id="@+id/goToFarmstoreButton">
 
                     <TextView
@@ -231,7 +236,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_margin="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginTop="25dp"
+                    android:layout_marginBottom="14dp"
                     android:weightSum="3">
 
                     <LinearLayout
@@ -239,14 +247,16 @@
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:id="@+id/sponsoredFarmsLayout">
 
                         <android.support.v7.widget.CardView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            app:cardCornerRadius="12dp"
-                            app:cardElevation="5dp"
-                            android:layout_margin="5dp"
+                            app:cardCornerRadius="15dp"
+                            app:cardElevation="7dp"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
                             app:cardBackgroundColor="@color/offWhite"
                             android:layout_gravity="center">
 
@@ -254,7 +264,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:src="@drawable/ic_menorah_sponsored_farms"
-                                android:padding="10dp"
+                                android:padding="14dp"
                                 android:adjustViewBounds="true"
                                 android:layout_gravity="center"/>
 
@@ -267,7 +277,8 @@
                             android:layout_height="wrap_content"
                             android:text="Sponsored Farms"
                             android:textColor="@color/black"
-                            android:textSize="15sp"/>
+                            android:textSize="15sp"
+                            android:layout_margin="6dp"/>
 
                     </LinearLayout>
 
@@ -276,14 +287,16 @@
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:id="@+id/farmsToWatchLayout">
 
                         <android.support.v7.widget.CardView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            app:cardCornerRadius="12dp"
-                            app:cardElevation="5dp"
-                            android:layout_margin="5dp"
+                            app:cardCornerRadius="15dp"
+                            app:cardElevation="7dp"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
                             app:cardBackgroundColor="@color/offWhite"
                             android:layout_gravity="center">
 
@@ -302,9 +315,10 @@
                             android:gravity="center"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Farms On The Watch"
+                            android:text="Farms To Watch"
                             android:textColor="@color/black"
-                            android:textSize="15sp"/>
+                            android:textSize="15sp"
+                            android:layout_margin="6dp"/>
 
                     </LinearLayout>
 
@@ -313,14 +327,16 @@
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:id="@+id/farmUpdatesLayout">
 
                         <android.support.v7.widget.CardView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            app:cardCornerRadius="12dp"
-                            app:cardElevation="5dp"
-                            android:layout_margin="5dp"
+                            app:cardCornerRadius="15dp"
+                            app:cardElevation="7dp"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
                             app:cardBackgroundColor="@color/offWhite"
                             android:layout_gravity="center">
 
@@ -341,7 +357,8 @@
                             android:layout_height="wrap_content"
                             android:text="Farm Updates"
                             android:textColor="@color/black"
-                            android:textSize="15sp"/>
+                            android:textSize="15sp"
+                            android:layout_margin="6dp"/>
 
                     </LinearLayout>
 
@@ -351,8 +368,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_margin="10dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginTop="18dp"
                     android:weightSum="3">
 
                     <LinearLayout
@@ -360,14 +378,16 @@
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:id="@+id/allFarmsLayout">
 
                         <android.support.v7.widget.CardView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            app:cardCornerRadius="12dp"
-                            app:cardElevation="5dp"
-                            android:layout_margin="5dp"
+                            app:cardCornerRadius="15dp"
+                            app:cardElevation="7dp"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
                             app:cardBackgroundColor="@color/offWhite"
                             android:layout_gravity="center">
 
@@ -388,7 +408,8 @@
                             android:layout_height="wrap_content"
                             android:text="See All Farms"
                             android:textColor="@color/black"
-                            android:textSize="15sp"/>
+                            android:textSize="15sp"
+                            android:layout_margin="6dp"/>
 
                     </LinearLayout>
 
@@ -397,14 +418,16 @@
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:id="@+id/projectManagerLayout">
 
                         <android.support.v7.widget.CardView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            app:cardCornerRadius="12dp"
-                            app:cardElevation="5dp"
-                            android:layout_margin="5dp"
+                            app:cardCornerRadius="15dp"
+                            app:cardElevation="7dp"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
                             app:cardBackgroundColor="@color/offWhite"
                             android:layout_gravity="center">
 
@@ -425,7 +448,8 @@
                             android:layout_height="wrap_content"
                             android:text="Project Manager"
                             android:textColor="@color/black"
-                            android:textSize="15sp"/>
+                            android:textSize="15sp"
+                            android:layout_margin="6dp"/>
 
                     </LinearLayout>
 
@@ -434,14 +458,16 @@
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:id="@+id/faqLayout">
 
                         <android.support.v7.widget.CardView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            app:cardCornerRadius="12dp"
-                            app:cardElevation="5dp"
-                            android:layout_margin="5dp"
+                            app:cardCornerRadius="15dp"
+                            app:cardElevation="7dp"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
                             app:cardBackgroundColor="@color/offWhite"
                             android:layout_gravity="center">
 
@@ -462,7 +488,8 @@
                             android:layout_height="wrap_content"
                             android:text="FAQ"
                             android:textColor="@color/black"
-                            android:textSize="15sp"/>
+                            android:textSize="15sp"
+                            android:layout_margin="6dp"/>
 
                     </LinearLayout>
 

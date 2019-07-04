@@ -5,8 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeFragments.FarmshopFragment"
-    android:background="@color/white">
+    tools:context=".HomeActivities.FarmShop">
 
     <include layout="@layout/snippet_for_general"/>
 
@@ -39,8 +38,11 @@
 
     <android.support.v4.view.ViewPager
         android:layout_below="@+id/farmshopTabs"
+        android:layout_above="@+id/navLayout"
         android:id="@+id/farmshopViewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
+
+    <include layout="@layout/snippet_for_bottom_nav"/>
 
 </RelativeLayout>

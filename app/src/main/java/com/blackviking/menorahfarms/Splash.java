@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.blackviking.menorahfarms.Common.Common;
+import com.blackviking.menorahfarms.HomeActivities.Dashboard;
+import com.blackviking.menorahfarms.HomeActivities.Home;
 
 import io.paperdb.Paper;
 
@@ -24,7 +26,7 @@ public class Splash extends AppCompatActivity {
 
         if (!TextUtils.isEmpty(localUser)){
 
-            Intent goToHome = new Intent(Splash.this, Home.class);
+            Intent goToHome = new Intent(Splash.this, Dashboard.class);
             startActivity(goToHome);
             finish();
 

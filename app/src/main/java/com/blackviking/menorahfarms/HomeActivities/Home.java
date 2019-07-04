@@ -1,14 +1,12 @@
-package com.blackviking.menorahfarms.HomeFragments;
+package com.blackviking.menorahfarms.HomeActivities;
 
-
+import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.blackviking.menorahfarms.R;
@@ -24,10 +22,10 @@ import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class HomeFragment extends Fragment {
+public class Home extends AppCompatActivity {
+
+    private LinearLayout homeSwitch, dashboardSwitch, farmstoreSwitch, accountSwitch;
+    private TextView homeText, dashboardText, farmstoreText, accountText;
 
     private TextView welcome, sponsorCycle;
     private ImageView cartButton;
@@ -37,16 +35,12 @@ public class HomeFragment extends Fragment {
     private DatabaseReference userRef, sponsoredRef;
     private String currentUid;
     private RecyclerView newsFeedRecycler;
-    private LinearLayoutManager layoutManager;
 
-    public HomeFragment() {
-        // Required empty public constructor
-    }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_home, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_home);
 
 
         /*---   FIREBASE   ---*/
@@ -57,11 +51,22 @@ public class HomeFragment extends Fragment {
 
 
         /*---   WIDGETS   ---*/
-        sponsorCycle = (TextView)v.findViewById(R.id.userSponsorCycle);
-        welcome = (TextView)v.findViewById(R.id.userWelcome);
-        cartButton = (ImageView)v.findViewById(R.id.userCart);
-        newsFeedRecycler = (RecyclerView)v.findViewById(R.id.newsFeedRecycler);
-        userAvatar = (CircleImageView)v.findViewById(R.id.userAvatar);
+        homeSwitch = (LinearLayout)findViewById(R.id.homeLayout);
+        dashboardSwitch = (LinearLayout)findViewById(R.id.dashboardLayout);
+        farmstoreSwitch = (LinearLayout)findViewById(R.id.farmShopLayout);
+        accountSwitch = (LinearLayout)findViewById(R.id.accountLayout);
+        homeText = (TextView)findViewById(R.id.homeText);
+        dashboardText = (TextView)findViewById(R.id.dashboardText);
+        farmstoreText = (TextView)findViewById(R.id.farmShopText);
+        accountText = (TextView)findViewById(R.id.accountText);
+
+
+        sponsorCycle = (TextView)findViewById(R.id.userSponsorCycle);
+        welcome = (TextView)findViewById(R.id.userWelcome);
+        cartButton = (ImageView)findViewById(R.id.userCart);
+        newsFeedRecycler = (RecyclerView)findViewById(R.id.newsFeedRecycler);
+        userAvatar = (CircleImageView)findViewById(R.id.userAvatar);
+
 
 
         /*---   CURRENT USER   ---*/
@@ -77,7 +82,7 @@ public class HomeFragment extends Fragment {
 
                         if (!profilePicture.equalsIgnoreCase("")){
 
-                            Picasso.with(getContext())
+                            Picasso.with(getBaseContext())
                                     .load(profilePicture)
                                     .networkPolicy(NetworkPolicy.OFFLINE)
                                     .placeholder(R.drawable.profile)
@@ -89,7 +94,7 @@ public class HomeFragment extends Fragment {
 
                                         @Override
                                         public void onError() {
-                                            Picasso.with(getContext())
+                                            Picasso.with(getBaseContext())
                                                     .load(profilePicture)
                                                     .placeholder(R.drawable.profile)
                                                     .into(userAvatar);
@@ -147,13 +152,51 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        /*---   BOTTOM NAV CONTROL   ---*/
+        homeSwitch.setBackgroundResource(R.drawable.off_white_backround);
+        homeText.setTextColor(getResources().getColor(R.color.colorPrimary));
+        dashboardSwitch.setBackgroundResource(R.drawable.white_backround);
+        dashboardText.setTextColor(getResources().getColor(R.color.black));
+        farmstoreSwitch.setBackgroundResource(R.drawable.white_backround);
+        farmstoreText.setTextColor(getResources().getColor(R.color.black));
+        accountSwitch.setBackgroundResource(R.drawable.white_backround);
+        accountText.setTextColor(getResources().getColor(R.color.black));
 
-        loadNewsFeed();
 
-        return v;
-    }
+        dashboardSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-    private void loadNewsFeed() {
+                Intent dashboardIntent = new Intent(Home.this, Dashboard.class);
+                startActivity(dashboardIntent);
+                finish();
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
+            }
+        });
+        farmstoreSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent farmstoreIntent = new Intent(Home.this, FarmShop.class);
+                startActivity(farmstoreIntent);
+                finish();
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
+            }
+        });
+        accountSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent accountIntent = new Intent(Home.this, Account.class);
+                startActivity(accountIntent);
+                finish();
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
+            }
+        });
+
     }
 
 }

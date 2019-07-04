@@ -1,19 +1,14 @@
-package com.blackviking.menorahfarms.HomeFragments;
+package com.blackviking.menorahfarms.HomeActivities;
 
-
+import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.blackviking.menorahfarms.Home;
 import com.blackviking.menorahfarms.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -27,10 +22,10 @@ import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class DashboardFragment extends Fragment {
+public class Dashboard extends AppCompatActivity {
+
+    private LinearLayout homeSwitch, dashboardSwitch, farmstoreSwitch, accountSwitch;
+    private TextView homeText, dashboardText, farmstoreText, accountText;
 
     private TextView welcome, sponsorCycle, totalReturnsText, nextEndOfCycleDate;
     private ImageView cartButton;
@@ -42,15 +37,10 @@ public class DashboardFragment extends Fragment {
     private DatabaseReference userRef, sponsoredRef;
     private String currentUid;
 
-    public DashboardFragment() {
-        // Required empty public constructor
-    }
-
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_dashboard, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_dashboard);
 
 
         /*---   FIREBASE   ---*/
@@ -61,24 +51,74 @@ public class DashboardFragment extends Fragment {
 
 
         /*---   WIDGETS   ---*/
-        sponsorCycle = (TextView)v.findViewById(R.id.userSponsorCycle);
-        welcome = (TextView)v.findViewById(R.id.userWelcome);
-        totalReturnsText = (TextView)v.findViewById(R.id.totalReturns);
-        nextEndOfCycleDate = (TextView)v.findViewById(R.id.nextEndOfCycleDate);
-        cartButton = (ImageView)v.findViewById(R.id.userCart);
-        userAvatar = (CircleImageView)v.findViewById(R.id.userAvatar);
-        goToFarmstoreButton = (RelativeLayout)v.findViewById(R.id.goToFarmstoreButton);
-        sponsoredFarmsLayout = (LinearLayout)v.findViewById(R.id.sponsoredFarmsLayout);
-        farmsToWatchLayout = (LinearLayout)v.findViewById(R.id.farmsToWatchLayout);
-        farmUpdatesLayout = (LinearLayout)v.findViewById(R.id.farmUpdatesLayout);
-        allFarmsLayout = (LinearLayout)v.findViewById(R.id.allFarmsLayout);
-        projectManagerLayout = (LinearLayout)v.findViewById(R.id.projectManagerLayout);
-        faqLayout = (LinearLayout)v.findViewById(R.id.faqLayout);
+        homeSwitch = (LinearLayout)findViewById(R.id.homeLayout);
+        dashboardSwitch = (LinearLayout)findViewById(R.id.dashboardLayout);
+        farmstoreSwitch = (LinearLayout)findViewById(R.id.farmShopLayout);
+        accountSwitch = (LinearLayout)findViewById(R.id.accountLayout);
+        homeText = (TextView)findViewById(R.id.homeText);
+        dashboardText = (TextView)findViewById(R.id.dashboardText);
+        farmstoreText = (TextView)findViewById(R.id.farmShopText);
+        accountText = (TextView)findViewById(R.id.accountText);
 
 
-        /*---   TEST   ---*/
-        final Home home = new Home();
-        final FarmshopFragment farmshopFragment = new FarmshopFragment();
+        sponsorCycle = (TextView)findViewById(R.id.userSponsorCycle);
+        welcome = (TextView)findViewById(R.id.userWelcome);
+        totalReturnsText = (TextView)findViewById(R.id.totalReturns);
+        nextEndOfCycleDate = (TextView)findViewById(R.id.nextEndOfCycleDate);
+        cartButton = (ImageView)findViewById(R.id.userCart);
+        userAvatar = (CircleImageView)findViewById(R.id.userAvatar);
+        goToFarmstoreButton = (RelativeLayout)findViewById(R.id.goToFarmstoreButton);
+        sponsoredFarmsLayout = (LinearLayout)findViewById(R.id.sponsoredFarmsLayout);
+        farmsToWatchLayout = (LinearLayout)findViewById(R.id.farmsToWatchLayout);
+        farmUpdatesLayout = (LinearLayout)findViewById(R.id.farmUpdatesLayout);
+        allFarmsLayout = (LinearLayout)findViewById(R.id.allFarmsLayout);
+        projectManagerLayout = (LinearLayout)findViewById(R.id.projectManagerLayout);
+        faqLayout = (LinearLayout)findViewById(R.id.faqLayout);
+
+
+        /*---   BOTTOM NAV   ---*/
+        homeSwitch.setBackgroundResource(R.drawable.white_backround);
+        homeText.setTextColor(getResources().getColor(R.color.black));
+        dashboardSwitch.setBackgroundResource(R.drawable.off_white_backround);
+        dashboardText.setTextColor(getResources().getColor(R.color.colorPrimary));
+        farmstoreSwitch.setBackgroundResource(R.drawable.white_backround);
+        farmstoreText.setTextColor(getResources().getColor(R.color.black));
+        accountSwitch.setBackgroundResource(R.drawable.white_backround);
+        accountText.setTextColor(getResources().getColor(R.color.black));
+
+        homeSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent homeIntent = new Intent(Dashboard.this, Home.class);
+                startActivity(homeIntent);
+                finish();
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
+            }
+        });
+        farmstoreSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent farmstoreIntent = new Intent(Dashboard.this, FarmShop.class);
+                startActivity(farmstoreIntent);
+                finish();
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
+            }
+        });
+        accountSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent accountIntent = new Intent(Dashboard.this, Account.class);
+                startActivity(accountIntent);
+                finish();
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
+            }
+        });
 
 
         /*---   CURRENT USER   ---*/
@@ -94,7 +134,7 @@ public class DashboardFragment extends Fragment {
 
                         if (!profilePicture.equalsIgnoreCase("")){
 
-                            Picasso.with(getContext())
+                            Picasso.with(getBaseContext())
                                     .load(profilePicture)
                                     .networkPolicy(NetworkPolicy.OFFLINE)
                                     .placeholder(R.drawable.profile)
@@ -106,7 +146,7 @@ public class DashboardFragment extends Fragment {
 
                                         @Override
                                         public void onError() {
-                                            Picasso.with(getContext())
+                                            Picasso.with(getBaseContext())
                                                     .load(profilePicture)
                                                     .placeholder(R.drawable.profile)
                                                     .into(userAvatar);
@@ -255,9 +295,5 @@ public class DashboardFragment extends Fragment {
 
             }
         });
-
-
-        return v;
     }
-
 }

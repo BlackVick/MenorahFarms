@@ -8,9 +8,10 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.blackviking.menorahfarms.Common.Common;
+import com.blackviking.menorahfarms.HomeActivities.Dashboard;
+import com.blackviking.menorahfarms.HomeActivities.Home;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.facebook.login.LoginManager;
@@ -177,7 +178,7 @@ public class Registration extends AppCompatActivity {
 
         Paper.book().write(Common.USER_ID, currentUid);
 
-        Intent homeIntent = new Intent(Registration.this, Home.class);
+        Intent homeIntent = new Intent(Registration.this, Dashboard.class);
         homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(homeIntent);
         finish();

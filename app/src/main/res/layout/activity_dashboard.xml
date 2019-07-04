@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeFragments.DashboardFragment"
+    tools:context=".HomeActivities.Dashboard"
     android:background="@drawable/menorah_background">
 
     <LinearLayout
@@ -105,7 +105,7 @@
             android:layout_marginStart="15dp"
             android:layout_marginEnd="15dp"
             android:layout_marginTop="10dp"
-            android:layout_marginBottom="4dp">
+            android:layout_marginBottom="10dp">
 
             <LinearLayout
                 android:layout_marginEnd="2dp"
@@ -191,6 +191,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/statisticsLayout"
+        android:layout_above="@+id/navLayout"
         android:elevation="8dp"
         android:background="@drawable/login_back_from_bottom">
 
@@ -500,5 +501,7 @@
         </ScrollView>
 
     </RelativeLayout>
+
+    <include layout="@layout/snippet_for_bottom_nav"/>
 
 </RelativeLayout>

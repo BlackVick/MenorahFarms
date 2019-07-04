@@ -20,8 +20,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".FarmsOnTheWatch"></activity>
-        <activity android:name=".Sponsor.SponsoredFarms" />
         <activity
             android:name=".Splash"
             android:configChanges="orientation"
@@ -74,9 +72,29 @@
             android:screenOrientation="portrait"
             android:theme="@style/LoginBackground" />
         <activity
-            android:name=".Home"
+            android:name=".HomeActivities.Home"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".Sponsor.SponsoredFarms"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".DashboardMenu.FarmsOnTheWatch"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".HomeActivities.Account"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".HomeActivities.Dashboard"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".HomeActivities.FarmShop"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

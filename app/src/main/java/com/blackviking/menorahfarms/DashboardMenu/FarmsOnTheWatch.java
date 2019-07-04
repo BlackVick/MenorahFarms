@@ -1,7 +1,9 @@
-package com.blackviking.menorahfarms;
+package com.blackviking.menorahfarms.DashboardMenu;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.blackviking.menorahfarms.R;
 
 public class FarmsOnTheWatch extends AppCompatActivity {
 

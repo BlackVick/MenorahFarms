@@ -1,6 +1,7 @@
 package com.blackviking.menorahfarms.FarmshopFragments;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -13,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.blackviking.menorahfarms.FarmDetails;
 import com.blackviking.menorahfarms.Interface.ItemClickListener;
 import com.blackviking.menorahfarms.Models.FarmModel;
 import com.blackviking.menorahfarms.R;
@@ -131,7 +133,7 @@ public class NowSellingFragment extends Fragment {
                         .equalTo("Now Selling")
         ) {
             @Override
-            protected void populateViewHolder(FarmStoreViewHolder viewHolder, final FarmModel model, int position) {
+            protected void populateViewHolder(final FarmStoreViewHolder viewHolder, final FarmModel model, int position) {
 
                 if (model.getPackaged().equalsIgnoreCase("true")){
 
@@ -159,7 +161,10 @@ public class NowSellingFragment extends Fragment {
                 viewHolder.setItemClickListener(new ItemClickListener() {
                     @Override
                     public void onClick(View view, int position, boolean isLongClick) {
-                        Toast.makeText(getContext(), ""+model.getFarmName(), Toast.LENGTH_SHORT).show();
+                        Intent farmDetailIntent = new Intent(getContext(), FarmDetails.class);
+                        farmDetailIntent.putExtra("FarmId", adapter.getRef(viewHolder.getAdapterPosition()).getKey());
+                        startActivity(farmDetailIntent);
+                        getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
                     }
                 });
 

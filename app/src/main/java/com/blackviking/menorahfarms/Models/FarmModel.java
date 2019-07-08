@@ -6,7 +6,6 @@ public class FarmModel {
     private String farmLocation;
     private String farmType;
     private String pricePerUnit;
-    private String pricePerUnitAcada;
     private String farmRoi;
     private String sponsorDuration;
     private String farmState;
@@ -20,12 +19,11 @@ public class FarmModel {
     public FarmModel() {
     }
 
-    public FarmModel(String farmName, String farmLocation, String farmType, String pricePerUnit, String pricePerUnitAcada, String farmRoi, String sponsorDuration, String farmState, String farmImage, String farmImageThumb, String unitsAvailable, String unitsSold, String packaged, String packagedType) {
+    public FarmModel(String farmName, String farmLocation, String farmType, String pricePerUnit, String farmRoi, String sponsorDuration, String farmState, String farmImage, String farmImageThumb, String unitsAvailable, String unitsSold, String packaged, String packagedType) {
         this.farmName = farmName;
         this.farmLocation = farmLocation;
         this.farmType = farmType;
         this.pricePerUnit = pricePerUnit;
-        this.pricePerUnitAcada = pricePerUnitAcada;
         this.farmRoi = farmRoi;
         this.sponsorDuration = sponsorDuration;
         this.farmState = farmState;
@@ -67,14 +65,6 @@ public class FarmModel {
 
     public void setPricePerUnit(String pricePerUnit) {
         this.pricePerUnit = pricePerUnit;
-    }
-
-    public String getPricePerUnitAcada() {
-        return pricePerUnitAcada;
-    }
-
-    public void setPricePerUnitAcada(String pricePerUnitAcada) {
-        this.pricePerUnitAcada = pricePerUnitAcada;
     }
 
     public String getFarmRoi() {

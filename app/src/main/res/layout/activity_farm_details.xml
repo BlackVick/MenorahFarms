@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".FarmDetails">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@color/colorAccent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="10">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_weight="1.2"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_menorah_back_button_white"
+                    android:layout_centerInParent="true"
+                    android:id="@+id/backButton"
+                    android:adjustViewBounds="true"/>
+
+            </RelativeLayout>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="8.8"
+                android:layout_height="match_parent"
+                android:text="Farm Details"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:gravity="center_vertical"
+                android:paddingStart="30dp"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="55.1dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="170dp"
+                app:corner_radius="15dp"
+                android:elevation="6dp">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/farmDetailImage"
+                    android:src="@drawable/menorah_placeholder"
+                    android:scaleType="centerCrop"
+                    android:adjustViewBounds="true"/>
+
+            </com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:weightSum="10">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="6"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textStyle="bold"
+                    android:textSize="23sp"
+                    android:textColor="@color/black"
+                    android:id="@+id/farmDetailsType"
+                    android:gravity="center_vertical"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="4"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    android:id="@+id/farmDetailsUnitsLeft"
+                    android:gravity="center_vertical|end"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="@color/grey"
+                android:textSize="13sp"
+                android:id="@+id/farmDetailLocation"
+                android:layout_marginTop="10dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="@color/black"
+                android:textSize="23sp"
+                android:id="@+id/farmDetailROI"
+                android:layout_marginTop="10dp"/>
+
+            <com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout
+                android:background="@drawable/farm_item_bacground"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:corner_radius="7dp"
+                android:elevation="4dp"
+                android:layout_marginTop="20dp"
+                android:padding="10dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="15dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="15dp"
+                        android:weightSum="10">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="6"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Price"
+                                android:textSize="18sp"
+                                android:textColor="@color/black" />
+
+                            <TextView
+                                android:layout_marginTop="8dp"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text=""
+                                android:textSize="23sp"
+                                android:textColor="@color/black"
+                                android:textStyle="bold"
+                                android:id="@+id/farmDetailUnitPrice"
+                                android:gravity="center_vertical"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="4"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Farm Unit(s)"
+                                android:textSize="18sp"
+                                android:textColor="@color/black" />
+
+                            <com.cepheuen.elegantnumberbutton.view.ElegantNumberButton
+                                android:id="@+id/farmDetailNumberButton"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:layout_marginTop="10dp"
+                                app:backGroundColor="@color/colorPrimary"
+                                app:initialNumber="1"
+                                app:textSize="12sp"
+                                app:textColor="@color/white"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:background="@drawable/farm_detail_bacground"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginStart="7dp"
+                        android:layout_marginEnd="7dp"
+                        android:layout_marginBottom="10dp"
+                        android:padding="10dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/totalRoiAndPrice"
+                            android:text=""
+                            android:textStyle="normal"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"/>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="0.4dp"
+                            android:layout_marginTop="10dp"
+                            android:background="@color/black"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/totalDuration"
+                            android:text=""
+                            android:textColor="@color/colorPrimaryDark"
+                            android:textSize="16sp"
+                            android:layout_marginTop="10dp"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/totalPayback"
+                            android:text=""
+                            android:textColor="@color/colorPrimaryDark"
+                            android:textSize="18sp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginBottom="15dp"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="40dp"
+                android:layout_marginBottom="20dp"
+                android:weightSum="2">
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/new_login_button"
+                    android:layout_margin="3dp"
+                    android:id="@+id/followFarmButton">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="Follow"
+                        android:textSize="17sp"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        android:drawableStart="@drawable/ic_follow_farm_white"
+                        android:drawablePadding="10dp"
+                        android:paddingTop="20dp"
+                        android:paddingBottom="20dp"
+                        android:gravity="center"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/new_login_button"
+                    android:layout_margin="3dp"
+                    android:id="@+id/addToCartButton">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="Add To Cart"
+                        android:textSize="17sp"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        android:drawableStart="@drawable/ic_menorah_cart_white"
+                        android:drawablePadding="10dp"
+                        android:paddingTop="20dp"
+                        android:paddingBottom="20dp"
+                        android:gravity="center"/>
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</RelativeLayout>

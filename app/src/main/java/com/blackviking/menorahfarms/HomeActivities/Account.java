@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.blackviking.menorahfarms.CartAndHistory.Cart;
 import com.blackviking.menorahfarms.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -30,7 +31,7 @@ public class Account extends AppCompatActivity {
     private TextView homeText, dashboardText, farmstoreText, accountText;
 
     private TextView userName, userEmail, profileProgressText;
-    private ImageView cartButton, backButton;
+    private ImageView cartButton;
     private Button resetPassword;
     private CircleImageView userAvatar;
     private ProgressBar profileProgress;
@@ -65,7 +66,6 @@ public class Account extends AppCompatActivity {
         userName = (TextView)findViewById(R.id.userFullName);
         userEmail = (TextView)findViewById(R.id.userEmail);
         profileProgressText = (TextView)findViewById(R.id.profileProgressText);
-        backButton = (ImageView)findViewById(R.id.backButton);
         cartButton = (ImageView)findViewById(R.id.cartButton);
         resetPassword = (Button)findViewById(R.id.changePasswordButton);
         resetPassword.setEnabled(false);
@@ -74,13 +74,9 @@ public class Account extends AppCompatActivity {
 
 
         /*---   BOTTOM NAV   ---*/
-        homeSwitch.setBackgroundResource(R.drawable.white_backround);
         homeText.setTextColor(getResources().getColor(R.color.black));
-        dashboardSwitch.setBackgroundResource(R.drawable.white_backround);
         dashboardText.setTextColor(getResources().getColor(R.color.black));
-        farmstoreSwitch.setBackgroundResource(R.drawable.white_backround);
         farmstoreText.setTextColor(getResources().getColor(R.color.black));
-        accountSwitch.setBackgroundResource(R.drawable.off_white_backround);
         accountText.setTextColor(getResources().getColor(R.color.colorPrimary));
 
 
@@ -180,6 +176,19 @@ public class Account extends AppCompatActivity {
 
                     }
                 });
+
+
+        /*---   CART   ---*/
+        cartButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent cartIntent = new Intent(Account.this, Cart.class);
+                startActivity(cartIntent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
+            }
+        });
 
 
         setProfileProgress();

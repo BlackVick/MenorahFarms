@@ -9,6 +9,13 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.blackviking.menorahfarms.About;
+import com.blackviking.menorahfarms.CartAndHistory.Cart;
+import com.blackviking.menorahfarms.DashboardMenu.AccountManager;
+import com.blackviking.menorahfarms.DashboardMenu.Faq;
+import com.blackviking.menorahfarms.DashboardMenu.FarmUpdates;
+import com.blackviking.menorahfarms.DashboardMenu.FollowedFarms;
+import com.blackviking.menorahfarms.DashboardMenu.SponsoredFarms;
 import com.blackviking.menorahfarms.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -31,7 +38,7 @@ public class Dashboard extends AppCompatActivity {
     private ImageView cartButton;
     private CircleImageView userAvatar;
     private RelativeLayout goToFarmstoreButton;
-    private LinearLayout sponsoredFarmsLayout, farmsToWatchLayout, farmUpdatesLayout, allFarmsLayout, projectManagerLayout, faqLayout;
+    private LinearLayout sponsoredFarmsLayout, farmsToWatchLayout, farmUpdatesLayout, allFarmsLayout, projectManagerLayout, faqLayout, about;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference userRef, sponsoredRef;
@@ -74,16 +81,13 @@ public class Dashboard extends AppCompatActivity {
         allFarmsLayout = (LinearLayout)findViewById(R.id.allFarmsLayout);
         projectManagerLayout = (LinearLayout)findViewById(R.id.projectManagerLayout);
         faqLayout = (LinearLayout)findViewById(R.id.faqLayout);
+        about = (LinearLayout)findViewById(R.id.aboutLayout);
 
 
         /*---   BOTTOM NAV   ---*/
-        homeSwitch.setBackgroundResource(R.drawable.white_backround);
         homeText.setTextColor(getResources().getColor(R.color.black));
-        dashboardSwitch.setBackgroundResource(R.drawable.off_white_backround);
         dashboardText.setTextColor(getResources().getColor(R.color.colorPrimary));
-        farmstoreSwitch.setBackgroundResource(R.drawable.white_backround);
         farmstoreText.setTextColor(getResources().getColor(R.color.black));
-        accountSwitch.setBackgroundResource(R.drawable.white_backround);
         accountText.setTextColor(getResources().getColor(R.color.black));
 
         homeSwitch.setOnClickListener(new View.OnClickListener() {
@@ -240,6 +244,10 @@ public class Dashboard extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                Intent cartIntent = new Intent(Dashboard.this, Cart.class);
+                startActivity(cartIntent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
             }
         });
 
@@ -248,6 +256,10 @@ public class Dashboard extends AppCompatActivity {
         goToFarmstoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                Intent farmShopIntent = new Intent(Dashboard.this, FarmShop.class);
+                startActivity(farmShopIntent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
 
             }
         });
@@ -258,12 +270,20 @@ public class Dashboard extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                Intent sponsoredFarmsIntent = new Intent(Dashboard.this, SponsoredFarms.class);
+                startActivity(sponsoredFarmsIntent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
             }
         });
 
         farmsToWatchLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                Intent followedFarmsIntent = new Intent(Dashboard.this, FollowedFarms.class);
+                startActivity(followedFarmsIntent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
 
             }
         });
@@ -272,12 +292,20 @@ public class Dashboard extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                Intent farmUpdatesIntent = new Intent(Dashboard.this, FarmUpdates.class);
+                startActivity(farmUpdatesIntent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
             }
         });
 
         allFarmsLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                Intent farmShopIntent = new Intent(Dashboard.this, FarmShop.class);
+                startActivity(farmShopIntent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
 
             }
         });
@@ -286,12 +314,31 @@ public class Dashboard extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                Intent projectManagerIntent = new Intent(Dashboard.this, AccountManager.class);
+                startActivity(projectManagerIntent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
             }
         });
 
         faqLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                Intent faqIntent = new Intent(Dashboard.this, Faq.class);
+                startActivity(faqIntent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
+            }
+        });
+
+        about.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent aboutIntent = new Intent(Dashboard.this, About.class);
+                startActivity(aboutIntent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
 
             }
         });

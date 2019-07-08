@@ -48,13 +48,9 @@ public class FarmShop extends AppCompatActivity {
 
 
         /*---   BOTTOM NAV   ---*/
-        homeSwitch.setBackgroundResource(R.drawable.white_backround);
         homeText.setTextColor(getResources().getColor(R.color.black));
-        dashboardSwitch.setBackgroundResource(R.drawable.white_backround);
         dashboardText.setTextColor(getResources().getColor(R.color.black));
-        farmstoreSwitch.setBackgroundResource(R.drawable.off_white_backround);
         farmstoreText.setTextColor(getResources().getColor(R.color.colorPrimary));
-        accountSwitch.setBackgroundResource(R.drawable.white_backround);
         accountText.setTextColor(getResources().getColor(R.color.black));
 
         homeSwitch.setOnClickListener(new View.OnClickListener() {

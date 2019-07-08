@@ -10,8 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="7dp"
-        android:id="@+id/nowSellingRecycler"
-        android:visibility="gone"/>
+        android:id="@+id/nowSellingRecycler"/>
 
     <LinearLayout
         android:layout_width="match_parent"

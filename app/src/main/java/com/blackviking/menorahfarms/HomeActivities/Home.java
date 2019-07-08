@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.blackviking.menorahfarms.CartAndHistory.Cart;
 import com.blackviking.menorahfarms.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -149,17 +150,17 @@ public class Home extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                Intent cartIntent = new Intent(Home.this, Cart.class);
+                startActivity(cartIntent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
             }
         });
 
         /*---   BOTTOM NAV CONTROL   ---*/
-        homeSwitch.setBackgroundResource(R.drawable.off_white_backround);
         homeText.setTextColor(getResources().getColor(R.color.colorPrimary));
-        dashboardSwitch.setBackgroundResource(R.drawable.white_backround);
         dashboardText.setTextColor(getResources().getColor(R.color.black));
-        farmstoreSwitch.setBackgroundResource(R.drawable.white_backround);
         farmstoreText.setTextColor(getResources().getColor(R.color.black));
-        accountSwitch.setBackgroundResource(R.drawable.white_backround);
         accountText.setTextColor(getResources().getColor(R.color.black));
 
 

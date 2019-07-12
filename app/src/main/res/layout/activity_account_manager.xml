@@ -1,9 +1,175 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".DashboardMenu.AccountManager">
 
-</android.support.constraint.ConstraintLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@color/colorAccent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="10">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_weight="1.2"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_menorah_back_button_white"
+                    android:layout_centerInParent="true"
+                    android:id="@+id/backButton"
+                    android:adjustViewBounds="true"/>
+
+            </RelativeLayout>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="8.8"
+                android:layout_height="match_parent"
+                android:text="Account Manager"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:gravity="center_vertical"
+                android:paddingStart="30dp"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:id="@+id/notEmptyLayout"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_centerInParent="true"
+            android:padding="25dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_gravity="center"
+                app:civ_circle_background_color="@color/white"
+                app:civ_border_color="@color/white"
+                app:civ_border_width="0.5dp"
+                android:src="@drawable/profile"
+                android:id="@+id/accountManagerAvatar"
+                android:elevation="10dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:text=""
+                android:layout_gravity="center"
+                android:textStyle="bold"
+                android:textSize="23sp"
+                android:textColor="@color/black"
+                android:drawableStart="@drawable/ic_user_account"
+                android:drawablePadding="25dp"
+                android:id="@+id/accountManagerName"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:text=""
+                android:layout_gravity="center"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:drawableStart="@drawable/ic_user_address"
+                android:drawablePadding="25dp"
+                android:id="@+id/accountManagerAddress"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="40dp"
+                android:layout_marginEnd="40dp"
+                android:layout_marginTop="25dp"
+                android:weightSum="10">
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_weight="5"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/green_button"
+                    android:text="Call"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:drawableStart="@drawable/ic_white_phone"
+                    android:padding="8dp"
+                    android:id="@+id/callManagerButton"
+                    android:layout_marginEnd="10dp"/>
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_weight="5"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/green_button"
+                    android:text="Chat"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:drawableStart="@drawable/ic_whatsapp_icon"
+                    android:padding="8dp"
+                    android:id="@+id/whatsappManagerButton"
+                    android:layout_marginStart="10dp"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:id="@+id/emptyLayout"
+        android:orientation="vertical"
+        android:layout_margin="35dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Not Available"
+            android:gravity="center"
+            android:textColor="@color/colorAccent"
+            android:textSize="25sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="You have not been assigned an account manager yet. Please update your profile or contact us if you are facing any difficulties."
+            android:gravity="center"
+            android:textColor="@color/grey"
+            android:textSize="15sp"
+            android:layout_marginTop="10dp"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

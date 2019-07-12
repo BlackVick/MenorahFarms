@@ -385,6 +385,7 @@ public class SignUp extends AppCompatActivity {
             newUserMap.put("kinPhone", "");
             newUserMap.put("kinAddress", "");
             newUserMap.put("linkedIn", "");
+            newUserMap.put("accountManager", "");
 
             userRef.child(currentUid)
                     .setValue(newUserMap)
@@ -538,6 +539,7 @@ public class SignUp extends AppCompatActivity {
         newUserMap.put("kinPhone", "");
         newUserMap.put("kinAddress", "");
         newUserMap.put("linkedIn", "");
+        newUserMap.put("accountManager", "");
 
         userRef.child(currentUid)
                 .setValue(newUserMap)
@@ -681,6 +683,7 @@ public class SignUp extends AppCompatActivity {
         newUserMap.put("kinPhone", "");
         newUserMap.put("kinAddress", "");
         newUserMap.put("linkedIn", "");
+        newUserMap.put("accountManager", "");
 
         userRef.child(currentUid)
                 .setValue(newUserMap)

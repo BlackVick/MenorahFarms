@@ -1,5 +1,6 @@
 package com.blackviking.menorahfarms;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -34,7 +35,7 @@ public class FarmDetails extends AppCompatActivity {
     private ImageView backButton, farmImage;
     private TextView farmType, unitsLeft, farmLocation, farmROI, unitPrice, totalROI, totalDuration, totalPay;
     private ImageView decreaseUnitNumber, increaseUnitNumber;
-    private TextView unitNumber;
+    private TextView unitNumber, farmDescription;
     private RelativeLayout followFarmBtn, addToCartBtn;
 
     private int unitNumberText = 1;
@@ -69,6 +70,7 @@ public class FarmDetails extends AppCompatActivity {
         totalROI = (TextView)findViewById(R.id.totalRoiAndPrice);
         totalDuration = (TextView)findViewById(R.id.totalDuration);
         totalPay = (TextView)findViewById(R.id.totalPayback);
+        farmDescription = (TextView)findViewById(R.id.farmDescription);
         followFarmBtn = (RelativeLayout)findViewById(R.id.followFarmButton);
         addToCartBtn = (RelativeLayout)findViewById(R.id.addToCartButton);
         decreaseUnitNumber = (ImageView)findViewById(R.id.decreaseUnitNumber);
@@ -150,6 +152,17 @@ public class FarmDetails extends AppCompatActivity {
 
                                         }
 
+                                    }
+                                });
+
+
+                                farmDescription.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Intent farmDescIntent = new Intent(FarmDetails.this, FarmDescription.class);
+                                        farmDescIntent.putExtra("FarmId", farmId);
+                                        startActivity(farmDescIntent);
+                                        overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
                                     }
                                 });
 

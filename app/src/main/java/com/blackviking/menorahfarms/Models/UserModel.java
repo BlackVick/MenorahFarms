@@ -29,6 +29,7 @@ public class UserModel {
     private String kinRelationship;
     private String kinPhone;
     private String kinAddress;
+    private String accountManager;
 
     public UserModel() {
     }

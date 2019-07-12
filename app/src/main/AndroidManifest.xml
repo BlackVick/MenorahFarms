@@ -20,7 +20,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".AccountMenus.StudentDetails"></activity>
+        <activity android:name=".Sponsorship.SponsorshipDetails"></activity>
+        <activity android:name=".CartAndHistory.HistoryDetails" />
+        <activity android:name=".FarmDescription" />
+        <activity android:name=".AccountMenus.StudentDetails" />
         <activity android:name=".FarmDetails" />
         <activity android:name=".About" />
         <activity android:name=".AccountMenus.SocialMedia" />

@@ -140,7 +140,7 @@ public class OpeningSoonFragment extends Fragment {
                     viewHolder.farmType.setText(model.getFarmType());
                     viewHolder.farmLocation.setText(model.getFarmLocation());
                     viewHolder.farmUnitPrice.setText(model.getPricePerUnit());
-                    viewHolder.farmROI.setText("Returns " + model.getFarmRoi() + " in " + model.getSponsorDuration());
+                    viewHolder.farmROI.setText("Returns " + model.getFarmRoi() + "% in " + model.getSponsorDuration() + " months");
                     viewHolder.farmName.setText(model.getFarmName());
 
                 } else {
@@ -150,7 +150,7 @@ public class OpeningSoonFragment extends Fragment {
                     viewHolder.farmType.setText(model.getFarmType());
                     viewHolder.farmLocation.setText(model.getFarmLocation());
                     viewHolder.farmUnitPrice.setText(model.getPricePerUnit());
-                    viewHolder.farmROI.setText("Returns " + model.getFarmRoi() + " in " + model.getSponsorDuration());
+                    viewHolder.farmROI.setText("Returns " + model.getFarmRoi() + "% in " + model.getSponsorDuration() + " months");
                     viewHolder.farmName.setText(model.getFarmName());
 
                 }

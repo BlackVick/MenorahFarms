@@ -12,10 +12,10 @@
             <solid android:color="@color/transparent"/>
 
             <corners
-                android:radius="30dp"/>
+                android:radius="12dp"/>
 
             <stroke android:width="0.6dp"
-                android:color="@color/white"/>
+                android:color="@color/colorAccent"/>
 
         </shape>
 

@@ -367,6 +367,24 @@ public class SignUp extends AppCompatActivity {
             newUserMap.put("facebook", "");
             newUserMap.put("instagram", "");
             newUserMap.put("twitter", "");
+            newUserMap.put("userType", "User");
+            newUserMap.put("userPackage", "Worker");
+            newUserMap.put("phone", "");
+            newUserMap.put("birthday", "");
+            newUserMap.put("gender", "");
+            newUserMap.put("nationality", "");
+            newUserMap.put("address", "");
+            newUserMap.put("city", "");
+            newUserMap.put("state", "");
+            newUserMap.put("bank", "");
+            newUserMap.put("accountName", "");
+            newUserMap.put("accountNumber", "");
+            newUserMap.put("kinName", "");
+            newUserMap.put("kinEmail", "");
+            newUserMap.put("kinRelationship", "");
+            newUserMap.put("kinPhone", "");
+            newUserMap.put("kinAddress", "");
+            newUserMap.put("linkedIn", "");
 
             userRef.child(currentUid)
                     .setValue(newUserMap)
@@ -502,6 +520,24 @@ public class SignUp extends AppCompatActivity {
         newUserMap.put("facebook", "");
         newUserMap.put("instagram", "");
         newUserMap.put("twitter", "");
+        newUserMap.put("userType", "User");
+        newUserMap.put("userPackage", "Worker");
+        newUserMap.put("phone", "");
+        newUserMap.put("birthday", "");
+        newUserMap.put("gender", "");
+        newUserMap.put("nationality", "");
+        newUserMap.put("address", "");
+        newUserMap.put("city", "");
+        newUserMap.put("state", "");
+        newUserMap.put("bank", "");
+        newUserMap.put("accountName", "");
+        newUserMap.put("accountNumber", "");
+        newUserMap.put("kinName", "");
+        newUserMap.put("kinEmail", "");
+        newUserMap.put("kinRelationship", "");
+        newUserMap.put("kinPhone", "");
+        newUserMap.put("kinAddress", "");
+        newUserMap.put("linkedIn", "");
 
         userRef.child(currentUid)
                 .setValue(newUserMap)
@@ -624,9 +660,27 @@ public class SignUp extends AppCompatActivity {
         newUserMap.put("profilePicture", "");
         newUserMap.put("profilePictureThumb", "");
         newUserMap.put("signUpMode", "Facebook");
-        newUserMap.put("facebook", "https://facebook.com/me?access_token="+token.getToken());
+        newUserMap.put("facebook", "");
         newUserMap.put("instagram", "");
         newUserMap.put("twitter", "");
+        newUserMap.put("userType", "User");
+        newUserMap.put("userPackage", "Worker");
+        newUserMap.put("phone", "");
+        newUserMap.put("birthday", "");
+        newUserMap.put("gender", "");
+        newUserMap.put("nationality", "");
+        newUserMap.put("address", "");
+        newUserMap.put("city", "");
+        newUserMap.put("state", "");
+        newUserMap.put("bank", "");
+        newUserMap.put("accountName", "");
+        newUserMap.put("accountNumber", "");
+        newUserMap.put("kinName", "");
+        newUserMap.put("kinEmail", "");
+        newUserMap.put("kinRelationship", "");
+        newUserMap.put("kinPhone", "");
+        newUserMap.put("kinAddress", "");
+        newUserMap.put("linkedIn", "");
 
         userRef.child(currentUid)
                 .setValue(newUserMap)

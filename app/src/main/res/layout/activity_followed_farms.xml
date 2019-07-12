@@ -7,28 +7,80 @@
     android:layout_height="match_parent"
     tools:context=".DashboardMenu.FollowedFarms">
 
-    <include layout="@layout/snippet_for_general"/>
-
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize">
+        android:layout_height="55dp"
+        android:background="@color/colorAccent">
 
-        <android.support.v7.widget.RecyclerView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/farmsToWatchRecycler"/>
+            android:orientation="horizontal"
+            android:weightSum="10">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_weight="1.2"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_menorah_back_button_white"
+                    android:layout_centerInParent="true"
+                    android:id="@+id/backButton"
+                    android:adjustViewBounds="true"/>
+
+            </RelativeLayout>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="8.8"
+                android:layout_height="match_parent"
+                android:text="Followed Farms"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:gravity="center_vertical"
+                android:paddingStart="30dp"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:id="@+id/followedFarmsRecycler"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:id="@+id/emptyLayout"
+        android:orientation="vertical"
+        android:layout_margin="35dp"
+        android:visibility="gone">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_margin="35dp"
+            android:text="No Farms Are Currently Follwed"
             android:gravity="center"
-            android:text="There are currently no farms listed on the watch list. Check back periodically to stay updated."
-            android:textColor="@color/offBlack"
-            android:textSize="17sp"/>
+            android:textColor="@color/colorAccent"
+            android:textSize="25sp"
+            android:textStyle="bold"/>
 
-    </RelativeLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="You can go to the farm store to see new farms opening soon for you to follow and stay up to date."
+            android:gravity="center"
+            android:textColor="@color/grey"
+            android:textSize="15sp"
+            android:layout_marginTop="10dp"/>
+
+    </LinearLayout>
 
 </RelativeLayout>

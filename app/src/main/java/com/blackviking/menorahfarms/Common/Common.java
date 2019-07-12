@@ -8,6 +8,9 @@ import android.support.v7.app.AlertDialog;
 
 import com.blackviking.menorahfarms.R;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
 public class Common {
 
     /*---   ACCOUNT INFO   ---*/
@@ -48,6 +51,16 @@ public class Common {
     public static APIService getFCMService()    {
         return RetrofitClient.getClient(BASE_URL).create(APIService.class);
     }*/
+
+
+    /*---   CONVERT LONG TO PRICE   ---*/
+    public static String convertToPrice(Context context, long thePrice){
+
+        NumberFormat n = NumberFormat.getCurrencyInstance(new java.util.Locale("en","ng"));
+        String convertedPrice = n.format(thePrice);
+        return convertedPrice;
+
+    }
 
 
     /*---   CHECK FOR INTERNET   ---*/

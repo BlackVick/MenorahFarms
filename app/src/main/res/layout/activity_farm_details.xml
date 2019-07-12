@@ -124,6 +124,18 @@
                 android:id="@+id/farmDetailROI"
                 android:layout_marginTop="10dp"/>
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Farm Sponsorship Info"
+                android:textColor="@color/colorPrimary"
+                android:drawableStart="@drawable/ic_sponsor_info"
+                android:drawablePadding="15dp"
+                android:textSize="16sp"
+                android:layout_marginTop="40dp"
+                android:layout_marginBottom="10dp"
+                android:gravity="center_vertical"/>
+
             <com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout
                 android:background="@drawable/farm_item_bacground"
                 android:layout_width="match_parent"
@@ -185,15 +197,56 @@
                                 android:textSize="18sp"
                                 android:textColor="@color/black" />
 
-                            <com.cepheuen.elegantnumberbutton.view.ElegantNumberButton
-                                android:id="@+id/farmDetailNumberButton"
-                                android:layout_width="match_parent"
-                                android:layout_height="40dp"
-                                android:layout_marginTop="10dp"
-                                app:backGroundColor="@color/colorPrimary"
-                                app:initialNumber="1"
-                                app:textSize="12sp"
-                                app:textColor="@color/white"/>
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:layout_marginTop="8dp"
+                                android:background="@drawable/number_button_bacground">
+
+                                <RelativeLayout
+                                    android:layout_width="35dp"
+                                    android:layout_height="28dp">
+
+                                    <ImageView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:src="@drawable/ic_subtract_number_unit"
+                                        android:adjustViewBounds="true"
+                                        android:id="@+id/decreaseUnitNumber"/>
+
+                                </RelativeLayout>
+
+                                <RelativeLayout
+                                    android:layout_width="45dp"
+                                    android:layout_height="28dp"
+                                    android:background="@color/colorPrimary">
+
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:gravity="center"
+                                        android:text=""
+                                        android:textColor="@color/white"
+                                        android:textSize="16sp"
+                                        android:id="@+id/unitNumber"/>
+
+                                </RelativeLayout>
+
+                                <RelativeLayout
+                                    android:layout_width="35dp"
+                                    android:layout_height="28dp">
+
+                                    <ImageView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:src="@drawable/ic_add_number_unit"
+                                        android:adjustViewBounds="true"
+                                        android:id="@+id/increaseUnitNumber"/>
+
+                                </RelativeLayout>
+
+                            </LinearLayout>
 
                         </LinearLayout>
 

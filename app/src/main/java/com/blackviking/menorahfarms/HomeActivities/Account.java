@@ -11,6 +11,12 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.blackviking.menorahfarms.AccountMenus.BankDetails;
+import com.blackviking.menorahfarms.AccountMenus.ContactDetails;
+import com.blackviking.menorahfarms.AccountMenus.NextOfKin;
+import com.blackviking.menorahfarms.AccountMenus.PersonalDetails;
+import com.blackviking.menorahfarms.AccountMenus.SocialMedia;
+import com.blackviking.menorahfarms.AccountMenus.StudentDetails;
 import com.blackviking.menorahfarms.CartAndHistory.Cart;
 import com.blackviking.menorahfarms.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -35,6 +41,8 @@ public class Account extends AppCompatActivity {
     private Button resetPassword;
     private CircleImageView userAvatar;
     private ProgressBar profileProgress;
+
+    private LinearLayout personalDetailsLayout, contactDetailsLayout, bankDetailsLayout, nextOfKinLayout, socialMediaLayout, studentProfileLayout, logOutLayout;
 
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
@@ -71,6 +79,14 @@ public class Account extends AppCompatActivity {
         resetPassword.setEnabled(false);
         userAvatar = (CircleImageView)findViewById(R.id.userAvatar);
         profileProgress = (ProgressBar)findViewById(R.id.profileProgress);
+
+        personalDetailsLayout = (LinearLayout)findViewById(R.id.personalDetailsLayout);
+        contactDetailsLayout = (LinearLayout)findViewById(R.id.contactDetailsLayout);
+        bankDetailsLayout = (LinearLayout)findViewById(R.id.bankDetailsLayout);
+        nextOfKinLayout = (LinearLayout)findViewById(R.id.nextOfKinLayout);
+        socialMediaLayout = (LinearLayout)findViewById(R.id.socialMediaLayout);
+        studentProfileLayout = (LinearLayout)findViewById(R.id.studentProfileLayout);
+        logOutLayout = (LinearLayout)findViewById(R.id.logOutLayout);
 
 
         /*---   BOTTOM NAV   ---*/
@@ -189,6 +205,70 @@ public class Account extends AppCompatActivity {
 
             }
         });
+
+
+        personalDetailsLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent personalIntent = new Intent(Account.this, PersonalDetails.class);
+                startActivity(personalIntent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+            }
+        });
+
+        contactDetailsLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent conTactIntent = new Intent(Account.this, ContactDetails.class);
+                startActivity(conTactIntent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+            }
+        });
+
+        bankDetailsLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent bankIntent = new Intent(Account.this, BankDetails.class);
+                startActivity(bankIntent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+            }
+        });
+
+        nextOfKinLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent nextOfKinIntent = new Intent(Account.this, NextOfKin.class);
+                startActivity(nextOfKinIntent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+            }
+        });
+
+        socialMediaLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent socialIntent = new Intent(Account.this, SocialMedia.class);
+                startActivity(socialIntent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+            }
+        });
+
+        studentProfileLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent studentIntent = new Intent(Account.this, StudentDetails.class);
+                startActivity(studentIntent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+            }
+        });
+
+        logOutLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+
 
 
         setProfileProgress();

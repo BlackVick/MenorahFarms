@@ -11,6 +11,24 @@ public class UserModel {
     private String facebook;
     private String instagram;
     private String twitter;
+    private String linkedIn;
+    private String userType;
+    private String userPackage;
+    private String phone;
+    private String birthday;
+    private String gender;
+    private String nationality;
+    private String address;
+    private String city;
+    private String state;
+    private String bank;
+    private String accountName;
+    private String accountNumber;
+    private String kinName;
+    private String kinEmail;
+    private String kinRelationship;
+    private String kinPhone;
+    private String kinAddress;
 
     public UserModel() {
     }

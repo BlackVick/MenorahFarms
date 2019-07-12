@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/farm_item_bacground"
+    android:layout_width="match_parent"
+    android:layout_marginStart="10dp"
+    android:layout_marginEnd="10dp"
+    android:layout_marginTop="13dp"
+    android:layout_marginBottom="13dp"
+    android:layout_height="wrap_content"
+    app:corner_radius="11dp"
+    android:elevation="6dp"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="10">
+
+        <com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="80dp"
+            app:corner_radius="11dp"
+            android:layout_gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/menorah_placeholder"
+                android:scaleType="centerCrop"
+                android:id="@+id/cartItemImage"/>
+
+        </com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="4"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/cartItemType"
+                android:text=""
+                android:textColor="@color/black"
+                android:padding="2dp"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/cartItemLocation"
+                android:text=""
+                android:textColor="@color/black"
+                android:padding="1dp"
+                android:textSize="12sp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/cartItemROI"
+                android:text=""
+                android:textColor="@color/black"
+                android:padding="1dp"
+                android:textSize="12sp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/cartItemDuration"
+                android:text=""
+                android:textColor="@color/black"
+                android:padding="1dp"
+                android:textSize="12sp"/>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/cartItemPrice"
+                android:text=""
+                android:textColor="@color/black"
+                android:padding="2dp"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/cartItemPrice"
+                android:id="@+id/cartItemUnits"
+                android:text=""
+                android:textColor="@color/black"
+                android:padding="1dp"
+                android:textSize="12sp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/cartItemUnits"
+                android:layout_marginTop="15dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/ic_remove_from_cart"
+                    android:background="@drawable/remove_cart_item_ring"
+                    android:padding="3dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_margin="2dp"
+                    android:id="@+id/removeFromCart"/>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/new_login_button"
+                    android:layout_marginStart="4dp"
+                    android:text="Pay"
+                    android:textColor="@color/white"
+                    android:id="@+id/checkout"/>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout>

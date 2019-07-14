@@ -1,5 +1,6 @@
 package com.blackviking.menorahfarms.DashboardMenu;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 
 import com.blackviking.menorahfarms.CartAndHistory.Cart;
 import com.blackviking.menorahfarms.Common.Common;
+import com.blackviking.menorahfarms.FarmDetails;
 import com.blackviking.menorahfarms.Interface.ItemClickListener;
 import com.blackviking.menorahfarms.Models.CartModel;
 import com.blackviking.menorahfarms.Models.FollowedFarmModel;
@@ -164,7 +166,10 @@ public class FollowedFarms extends AppCompatActivity {
                                 viewHolder.setItemClickListener(new ItemClickListener() {
                                     @Override
                                     public void onClick(View view, int position, boolean isLongClick) {
-                                        Toast.makeText(FollowedFarms.this, "Clicked", Toast.LENGTH_SHORT).show();
+                                        Intent farmDetailIntent = new Intent(FollowedFarms.this, FarmDetails.class);
+                                        farmDetailIntent.putExtra("FarmId", adapter.getRef(viewHolder.getAdapterPosition()).getKey());
+                                        startActivity(farmDetailIntent);
+                                        overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
                                     }
                                 });
 

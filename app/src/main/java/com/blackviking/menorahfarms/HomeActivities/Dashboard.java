@@ -10,11 +10,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.blackviking.menorahfarms.About;
+import com.blackviking.menorahfarms.AdminDash;
 import com.blackviking.menorahfarms.CartAndHistory.Cart;
+import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.DashboardMenu.AccountManager;
 import com.blackviking.menorahfarms.DashboardMenu.Faq;
 import com.blackviking.menorahfarms.DashboardMenu.FarmUpdates;
 import com.blackviking.menorahfarms.DashboardMenu.FollowedFarms;
+import com.blackviking.menorahfarms.DashboardMenu.Notifications;
 import com.blackviking.menorahfarms.DashboardMenu.SponsoredFarms;
 import com.blackviking.menorahfarms.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,7 +41,7 @@ public class Dashboard extends AppCompatActivity {
     private ImageView cartButton;
     private CircleImageView userAvatar;
     private RelativeLayout goToFarmstoreButton;
-    private LinearLayout sponsoredFarmsLayout, farmsToWatchLayout, farmUpdatesLayout, allFarmsLayout, projectManagerLayout, faqLayout, about;
+    private LinearLayout sponsoredFarmsLayout, farmsToWatchLayout, farmUpdatesLayout, allFarmsLayout, projectManagerLayout, notificationLayout, faqLayout, about, adminLayout;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference userRef, sponsoredRef;
@@ -80,8 +83,10 @@ public class Dashboard extends AppCompatActivity {
         farmUpdatesLayout = (LinearLayout)findViewById(R.id.farmUpdatesLayout);
         allFarmsLayout = (LinearLayout)findViewById(R.id.allFarmsLayout);
         projectManagerLayout = (LinearLayout)findViewById(R.id.projectManagerLayout);
+        notificationLayout = (LinearLayout)findViewById(R.id.notificationLayout);
         faqLayout = (LinearLayout)findViewById(R.id.faqLayout);
         about = (LinearLayout)findViewById(R.id.aboutLayout);
+        adminLayout = (LinearLayout)findViewById(R.id.adminLayout);
 
 
         /*---   BOTTOM NAV   ---*/
@@ -133,6 +138,7 @@ public class Dashboard extends AppCompatActivity {
 
                         String userFirstName = dataSnapshot.child("firstName").getValue().toString();
                         final String profilePicture = dataSnapshot.child("profilePictureThumb").getValue().toString();
+                        final String profileType = dataSnapshot.child("userType").getValue().toString();
 
                         welcome.setText("Hi, "+userFirstName);
 
@@ -160,6 +166,25 @@ public class Dashboard extends AppCompatActivity {
                         } else {
 
                             userAvatar.setImageResource(R.drawable.profile);
+
+                        }
+
+
+                        if (profileType.equalsIgnoreCase("Admin")){
+
+                            adminLayout.setVisibility(View.VISIBLE);
+                            adminLayout.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent adminIntent = new Intent(Dashboard.this, AdminDash.class);
+                                    startActivity(adminIntent);
+                                    overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+                                }
+                            });
+
+                        } else {
+
+                            adminLayout.setVisibility(View.GONE);
 
                         }
 
@@ -192,7 +217,7 @@ public class Dashboard extends AppCompatActivity {
 
                                     }
 
-                                    totalReturnsText.setText("₦ " + String.valueOf(totalReturn));
+                                    totalReturnsText.setText(Common.convertToPrice(Dashboard.this, totalReturn));
 
                                 } else {
 
@@ -218,16 +243,24 @@ public class Dashboard extends AppCompatActivity {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                if (dataSnapshot.exists()) {
+                                for (DataSnapshot snap : dataSnapshot.getChildren()){
 
-                                    String date = dataSnapshot.child("cycleEndDate").getValue().toString();
-                                    nextEndOfCycleDate.setText(date);
+                                    String theKey = snap.getKey();
 
-                                } else {
+                                    if (dataSnapshot.exists()) {
 
-                                    nextEndOfCycleDate.setText("Not Available");
+                                        String date = dataSnapshot.child(theKey).child("cycleEndDate").getValue().toString();
+                                        nextEndOfCycleDate.setText(date);
+
+                                    } else {
+
+                                        nextEndOfCycleDate.setText("Not Available");
+
+                                    }
 
                                 }
+
+
 
                             }
 
@@ -316,6 +349,17 @@ public class Dashboard extends AppCompatActivity {
 
                 Intent projectManagerIntent = new Intent(Dashboard.this, AccountManager.class);
                 startActivity(projectManagerIntent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
+            }
+        });
+
+        notificationLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent notificationIntent = new Intent(Dashboard.this, Notifications.class);
+                startActivity(notificationIntent);
                 overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
 
             }

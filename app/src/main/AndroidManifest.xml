@@ -20,7 +20,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Sponsorship.SponsorshipDetails"></activity>
+        <activity android:name=".DashboardMenu.Notifications"></activity>
+
+        <service
+            android:name=".Services.CheckForSponsorship"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity android:name=".AdminDash" />
+        <activity android:name=".Sponsorship.SponsorshipDetails" />
         <activity android:name=".CartAndHistory.HistoryDetails" />
         <activity android:name=".FarmDescription" />
         <activity android:name=".AccountMenus.StudentDetails" />

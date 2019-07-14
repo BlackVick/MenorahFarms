@@ -8,27 +8,27 @@ public class SponsoredFarmModel {
     private String sponsorRefNumber;
     private String unitPrice;
     private String sponsoredUnits;
-    private String sponsoredUnitPrice;
     private String sponsoredFarmType;
     private String sponsoredFarmRoi;
     private String sponsorshipDuration;
     private long startPoint;
+    private String farmId;
 
     public SponsoredFarmModel() {
     }
 
-    public SponsoredFarmModel(String sponsorReturn, String cycleEndDate, String cycleStartDate, String sponsorRefNumber, String unitPrice, String sponsoredUnits, String sponsoredUnitPrice, String sponsoredFarmType, String sponsoredFarmRoi, String sponsorshipDuration, long startPoint) {
+    public SponsoredFarmModel(String sponsorReturn, String cycleEndDate, String cycleStartDate, String sponsorRefNumber, String unitPrice, String sponsoredUnits, String sponsoredFarmType, String sponsoredFarmRoi, String sponsorshipDuration, long startPoint, String farmId) {
         this.sponsorReturn = sponsorReturn;
         this.cycleEndDate = cycleEndDate;
         this.cycleStartDate = cycleStartDate;
         this.sponsorRefNumber = sponsorRefNumber;
         this.unitPrice = unitPrice;
         this.sponsoredUnits = sponsoredUnits;
-        this.sponsoredUnitPrice = sponsoredUnitPrice;
         this.sponsoredFarmType = sponsoredFarmType;
         this.sponsoredFarmRoi = sponsoredFarmRoi;
         this.sponsorshipDuration = sponsorshipDuration;
         this.startPoint = startPoint;
+        this.farmId = farmId;
     }
 
     public String getSponsorReturn() {
@@ -79,14 +79,6 @@ public class SponsoredFarmModel {
         this.sponsoredUnits = sponsoredUnits;
     }
 
-    public String getSponsoredUnitPrice() {
-        return sponsoredUnitPrice;
-    }
-
-    public void setSponsoredUnitPrice(String sponsoredUnitPrice) {
-        this.sponsoredUnitPrice = sponsoredUnitPrice;
-    }
-
     public String getSponsoredFarmType() {
         return sponsoredFarmType;
     }
@@ -117,5 +109,13 @@ public class SponsoredFarmModel {
 
     public void setStartPoint(long startPoint) {
         this.startPoint = startPoint;
+    }
+
+    public String getFarmId() {
+        return farmId;
+    }
+
+    public void setFarmId(String farmId) {
+        this.farmId = farmId;
     }
 }

@@ -193,8 +193,8 @@
                                 <ImageView
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:src="@drawable/ic_menorah_sponsored_farms"
-                                    android:padding="14dp"
+                                    android:src="@drawable/ic_menorah_personal_details"
+                                    android:padding="15dp"
                                     android:adjustViewBounds="true"
                                     android:layout_gravity="center"/>
 
@@ -233,8 +233,8 @@
                                 <ImageView
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:src="@drawable/ic_menorah_farms_on_watch"
-                                    android:padding="10dp"
+                                    android:src="@drawable/ic_menorah_contact_details"
+                                    android:padding="15dp"
                                     android:adjustViewBounds="true"
                                     android:layout_gravity="center"/>
 
@@ -273,8 +273,8 @@
                                 <ImageView
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:src="@drawable/ic_menorah_farm_updates"
-                                    android:padding="10dp"
+                                    android:src="@drawable/ic_menorah_bank_details"
+                                    android:padding="15dp"
                                     android:adjustViewBounds="true"
                                     android:layout_gravity="center"/>
 
@@ -324,8 +324,8 @@
                                 <ImageView
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:src="@drawable/ic_menorah_all_farms"
-                                    android:padding="10dp"
+                                    android:src="@drawable/ic_menorah_next_of_kin"
+                                    android:padding="15dp"
                                     android:adjustViewBounds="true"
                                     android:layout_gravity="center"/>
 
@@ -364,8 +364,8 @@
                                 <ImageView
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:src="@drawable/ic_menorah_project_manager"
-                                    android:padding="10dp"
+                                    android:src="@drawable/ic_menorah_social_details"
+                                    android:padding="15dp"
                                     android:adjustViewBounds="true"
                                     android:layout_gravity="center"/>
 
@@ -440,6 +440,46 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:orientation="vertical"
+                            android:id="@+id/historyLayout">
+
+                            <android.support.v7.widget.CardView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:cardCornerRadius="15dp"
+                                app:cardElevation="7dp"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginEnd="8dp"
+                                app:cardBackgroundColor="@color/offWhite"
+                                android:layout_gravity="center">
+
+                                <ImageView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:src="@drawable/ic_menorah_personal_details"
+                                    android:padding="15dp"
+                                    android:adjustViewBounds="true"
+                                    android:layout_gravity="center"/>
+
+                            </android.support.v7.widget.CardView>
+
+                            <TextView
+                                android:layout_gravity="center"
+                                android:gravity="center"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="History"
+                                android:textColor="@color/black"
+                                android:textSize="15sp"
+                                android:layout_margin="6dp"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="vertical"
                             android:id="@+id/logOutLayout">
 
                             <android.support.v7.widget.CardView
@@ -455,8 +495,8 @@
                                 <ImageView
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:src="@drawable/ic_menorah_faq"
-                                    android:padding="10dp"
+                                    android:src="@drawable/ic_menorah_logout"
+                                    android:padding="15dp"
                                     android:adjustViewBounds="true"
                                     android:layout_gravity="center"/>
 

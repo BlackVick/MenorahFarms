@@ -25,6 +25,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
 
 public class SponsoredFarms extends AppCompatActivity {
 
@@ -35,7 +38,7 @@ public class SponsoredFarms extends AppCompatActivity {
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private DatabaseReference userRef, sponsorshipRef;
+    private DatabaseReference userRef, sponsorshipRef, farmRef;
     private String currentUid;
 
     private FirebaseRecyclerAdapter<SponsoredFarmModel, SponsoredFarmViewHolder> adapter;
@@ -49,6 +52,7 @@ public class SponsoredFarms extends AppCompatActivity {
 
         /*---   FIREBASE   ---*/
         userRef = db.getReference("Users");
+        farmRef = db.getReference("Farms");
         sponsorshipRef = db.getReference("SponsoredFarms");
         if (mAuth.getCurrentUser() != null)
             currentUid = mAuth.getCurrentUser().getUid();
@@ -132,8 +136,54 @@ public class SponsoredFarms extends AppCompatActivity {
 
                 viewHolder.sponsoredFarmDate.setText(lastSeenTime);
 
+
+                /*---   IMAGE   ---*/
+                farmRef.child(model.getFarmId())
+                        .addListenerForSingleValueEvent(
+                                new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                        final String farmImage = dataSnapshot.child("farmImageThumb").getValue().toString();
+
+                                        if (!farmImage.equalsIgnoreCase("")){
+
+                                            Picasso.with(getBaseContext())
+                                                    .load(farmImage)
+                                                    .networkPolicy(NetworkPolicy.OFFLINE)
+                                                    .placeholder(R.drawable.menorah_placeholder)
+                                                    .into(viewHolder.sponsoredFarmImage, new Callback() {
+                                                        @Override
+                                                        public void onSuccess() {
+
+                                                        }
+
+                                                        @Override
+                                                        public void onError() {
+                                                            Picasso.with(getBaseContext())
+                                                                    .load(farmImage)
+                                                                    .placeholder(R.drawable.menorah_placeholder)
+                                                                    .into(viewHolder.sponsoredFarmImage);
+                                                        }
+                                                    });
+
+                                        } else {
+
+                                            viewHolder.sponsoredFarmImage.setImageResource(R.drawable.menorah_placeholder);
+
+                                        }
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                }
+                        );
+
                 /*---   PRICE   ---*/
-                long priceToLong = Long.parseLong(model.getSponsoredUnitPrice());
+                long priceToLong = Long.parseLong(model.getUnitPrice());
 
                 viewHolder.sponsoredFarmType.setText(model.getSponsoredFarmType());
                 viewHolder.sponsoredFarmPriceUnit.setText(Common.convertToPrice(SponsoredFarms.this, priceToLong) + " x " + model.getSponsoredUnits() + " units.");

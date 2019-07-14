@@ -18,7 +18,10 @@ import com.blackviking.menorahfarms.AccountMenus.PersonalDetails;
 import com.blackviking.menorahfarms.AccountMenus.SocialMedia;
 import com.blackviking.menorahfarms.AccountMenus.StudentDetails;
 import com.blackviking.menorahfarms.CartAndHistory.Cart;
+import com.blackviking.menorahfarms.CartAndHistory.SponsorshipHistory;
 import com.blackviking.menorahfarms.R;
+import com.blackviking.menorahfarms.SignIn;
+import com.facebook.login.LoginManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -30,6 +33,7 @@ import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import io.paperdb.Paper;
 
 public class Account extends AppCompatActivity {
 
@@ -42,12 +46,12 @@ public class Account extends AppCompatActivity {
     private CircleImageView userAvatar;
     private ProgressBar profileProgress;
 
-    private LinearLayout personalDetailsLayout, contactDetailsLayout, bankDetailsLayout, nextOfKinLayout, socialMediaLayout, studentProfileLayout, logOutLayout;
+    private LinearLayout personalDetailsLayout, contactDetailsLayout, bankDetailsLayout, nextOfKinLayout, socialMediaLayout, studentProfileLayout, historyLayout, logOutLayout;
 
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference userRef;
-    private String currentUid;
+    private String currentUid, loginType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +90,7 @@ public class Account extends AppCompatActivity {
         nextOfKinLayout = (LinearLayout)findViewById(R.id.nextOfKinLayout);
         socialMediaLayout = (LinearLayout)findViewById(R.id.socialMediaLayout);
         studentProfileLayout = (LinearLayout)findViewById(R.id.studentProfileLayout);
+        historyLayout = (LinearLayout)findViewById(R.id.historyLayout);
         logOutLayout = (LinearLayout)findViewById(R.id.logOutLayout);
 
 
@@ -141,7 +146,7 @@ public class Account extends AppCompatActivity {
                         String userLastName = dataSnapshot.child("lastName").getValue().toString();
                         final String profilePicture = dataSnapshot.child("profilePictureThumb").getValue().toString();
                         final String theUserEmail = dataSnapshot.child("email").getValue().toString();
-                        final String loginType = dataSnapshot.child("signUpMode").getValue().toString();
+                        loginType = dataSnapshot.child("signUpMode").getValue().toString();
 
                         userName.setText(userFirstName + " " + userLastName);
                         userEmail.setText(theUserEmail);
@@ -261,9 +266,43 @@ public class Account extends AppCompatActivity {
             }
         });
 
+        historyLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent historyIntent = new Intent(Account.this, SponsorshipHistory.class);
+                startActivity(historyIntent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+            }
+        });
+
         logOutLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if (loginType.equalsIgnoreCase("Facebook")){
+
+                    Paper.book().destroy();
+
+                    mAuth.signOut();
+                    LoginManager.getInstance().logOut();
+
+                    Intent signoutIntent = new Intent(Account.this, SignIn.class);
+                    signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(signoutIntent);
+                    finish();
+
+                } else {
+
+                    Paper.book().destroy();
+
+                    mAuth.signOut();
+
+                    Intent signoutIntent = new Intent(Account.this, SignIn.class);
+                    signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(signoutIntent);
+                    finish();
+
+                }
 
             }
         });

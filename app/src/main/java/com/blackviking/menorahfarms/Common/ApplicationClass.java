@@ -11,7 +11,7 @@ import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 import com.google.firebase.database.FirebaseDatabase;
-import com.squareup.picasso.OkHttpDownloader;
+import com.squareup.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
 
 import net.danlew.android.joda.JodaTimeAndroid;
@@ -54,7 +54,7 @@ public class ApplicationClass extends Application {
 
         /*-------PICASSO--------*/
         Picasso.Builder builder = new Picasso.Builder(this);
-        builder.downloader(new OkHttpDownloader(this, Integer.MAX_VALUE));
+        builder.downloader(new OkHttp3Downloader(this, Integer.MAX_VALUE));
         Picasso built = builder.build();
         built.setIndicatorsEnabled(false);
         built.setLoggingEnabled(true);

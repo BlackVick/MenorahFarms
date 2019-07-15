@@ -129,7 +129,7 @@ public class StudentDetails extends AppCompatActivity {
                             
                             if (!theStudentId.equalsIgnoreCase("")){
 
-                                Picasso.with(getBaseContext())
+                                Picasso.get()
                                         .load(theStudentId)
                                         .networkPolicy(NetworkPolicy.OFFLINE)
                                         .placeholder(R.drawable.menorah_placeholder)
@@ -140,8 +140,8 @@ public class StudentDetails extends AppCompatActivity {
                                             }
 
                                             @Override
-                                            public void onError() {
-                                                Picasso.with(getBaseContext())
+                                            public void onError(Exception e) {
+                                                Picasso.get()
                                                         .load(theStudentId)
                                                         .placeholder(R.drawable.menorah_placeholder)
                                                         .into(studentId);

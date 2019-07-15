@@ -121,7 +121,7 @@ public class AccountManager extends AppCompatActivity {
 
                         if (!theProfilePic.equalsIgnoreCase("")){
 
-                            Picasso.with(getBaseContext())
+                            Picasso.get()
                                     .load(theProfilePic)
                                     .networkPolicy(NetworkPolicy.OFFLINE)
                                     .placeholder(R.drawable.profile)
@@ -132,8 +132,8 @@ public class AccountManager extends AppCompatActivity {
                                         }
 
                                         @Override
-                                        public void onError() {
-                                            Picasso.with(getBaseContext())
+                                        public void onError(Exception e) {
+                                            Picasso.get()
                                                     .load(theProfilePic)
                                                     .placeholder(R.drawable.profile)
                                                     .into(accountManagerAvatar);

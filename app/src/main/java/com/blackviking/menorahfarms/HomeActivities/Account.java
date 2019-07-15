@@ -153,7 +153,7 @@ public class Account extends AppCompatActivity {
 
                         if (!profilePicture.equalsIgnoreCase("")){
 
-                            Picasso.with(getBaseContext())
+                            Picasso.get()
                                     .load(profilePicture)
                                     .networkPolicy(NetworkPolicy.OFFLINE)
                                     .placeholder(R.drawable.profile)
@@ -164,8 +164,8 @@ public class Account extends AppCompatActivity {
                                         }
 
                                         @Override
-                                        public void onError() {
-                                            Picasso.with(getBaseContext())
+                                        public void onError(Exception e) {
+                                            Picasso.get()
                                                     .load(profilePicture)
                                                     .placeholder(R.drawable.profile)
                                                     .into(userAvatar);

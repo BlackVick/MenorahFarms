@@ -137,7 +137,7 @@ public class FollowedFarms extends AppCompatActivity {
 
                                 if (!theFarmImage.equalsIgnoreCase("")){
 
-                                    Picasso.with(getBaseContext())
+                                    Picasso.get()
                                             .load(theFarmImage)
                                             .networkPolicy(NetworkPolicy.OFFLINE)
                                             .placeholder(R.drawable.menorah_placeholder)
@@ -148,8 +148,8 @@ public class FollowedFarms extends AppCompatActivity {
                                                 }
 
                                                 @Override
-                                                public void onError() {
-                                                    Picasso.with(getBaseContext())
+                                                public void onError(Exception e) {
+                                                    Picasso.get()
                                                             .load(theFarmImage)
                                                             .placeholder(R.drawable.menorah_placeholder)
                                                             .into(viewHolder.followedFarmImage);

@@ -2,6 +2,7 @@ package com.blackviking.menorahfarms.CartAndHistory;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,6 +18,9 @@ import com.blackviking.menorahfarms.Models.CartModel;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.ViewHolders.CartViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.flutterwave.raveandroid.RaveConstants;
+import com.flutterwave.raveandroid.RavePayActivity;
+import com.flutterwave.raveandroid.RavePayManager;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -46,8 +50,16 @@ public class Cart extends AppCompatActivity {
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private DatabaseReference cartRef, userRef, farmRef, sponsorshipRef;
+    private DatabaseReference cartRef, userRef, farmRef, sponsorshipRef, payHistoryRef;
     private String currentuid;
+    private String userFirstName, userLastName, userEmail, paymentReference;
+
+    private String currentFarmType = "", currentFarmRoi = "", currentUnitPrice = "", currentDuration = "", currentFarmId = "";
+    private String todayString = "", futureString = "";
+    private long totalPrice = 0, currentTotalPayout = 0;
+    private int currentUnits = 0;
+    private String publicKey = "FLWPUBK-bb6cf62f9e07f4b7f1028699eaa58873-X";
+    private String encryptionKey = "0b17c443fa8aba1186a42910";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +72,7 @@ public class Cart extends AppCompatActivity {
         userRef = db.getReference("Users");
         farmRef = db.getReference("Farms");
         sponsorshipRef = db.getReference("SponsoredFarms");
+        payHistoryRef = db.getReference("TransactionHistory");
         if (mAuth.getCurrentUser() != null)
             currentuid = mAuth.getCurrentUser().getUid();
 
@@ -94,6 +107,25 @@ public class Cart extends AppCompatActivity {
                             emptyLayout.setVisibility(View.VISIBLE);
 
                         }
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+
+        /*---   USER INFO   ---*/
+        userRef.child(currentuid)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        userFirstName = dataSnapshot.child("firstName").getValue().toString();
+                        userLastName = dataSnapshot.child("lastName").getValue().toString();
+                        userEmail = dataSnapshot.child("email").getValue().toString();
 
                     }
 
@@ -145,7 +177,7 @@ public class Cart extends AppCompatActivity {
 
                                 if (!theFarmImage.equalsIgnoreCase("")){
 
-                                    Picasso.with(getBaseContext())
+                                    Picasso.get()
                                             .load(theFarmImage)
                                             .networkPolicy(NetworkPolicy.OFFLINE)
                                             .placeholder(R.drawable.menorah_placeholder)
@@ -156,12 +188,13 @@ public class Cart extends AppCompatActivity {
                                                 }
 
                                                 @Override
-                                                public void onError() {
-                                                    Picasso.with(getBaseContext())
+                                                public void onError(Exception e) {
+                                                    Picasso.get()
                                                             .load(theFarmImage)
                                                             .placeholder(R.drawable.menorah_placeholder)
                                                             .into(viewHolder.cartItemImage);
                                                 }
+
                                             });
 
                                 } else {
@@ -182,6 +215,7 @@ public class Cart extends AppCompatActivity {
                                 viewHolder.checkout.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
+
                                         checkoutAndPay(theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
                                     }
                                 });
@@ -202,34 +236,106 @@ public class Cart extends AppCompatActivity {
 
     private void checkoutAndPay(String theFarmType, String theFarmROI, String theFarmUnitPrice, String theFarmSponsorDuration, long totalPayout, int units, String farmId) {
 
+
+        /*---   GLOBAL SET   ---*/
+        currentFarmType = theFarmType;
+        currentFarmRoi = theFarmROI;
+        currentUnitPrice = theFarmUnitPrice;
+        currentDuration = theFarmSponsorDuration;
+        currentFarmId = farmId;
+        currentTotalPayout = totalPayout;
+        currentUnits = units;
+
+
+        paymentReference = userEmail + "_BVS_" + System.currentTimeMillis();
+
+        /*---   PRICE TO PAY   ---*/
+        int thePrice = Integer.parseInt(theFarmUnitPrice);
+        totalPrice = thePrice * units;
+
+
         /*---   DURATION   ---*/
         int theDuration = Integer.parseInt(theFarmSponsorDuration);
         int theDays = 30 * theDuration;
 
         Date todayDate = Calendar.getInstance().getTime();
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-        String todayString = formatter.format(todayDate);
+        todayString = formatter.format(todayDate);
 
         Calendar cal = Calendar.getInstance();
         cal.setTime(todayDate);
         cal.add(Calendar.DATE, theDays);
         Date futureDate = cal.getTime();
         SimpleDateFormat formatterFuture = new SimpleDateFormat("dd-MM-yyyy");
-        String futureString = formatterFuture.format(futureDate);
+        futureString = formatterFuture.format(futureDate);
 
+
+
+        /*---   PAYMENT   ---*/
+        new RavePayManager(Cart.this).setAmount(totalPrice)
+                .setCountry("NG")
+                .setCurrency("NGN")
+                .setEmail(userEmail)
+                .setfName(userFirstName)
+                .setlName(userLastName)
+                .setNarration("Sponsorship Payment For " + String.valueOf(units) + " Units Of " + theFarmType + " Farm, On This Day " + todayString + ".")
+                .setPublicKey(publicKey)
+                .setEncryptionKey(encryptionKey)
+                .setTxRef(paymentReference)
+                .acceptAccountPayments(true)
+                .acceptCardPayments(true)
+                .onStagingEnv(false)
+                .isPreAuth(true)
+                .shouldDisplayFee(true)
+                .showStagingLabel(false)
+                .initialize();
+
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == RaveConstants.RAVE_REQUEST_CODE && data != null) {
+            String message = data.getStringExtra("response");
+
+            if (resultCode == RavePayActivity.RESULT_SUCCESS) {
+
+                pushToDb();
+
+            } else if (resultCode == RavePayActivity.RESULT_ERROR) {
+
+                Toast.makeText(this, "ERROR " + message, Toast.LENGTH_SHORT).show();
+
+            } else if (resultCode == RavePayActivity.RESULT_CANCELLED) {
+
+                Toast.makeText(this, "CANCELLED " + message, Toast.LENGTH_SHORT).show();
+
+            }
+        }
+    }
+
+    private void pushToDb() {
 
         Map<String, Object> sponsorshipMap = new HashMap<>();
-        sponsorshipMap.put("sponsorReturn", String.valueOf(totalPayout));
+        sponsorshipMap.put("sponsorReturn", String.valueOf(currentTotalPayout));
         sponsorshipMap.put("cycleEndDate", futureString);
         sponsorshipMap.put("cycleStartDate", todayString);
-        sponsorshipMap.put("sponsorRefNumber", "Black-Viking-001");
-        sponsorshipMap.put("unitPrice", theFarmUnitPrice);
-        sponsorshipMap.put("sponsoredUnits", String.valueOf(units));
-        sponsorshipMap.put("sponsoredFarmType", theFarmType);
-        sponsorshipMap.put("sponsoredFarmRoi", theFarmROI);
-        sponsorshipMap.put("sponsorshipDuration", theFarmSponsorDuration);
+        sponsorshipMap.put("sponsorRefNumber", paymentReference);
+        sponsorshipMap.put("unitPrice", currentUnitPrice);
+        sponsorshipMap.put("sponsoredUnits", String.valueOf(currentUnits));
+        sponsorshipMap.put("sponsoredFarmType", currentFarmType);
+        sponsorshipMap.put("sponsoredFarmRoi", currentFarmRoi);
+        sponsorshipMap.put("sponsorshipDuration", currentDuration);
         sponsorshipMap.put("startPoint", ServerValue.TIMESTAMP);
-        sponsorshipMap.put("farmId", farmId);
+        sponsorshipMap.put("totalAmountPaid", totalPrice);
+        sponsorshipMap.put("farmId", currentFarmId);
+
+        final Map<String, Object> logMap = new HashMap<>();
+        logMap.put("userName", userFirstName + " " + userLastName);
+        logMap.put("userEmail", userEmail);
+        logMap.put("paymentRef", paymentReference);
+        logMap.put("paymentDate", todayString);
+        logMap.put("farmSponsored", currentFarmId);
 
         sponsorshipRef.child(currentuid)
                 .push()
@@ -237,7 +343,25 @@ public class Cart extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Toast.makeText(Cart.this, "Success", Toast.LENGTH_SHORT).show();
+
+                        payHistoryRef.child(currentuid)
+                                .push()
+                                .setValue(logMap)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+
+                                        Toast.makeText(Cart.this, "Success", Toast.LENGTH_SHORT).show();
+
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+
+                            }
+                        });
+
+
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -245,14 +369,7 @@ public class Cart extends AppCompatActivity {
                 Toast.makeText(Cart.this, "Failed", Toast.LENGTH_SHORT).show();
             }
         });
-    }
 
-    public void getFutureDate(Date currentDate, int days) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(currentDate);
-        cal.add(Calendar.DATE, days);
-
-        Date futureDate = cal.getTime();
     }
 
     private void openDeleteDialog(final String key) {

@@ -12,12 +12,13 @@ public class SponsoredFarmModel {
     private String sponsoredFarmRoi;
     private String sponsorshipDuration;
     private long startPoint;
+    private long totalAmountPaid;
     private String farmId;
 
     public SponsoredFarmModel() {
     }
 
-    public SponsoredFarmModel(String sponsorReturn, String cycleEndDate, String cycleStartDate, String sponsorRefNumber, String unitPrice, String sponsoredUnits, String sponsoredFarmType, String sponsoredFarmRoi, String sponsorshipDuration, long startPoint, String farmId) {
+    public SponsoredFarmModel(String sponsorReturn, String cycleEndDate, String cycleStartDate, String sponsorRefNumber, String unitPrice, String sponsoredUnits, String sponsoredFarmType, String sponsoredFarmRoi, String sponsorshipDuration, long startPoint, long totalAmountPaid, String farmId) {
         this.sponsorReturn = sponsorReturn;
         this.cycleEndDate = cycleEndDate;
         this.cycleStartDate = cycleStartDate;
@@ -28,6 +29,7 @@ public class SponsoredFarmModel {
         this.sponsoredFarmRoi = sponsoredFarmRoi;
         this.sponsorshipDuration = sponsorshipDuration;
         this.startPoint = startPoint;
+        this.totalAmountPaid = totalAmountPaid;
         this.farmId = farmId;
     }
 
@@ -109,6 +111,14 @@ public class SponsoredFarmModel {
 
     public void setStartPoint(long startPoint) {
         this.startPoint = startPoint;
+    }
+
+    public long getTotalAmountPaid() {
+        return totalAmountPaid;
+    }
+
+    public void setTotalAmountPaid(long totalAmountPaid) {
+        this.totalAmountPaid = totalAmountPaid;
     }
 
     public String getFarmId() {

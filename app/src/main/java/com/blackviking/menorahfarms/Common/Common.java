@@ -19,6 +19,11 @@ public class Common {
     public static final String GOOD_TO_GO = "GoToGo";
 
 
+    /*---   FLUTTERWAVE   ---*/
+    public static final String flutterWavePublicKey = "FLWPUBK-bb6cf62f9e07f4b7f1028699eaa58873-X";
+    public static final String flutterWaveEncryptionKey = "0b17c443fa8aba1186a42910";
+
+
     /*---   SUBSCRIPTION TOGGLE   ---*/
     public static String isSubServiceRunning = "false";
 

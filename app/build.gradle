@@ -71,7 +71,7 @@ dependencies {
     /*---   IMAGE CONTROLLER LIBRARIES   ---*/
     implementation 'com.iceteck.silicompressorr:silicompressor:2.1'
     implementation 'id.zelory:compressor:2.1.0'
-    implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'de.hdodenhof:circleimageview:2.2.0'
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.7.+'
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
@@ -87,7 +87,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.github.ralphpina:Android-Permissions-Manager:v2.0.1'
     implementation 'com.android.support:multidex:1.0.3'
-    implementation 'com.squareup.okhttp:okhttp:2.5.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.4.2'
 
     /*---  EXO PLAYER STREAMING LIBRARIES ---*/
     implementation 'com.google.android.exoplayer:exoplayer:2.8.4'
@@ -98,6 +98,7 @@ dependencies {
 
     /*---   PAYSTACK   ---*/
     implementation 'co.paystack.android:paystack:3.0.9'
+    implementation 'com.github.Flutterwave:rave-android:1.0.38'
 
     /*---   DAY CALCULATION   ---*/
     implementation 'net.danlew:android.joda:2.10.1.2'

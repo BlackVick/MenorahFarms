@@ -21,7 +21,7 @@ public class SponsorshipDetails extends AppCompatActivity {
     private ImageView backButton;
     private TextView sponsoredFarmType, sponsoredFarmUnitPrice, sponsoredFarmUnits, sponsoredFarmROI,
             sponsoredFarmDuration, sponsoredFarmStartDate, sponsoredFarmEndDate, sponsoredFarmTotalReturn,
-            sponsoredFarmRefNumber;
+            sponsoredFarmRefNumber, sponsoredFarmTotalPrice;
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -56,6 +56,7 @@ public class SponsorshipDetails extends AppCompatActivity {
         sponsoredFarmEndDate = (TextView)findViewById(R.id.sponsoredFarmEndDate);
         sponsoredFarmTotalReturn = (TextView)findViewById(R.id.sponsoredFarmTotalReturn);
         sponsoredFarmRefNumber = (TextView)findViewById(R.id.sponsoredFarmRefNumber);
+        sponsoredFarmTotalPrice = (TextView)findViewById(R.id.sponsoredFarmTotalPrice);
 
 
         backButton.setOnClickListener(new View.OnClickListener() {
@@ -95,6 +96,7 @@ public class SponsorshipDetails extends AppCompatActivity {
 
                                 sponsoredFarmUnitPrice.setText(Common.convertToPrice(SponsorshipDetails.this, unitPriceToLong));
                                 sponsoredFarmTotalReturn.setText(Common.convertToPrice(SponsorshipDetails.this, totalReturnToLong));
+                                sponsoredFarmTotalPrice.setText(Common.convertToPrice(SponsorshipDetails.this, currentSponsorship.getTotalAmountPaid()));
 
 
 

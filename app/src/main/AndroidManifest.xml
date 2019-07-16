@@ -21,7 +21,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".DashboardMenu.Notifications"></activity>
+        <activity android:name=".AdminDetails.StudentRequestDetails"></activity>
+        <activity android:name=".AdminDetails.DueSponsorshipDetail" />
+
+        <service
+            android:name=".Services.SponsorshipMonitor"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity android:name=".DashboardMenu.Notifications" />
 
         <service
             android:name=".Services.CheckForSponsorship"

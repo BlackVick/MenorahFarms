@@ -305,7 +305,6 @@ public class StudentDetails extends AppCompatActivity {
         if (requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK){
 
             CropImage.activity(imageUri)
-                    .setAspectRatio(1,1)
                     .start(StudentDetails.this);
 
 
@@ -317,7 +316,6 @@ public class StudentDetails extends AppCompatActivity {
                 imageUri = data.getData();
 
                 CropImage.activity(imageUri)
-                        .setAspectRatio(1,1)
                         .start(StudentDetails.this);
             }
 
@@ -531,4 +529,5 @@ public class StudentDetails extends AppCompatActivity {
         });
 
     }
+
 }

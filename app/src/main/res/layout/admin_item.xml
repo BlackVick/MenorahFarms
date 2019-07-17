@@ -14,7 +14,8 @@
         android:id="@+id/itemIdentification"
         android:text=""
         android:textStyle="normal"
-        android:textSize="22sp"
+        android:textSize="17sp"
+        android:padding="3dp"
         android:textColor="@color/black"
         android:ellipsize="end"
         android:maxLines="1"/>

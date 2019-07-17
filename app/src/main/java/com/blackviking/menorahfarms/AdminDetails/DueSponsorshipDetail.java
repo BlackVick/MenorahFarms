@@ -218,14 +218,17 @@ public class DueSponsorshipDetail extends AppCompatActivity {
         historyMap.put("totalAmountPaid", currentSponsorship.getTotalAmountPaid());
         historyMap.put("farmId", currentSponsorship.getFarmId());
 
-        adminHistoryRef.push()
+        DatabaseReference pushRef = adminHistoryRef.push();
+        final String pushId= pushRef.toString();
+
+        adminHistoryRef.child(pushId)
                 .setValue(historyMap)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
 
                         historyRef.child(userId)
-                                .push()
+                                .child(pushId)
                                 .setValue(historyMap)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override

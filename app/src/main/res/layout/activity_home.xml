@@ -95,7 +95,8 @@
             android:layout_height="40dp"
             android:layout_gravity="center"
             android:src="@drawable/ic_menorah_cart_white"
-            android:id="@+id/userCart"/>
+            android:id="@+id/userCart"
+            android:padding="3dp"/>
 
     </LinearLayout>
 

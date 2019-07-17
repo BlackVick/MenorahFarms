@@ -3,6 +3,7 @@ package com.blackviking.menorahfarms.HomeActivities;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
@@ -10,7 +11,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.blackviking.menorahfarms.CartAndHistory.Cart;
+import com.blackviking.menorahfarms.Common.GetTimeAgo;
+import com.blackviking.menorahfarms.Models.NewsModel;
+import com.blackviking.menorahfarms.NewsDetail;
 import com.blackviking.menorahfarms.R;
+import com.blackviking.menorahfarms.ViewHolders.NewsViewHolder;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -33,9 +39,11 @@ public class Home extends AppCompatActivity {
     private CircleImageView userAvatar;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference userRef, sponsoredRef;
+    private DatabaseReference userRef, sponsoredRef, newsFeedRef;
     private String currentUid;
     private RecyclerView newsFeedRecycler;
+    private LinearLayoutManager layoutManager;
+    private FirebaseRecyclerAdapter<NewsModel, NewsViewHolder> adapter;
 
 
     @Override
@@ -47,6 +55,7 @@ public class Home extends AppCompatActivity {
         /*---   FIREBASE   ---*/
         userRef = db.getReference("Users");
         sponsoredRef = db.getReference("SponsoredFarms");
+        newsFeedRef = db.getReference("NewsFeed");
         if (mAuth.getCurrentUser() != null)
             currentUid = mAuth.getCurrentUser().getUid();
 
@@ -197,6 +206,73 @@ public class Home extends AppCompatActivity {
 
             }
         });
+
+
+        loadNews();
+
+    }
+
+    private void loadNews() {
+
+        newsFeedRecycler.setHasFixedSize(true);
+        layoutManager = new LinearLayoutManager(this);
+        layoutManager.setStackFromEnd(true);
+        layoutManager.setReverseLayout(true);
+        newsFeedRecycler.setLayoutManager(layoutManager);
+
+        adapter = new FirebaseRecyclerAdapter<NewsModel, NewsViewHolder>(
+                NewsModel.class,
+                R.layout.news_item,
+                NewsViewHolder.class,
+                newsFeedRef
+        ) {
+            @Override
+            protected void populateViewHolder(final NewsViewHolder viewHolder, final NewsModel model, int position) {
+
+                /*---   GET TIME AGO ALGORITHM   ---*/
+                GetTimeAgo getTimeAgo = new GetTimeAgo();
+                long lastTime = model.getNewsTime();
+                final String lastSeenTime = getTimeAgo.getTimeAgo(lastTime, getApplicationContext());
+
+                viewHolder.newsTitle.setText(model.getNewsTopic());
+                viewHolder.newsTime.setText(lastSeenTime);
+
+                if (!model.getNewsImageThumb().equalsIgnoreCase("")){
+
+                    Picasso.get()
+                            .load(model.getNewsImageThumb())
+                            .networkPolicy(NetworkPolicy.OFFLINE)
+                            .placeholder(R.drawable.menorah_placeholder)
+                            .into(viewHolder.newsImage, new Callback() {
+                                @Override
+                                public void onSuccess() {
+
+                                }
+
+                                @Override
+                                public void onError(Exception e) {
+                                    Picasso.get()
+                                            .load(model.getNewsImageThumb())
+                                            .placeholder(R.drawable.menorah_placeholder)
+                                            .into(viewHolder.newsImage);
+                                }
+                            });
+
+                }
+
+                viewHolder.newsInfoBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent newsInfoIntent = new Intent(Home.this, NewsDetail.class);
+                        newsInfoIntent.putExtra("NewsId", adapter.getRef(viewHolder.getAdapterPosition()).getKey());
+                        startActivity(newsInfoIntent);
+                        overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+                    }
+                });
+
+            }
+        };
+        newsFeedRecycler.setAdapter(adapter);
 
     }
 

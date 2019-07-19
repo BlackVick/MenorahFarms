@@ -6,6 +6,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AlertDialog;
 
+import com.blackviking.menorahfarms.Notification.APIService;
+import com.blackviking.menorahfarms.Notification.RetrofitClient;
 import com.blackviking.menorahfarms.R;
 
 import java.text.NumberFormat;
@@ -25,7 +27,7 @@ public class Common {
 
 
     /*---   SUBSCRIPTION TOGGLE   ---*/
-    public static String isSubServiceRunning = "false";
+    public static String isSponsorshipMonitorRunning = "SponsorMonitor";
 
 
     /*---   CONTEXT MENU   ---*/
@@ -52,10 +54,10 @@ public class Common {
     public static String SKIT_NOTIFICATION_TOPIC = "Skits";
 
 
-    /*private static final String BASE_URL = "https://fcm.googleapis.com/";
+    private static final String BASE_URL = "https://fcm.googleapis.com/";
     public static APIService getFCMService()    {
         return RetrofitClient.getClient(BASE_URL).create(APIService.class);
-    }*/
+    }
 
 
     /*---   CONVERT LONG TO PRICE   ---*/

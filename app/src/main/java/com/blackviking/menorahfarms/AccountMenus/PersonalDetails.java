@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 
+import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.SignUp;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -138,7 +139,11 @@ public class PersonalDetails extends AppCompatActivity {
         updateProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateChanges();
+                if (Common.isConnectedToInternet(getBaseContext())) {
+                    updateChanges();
+                } else {
+                    Common.showErrorDialog(PersonalDetails.this, "No Internet Access !");
+                }
             }
         });
     }

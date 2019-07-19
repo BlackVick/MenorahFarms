@@ -20,6 +20,7 @@ import com.blackviking.menorahfarms.DashboardMenu.FollowedFarms;
 import com.blackviking.menorahfarms.DashboardMenu.Notifications;
 import com.blackviking.menorahfarms.DashboardMenu.SponsoredFarms;
 import com.blackviking.menorahfarms.R;
+import com.blackviking.menorahfarms.Services.SponsorshipMonitor;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,6 +32,7 @@ import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import io.paperdb.Paper;
 
 public class Dashboard extends AppCompatActivity {
 
@@ -46,6 +48,7 @@ public class Dashboard extends AppCompatActivity {
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference userRef, sponsoredRef;
     private String currentUid;
+    private boolean isMonitorRunning;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -196,6 +199,10 @@ public class Dashboard extends AppCompatActivity {
                     }
                 });
 
+        if (Paper.book().read(Common.isSponsorshipMonitorRunning) == null)
+            Paper.book().write(Common.isSponsorshipMonitorRunning, false);
+        isMonitorRunning = Paper.book().read(Common.isSponsorshipMonitorRunning);
+
 
         /*---   SPONSORED CYCLE   ---*/
         sponsoredRef.child(currentUid)
@@ -218,6 +225,14 @@ public class Dashboard extends AppCompatActivity {
                                     }
 
                                     totalReturnsText.setText(Common.convertToPrice(Dashboard.this, totalReturn));
+
+
+                                    if (!isMonitorRunning) {
+
+                                        Intent sponsorshipMonitor = new Intent(Dashboard.this, SponsorshipMonitor.class);
+                                        startService(sponsorshipMonitor);
+
+                                    }
 
                                 } else {
 

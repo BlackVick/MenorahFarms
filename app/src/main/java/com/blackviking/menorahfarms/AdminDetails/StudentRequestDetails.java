@@ -9,16 +9,32 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.blackviking.menorahfarms.Common.Common;
+import com.blackviking.menorahfarms.Notification.APIService;
+import com.blackviking.menorahfarms.Notification.DataMessage;
+import com.blackviking.menorahfarms.Notification.MyResponse;
 import com.blackviking.menorahfarms.R;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Response;
 
 public class StudentRequestDetails extends AppCompatActivity {
 
@@ -27,8 +43,9 @@ public class StudentRequestDetails extends AppCompatActivity {
     private Button denyStudent, approveStudent;
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference userRef, studentRef;
+    private DatabaseReference userRef, studentRef, notificationRef;
     private String userId;
+    private APIService mService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,9 +57,14 @@ public class StudentRequestDetails extends AppCompatActivity {
         userId = getIntent().getStringExtra("UserId");
 
 
+        /*---   FCM   ---*/
+        mService = Common.getFCMService();
+
+
         /*---   FIREBASE   ---*/
         userRef = db.getReference("Users");
         studentRef = db.getReference("StudentDetails");
+        notificationRef = db.getReference("Notifications");
 
 
         /*---   WIDGETS   ---*/
@@ -162,7 +184,21 @@ public class StudentRequestDetails extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        sendApprovalNotification();
+                        userRef.child(userId)
+                                .child("userPackage")
+                                .setValue("Student")
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+
+                                        sendApprovalNotification();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+
+                            }
+                        });
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -193,8 +229,84 @@ public class StudentRequestDetails extends AppCompatActivity {
     }
 
     private void sendApprovalNotification() {
+
+        final Date todayDate = Calendar.getInstance().getTime();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy  hh:mm");
+        String todayString = formatter.format(todayDate);
+
+        Map<String, Object> notificationMap = new HashMap<>();
+        notificationMap.put("topic", "Student Approval");
+        notificationMap.put("message", "Your student details were examined and a conclusion to approve your account was reached. You can now sponsor farms under acada cash.");
+        notificationMap.put("time", todayString);
+
+
+        notificationRef.child(userId)
+                .push()
+                .setValue(notificationMap)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Map<String, String> dataSend = new HashMap<>();
+                        dataSend.put("title", "Student");
+                        dataSend.put("message", "Your student details were examined and a conclusion to approve your account was reached. You can now sponsor farms under acada cash.");
+                        DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(userId).toString(), dataSend);
+
+                        mService.sendNotification(dataMessage)
+                                .enqueue(new retrofit2.Callback<MyResponse>() {
+                                    @Override
+                                    public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<MyResponse> call, Throwable t) {
+                                    }
+                                });
+                    }
+                });
+
+        finish();
+
     }
 
     private void sendDenialNotification() {
+
+        final Date todayDate = Calendar.getInstance().getTime();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy  hh:mm");
+        String todayString = formatter.format(todayDate);
+
+        Map<String, Object> notificationMap = new HashMap<>();
+        notificationMap.put("topic", "Student Denial");
+        notificationMap.put("message", "Your student details were examined and a conclusion to deny your account was reached based on fake or invalid details.");
+        notificationMap.put("time", todayString);
+
+
+        notificationRef.child(userId)
+                .push()
+                .setValue(notificationMap)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Map<String, String> dataSend = new HashMap<>();
+                        dataSend.put("title", "Student");
+                        dataSend.put("message", "Your student details were examined and a conclusion to deny your account was reached based on fake or invalid details.");
+                        DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(userId).toString(), dataSend);
+
+                        mService.sendNotification(dataMessage)
+                                .enqueue(new retrofit2.Callback<MyResponse>() {
+                                    @Override
+                                    public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<MyResponse> call, Throwable t) {
+                                    }
+                                });
+                    }
+                });
+
+        finish();
+
     }
 }

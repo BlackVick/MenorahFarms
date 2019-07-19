@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.FarmDetails;
 import com.blackviking.menorahfarms.Interface.ItemClickListener;
 import com.blackviking.menorahfarms.Models.FarmModel;
@@ -26,6 +27,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -72,7 +76,7 @@ public class NowSellingFragment extends Fragment {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
 
-
+                                userType = dataSnapshot.child("userPackage").getValue().toString();
 
                             }
 
@@ -135,6 +139,8 @@ public class NowSellingFragment extends Fragment {
             @Override
             protected void populateViewHolder(final FarmStoreViewHolder viewHolder, final FarmModel model, int position) {
 
+                long priceToLong = Long.parseLong(model.getPricePerUnit());
+
                 if (model.getPackaged().equalsIgnoreCase("true")){
 
                     viewHolder.farmPackage.setVisibility(View.VISIBLE);
@@ -142,9 +148,48 @@ public class NowSellingFragment extends Fragment {
                     viewHolder.farmPackage.setText(model.getPackagedType());
                     viewHolder.farmType.setText(model.getFarmType());
                     viewHolder.farmLocation.setText(model.getFarmLocation());
-                    viewHolder.farmUnitPrice.setText(model.getPricePerUnit());
+                    viewHolder.farmUnitPrice.setText(Common.convertToPrice(getContext(), priceToLong));
                     viewHolder.farmROI.setText("Returns " + model.getFarmRoi() + "% in " + model.getSponsorDuration() + " months");
                     viewHolder.farmName.setText(model.getFarmName());
+
+                    if (model.getPackagedType().equalsIgnoreCase("Student")){
+
+                        viewHolder.setItemClickListener(new ItemClickListener() {
+                            @Override
+                            public void onClick(View view, int position, boolean isLongClick) {
+                                if (userType.equalsIgnoreCase("Student")){
+
+                                    viewHolder.setItemClickListener(new ItemClickListener() {
+                                        @Override
+                                        public void onClick(View view, int position, boolean isLongClick) {
+                                            Intent farmDetailIntent = new Intent(getContext(), FarmDetails.class);
+                                            farmDetailIntent.putExtra("FarmId", adapter.getRef(viewHolder.getAdapterPosition()).getKey());
+                                            startActivity(farmDetailIntent);
+                                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+                                        }
+                                    });
+
+                                } else {
+
+                                    Common.showErrorDialog(getContext(), "Only Students Can Access This Farm Type !");
+
+                                }
+                            }
+                        });
+
+                    } else {
+
+                        viewHolder.setItemClickListener(new ItemClickListener() {
+                            @Override
+                            public void onClick(View view, int position, boolean isLongClick) {
+                                Intent farmDetailIntent = new Intent(getContext(), FarmDetails.class);
+                                farmDetailIntent.putExtra("FarmId", adapter.getRef(viewHolder.getAdapterPosition()).getKey());
+                                startActivity(farmDetailIntent);
+                                getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+                            }
+                        });
+
+                    }
 
                 } else {
 
@@ -152,21 +197,44 @@ public class NowSellingFragment extends Fragment {
 
                     viewHolder.farmType.setText(model.getFarmType());
                     viewHolder.farmLocation.setText(model.getFarmLocation());
-                    viewHolder.farmUnitPrice.setText(model.getPricePerUnit());
+                    viewHolder.farmUnitPrice.setText(Common.convertToPrice(getContext(), priceToLong));
                     viewHolder.farmROI.setText("Returns " + model.getFarmRoi() + "% in " + model.getSponsorDuration() + " months");
                     viewHolder.farmName.setText(model.getFarmName());
 
+                    viewHolder.setItemClickListener(new ItemClickListener() {
+                        @Override
+                        public void onClick(View view, int position, boolean isLongClick) {
+                            Intent farmDetailIntent = new Intent(getContext(), FarmDetails.class);
+                            farmDetailIntent.putExtra("FarmId", adapter.getRef(viewHolder.getAdapterPosition()).getKey());
+                            startActivity(farmDetailIntent);
+                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+                        }
+                    });
+
                 }
 
-                viewHolder.setItemClickListener(new ItemClickListener() {
-                    @Override
-                    public void onClick(View view, int position, boolean isLongClick) {
-                        Intent farmDetailIntent = new Intent(getContext(), FarmDetails.class);
-                        farmDetailIntent.putExtra("FarmId", adapter.getRef(viewHolder.getAdapterPosition()).getKey());
-                        startActivity(farmDetailIntent);
-                        getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-                    }
-                });
+                if (!model.getFarmImageThumb().equalsIgnoreCase("")){
+
+                    Picasso.get()
+                            .load(model.getFarmImageThumb())
+                            .networkPolicy(NetworkPolicy.OFFLINE)
+                            .placeholder(R.drawable.menorah_placeholder)
+                            .into(viewHolder.farmImage, new Callback() {
+                                @Override
+                                public void onSuccess() {
+
+                                }
+
+                                @Override
+                                public void onError(Exception e) {
+                                    Picasso.get()
+                                            .load(model.getFarmImageThumb())
+                                            .placeholder(R.drawable.menorah_placeholder)
+                                            .into(viewHolder.farmImage);
+                                }
+                            });
+
+                }
 
             }
         };

@@ -8,6 +8,9 @@ import android.support.annotation.NonNull;
 import android.widget.Toast;
 
 import com.blackviking.menorahfarms.Common.Common;
+import com.blackviking.menorahfarms.Notification.APIService;
+import com.blackviking.menorahfarms.Notification.DataMessage;
+import com.blackviking.menorahfarms.Notification.MyResponse;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -24,12 +27,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.paperdb.Paper;
+import retrofit2.Call;
+import retrofit2.Response;
 
 public class SponsorshipMonitor extends Service {
 
     FirebaseDatabase db = FirebaseDatabase.getInstance();
-    DatabaseReference sponsoredFarmRef, dueSponsorRef;
+    DatabaseReference sponsoredFarmRef, dueSponsorRef, notificationRef, userRef;
     String userId, endDate, todayString;
+    APIService mService;
 
     public SponsorshipMonitor() {
     }
@@ -41,6 +47,12 @@ public class SponsorshipMonitor extends Service {
         /*---   FIREBASE   ---*/
         sponsoredFarmRef = db.getReference("SponsoredFarms");
         dueSponsorRef = db.getReference("DueSponsorships");
+        notificationRef = db.getReference("Notifications");
+        userRef = db.getReference("Users");
+
+
+        /*---   FCM   ---*/
+        mService = Common.getFCMService();
 
 
         /*---   USER   ---*/
@@ -71,6 +83,8 @@ public class SponsorshipMonitor extends Service {
 
                             if (dataSnapshot.exists()) {
 
+                                Paper.book().write(Common.isSponsorshipMonitorRunning, true);
+
                                 for (DataSnapshot snap : dataSnapshot.getChildren()) {
 
                                     endDate = snap.child("cycleEndDate").getValue().toString();
@@ -85,6 +99,7 @@ public class SponsorshipMonitor extends Service {
 
                             } else {
 
+                                Paper.book().write(Common.isSponsorshipMonitorRunning, false);
                                 stopSelf();
 
                             }
@@ -109,8 +124,6 @@ public class SponsorshipMonitor extends Service {
 
     private void endSponsorship(String key) {
 
-
-
         Map<String, Object> dueSponsorshipMap = new HashMap<>();
         dueSponsorshipMap.put("user", userId);
         dueSponsorshipMap.put("sponsorshipId", key);
@@ -126,7 +139,6 @@ public class SponsorshipMonitor extends Service {
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(SponsorshipMonitor.this, "Something Happened", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -134,6 +146,95 @@ public class SponsorshipMonitor extends Service {
     }
 
     private void sendNotificationToAdmin() {
+
+        final Date todayDate = Calendar.getInstance().getTime();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy  hh:mm");
+        String todayString = formatter.format(todayDate);
+
+        final Map<String, Object> notificationMap = new HashMap<>();
+        notificationMap.put("topic", "Sponsorship End");
+        notificationMap.put("message", "Congratulations! You have reached the end of a sponsorship cycle. Your full return will be made into your bank account shortly.");
+        notificationMap.put("time", todayString);
+
+        notificationRef.child(userId)
+                .push()
+                .setValue(notificationMap)
+                .addOnSuccessListener(
+                        new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+
+                                Map<String, String> dataSend = new HashMap<>();
+                                dataSend.put("title", "Sponsorship End");
+                                dataSend.put("message", "Congratulations! You have reached the end of a sponsorship cycle. Your full return will be made into your bank account shortly.");
+                                DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(userId).toString(), dataSend);
+
+                                mService.sendNotification(dataMessage)
+                                        .enqueue(new retrofit2.Callback<MyResponse>() {
+                                            @Override
+                                            public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+
+                                            }
+
+                                            @Override
+                                            public void onFailure(Call<MyResponse> call, Throwable t) {
+                                            }
+                                        });
+
+                                sendNotificationToRealAdmin();
+
+                            }
+                        }
+                ).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
+
+    }
+
+    private void sendNotificationToRealAdmin() {
+
+        userRef.orderByChild("userType")
+                .equalTo("Admin")
+                .addValueEventListener(
+                        new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                for (DataSnapshot snap : dataSnapshot.getChildren()){
+
+                                    String theUserIds = snap.getKey();
+
+                                    Map<String, String> dataSend = new HashMap<>();
+                                    dataSend.put("title", "Admin");
+                                    dataSend.put("message", "A Cycle Just Ended. Tend to customer");
+                                    DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(theUserIds).toString(), dataSend);
+
+                                    mService.sendNotification(dataMessage)
+                                            .enqueue(new retrofit2.Callback<MyResponse>() {
+                                                @Override
+                                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+
+                                                }
+
+                                                @Override
+                                                public void onFailure(Call<MyResponse> call, Throwable t) {
+                                                }
+                                            });
+
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        }
+                );
+
     }
 
     private void repeatTomorrow() {

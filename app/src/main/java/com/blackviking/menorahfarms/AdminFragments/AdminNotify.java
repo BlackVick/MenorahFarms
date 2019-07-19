@@ -12,6 +12,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.blackviking.menorahfarms.Common.Common;
+import com.blackviking.menorahfarms.Notification.APIService;
+import com.blackviking.menorahfarms.Notification.DataMessage;
+import com.blackviking.menorahfarms.Notification.MyResponse;
 import com.blackviking.menorahfarms.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -27,6 +31,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import retrofit2.Call;
+import retrofit2.Response;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -37,6 +44,7 @@ public class AdminNotify extends Fragment {
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference notificationRef, userRef;
+    private APIService mService;
 
 
     public AdminNotify() {
@@ -52,6 +60,10 @@ public class AdminNotify extends Fragment {
         /*---   FIREBASE   ---*/
         notificationRef = db.getReference("Notifications");
         userRef = db.getReference("Users");
+
+
+        /*---   FCM   ---*/
+        mService = Common.getFCMService();
 
 
         /*---   WIDGET   ---*/
@@ -92,7 +104,7 @@ public class AdminNotify extends Fragment {
         }
     }
 
-    private void sendBroadcast(String theTopic, String theMessage) {
+    private void sendBroadcast(String theTopic, final String theMessage) {
 
         final Date todayDate = Calendar.getInstance().getTime();
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy  hh:mm");
@@ -108,17 +120,38 @@ public class AdminNotify extends Fragment {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
+                        DatabaseReference pushRef = notificationRef.push();
+                        String pushId = pushRef.toString();
+
                         for (DataSnapshot snap : dataSnapshot.getChildren()){
 
-                            String theUserIds = snap.getKey();
+                            final String theUserIds = snap.getKey();
 
                             notificationRef.child(theUserIds)
-                                    .push()
+                                    .child(pushId)
                                     .setValue(notificationMap)
                                     .addOnSuccessListener(
                                     new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
+
+                                            Map<String, String> dataSend = new HashMap<>();
+                                            dataSend.put("title", "Menorah Farms");
+                                            dataSend.put("message", theMessage);
+                                            DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(theUserIds).toString(), dataSend);
+
+                                            mService.sendNotification(dataMessage)
+                                                    .enqueue(new retrofit2.Callback<MyResponse>() {
+                                                        @Override
+                                                        public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+
+                                                        }
+
+                                                        @Override
+                                                        public void onFailure(Call<MyResponse> call, Throwable t) {
+                                                        }
+                                                    });
+
                                         }
                                     }
                             ).addOnFailureListener(new OnFailureListener() {
@@ -130,8 +163,6 @@ public class AdminNotify extends Fragment {
 
                         }
 
-                        sendNotification();
-
                     }
 
                     @Override
@@ -141,9 +172,6 @@ public class AdminNotify extends Fragment {
                 }
         );
 
-    }
-
-    private void sendNotification() {
     }
 
 }

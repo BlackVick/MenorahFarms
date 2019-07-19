@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -92,7 +93,11 @@ public class ContactDetails extends AppCompatActivity {
         updateProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateChanges();
+                if (Common.isConnectedToInternet(getBaseContext())) {
+                    updateChanges();
+                } else {
+                    Common.showErrorDialog(ContactDetails.this, "No Internet Access !");
+                }
             }
         });
     }

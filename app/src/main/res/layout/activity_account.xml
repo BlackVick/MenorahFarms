@@ -78,7 +78,7 @@
                     android:paddingEnd="15dp"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
-                    android:layout_margin="3dp"
+                    android:layout_marginTop="6dp"
                     android:id="@+id/changePasswordButton"
                     android:visibility="invisible"/>
 
@@ -115,19 +115,20 @@
             android:layout_height="match_parent"
             android:layout_below="@+id/userLayout"
             android:background="@drawable/login_back_from_bottom"
+            android:animateLayoutChanges="true"
             android:layout_marginTop="10dp">
 
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scrollbars="none">
+                android:id="@+id/verifiedLayout"
+                android:scrollbars="none"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/verifiedLayout"
-                    android:orientation="vertical"
-                    android:visibility="gone">
+                    android:orientation="vertical">
 
                     <!--<TextView
                         android:layout_width="match_parent"
@@ -512,16 +513,67 @@
 
                 </LinearLayout>
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:id="@+id/unverifiedLayout">
-
-
-
-                </RelativeLayout>
-
             </ScrollView>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/unverifiedLayout"
+                android:animateLayoutChanges="true"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_margin="10dp"
+                    android:layout_alignParentEnd="true"
+                    android:id="@+id/reloadPage"
+                    android:background="@drawable/read_more_ring"
+                    android:src="@drawable/ic_reload_page"
+                    android:padding="6dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_centerInParent="true"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="E-Mail Not Verified"
+                        android:gravity="center"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="25sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="You have not verified your E-Mail. Please Check your inbox for an Activation Mail or Click the Button Below to resend Mail."
+                        android:gravity="center"
+                        android:textColor="@color/grey"
+                        android:textSize="15sp"
+                        android:layout_marginTop="10dp"/>
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="25dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:background="@drawable/read_more_ring"
+                        android:text="Resend Mail"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="19sp"
+                        android:textStyle="bold"
+                        android:id="@+id/resendActivationBtn"/>
+
+                </LinearLayout>
+
+            </RelativeLayout>
 
         </RelativeLayout>
 

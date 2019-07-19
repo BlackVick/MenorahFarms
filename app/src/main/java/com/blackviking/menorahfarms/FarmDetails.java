@@ -39,7 +39,7 @@ public class FarmDetails extends AppCompatActivity {
     private TextView farmType, unitsLeft, farmLocation, farmROI, unitPrice, totalROI, totalDuration, totalPay;
     private ImageView decreaseUnitNumber, increaseUnitNumber;
     private TextView unitNumber, farmDescription;
-    private RelativeLayout followFarmBtn, addToCartBtn;
+    private RelativeLayout followFarmBtn, addToCartBtn, followedFarmButton;
 
     private int unitNumberText = 1;
 
@@ -76,6 +76,7 @@ public class FarmDetails extends AppCompatActivity {
         farmDescription = (TextView)findViewById(R.id.farmDescription);
         followFarmBtn = (RelativeLayout)findViewById(R.id.followFarmButton);
         addToCartBtn = (RelativeLayout)findViewById(R.id.addToCartButton);
+        followedFarmButton = (RelativeLayout)findViewById(R.id.followedFarmButton);
         decreaseUnitNumber = (ImageView)findViewById(R.id.decreaseUnitNumber);
         increaseUnitNumber = (ImageView)findViewById(R.id.increaseUnitNumber);
         unitNumber = (TextView)findViewById(R.id.unitNumber);
@@ -88,8 +89,36 @@ public class FarmDetails extends AppCompatActivity {
             }
         });
 
-        loadCurrentFarm();
+        followedRef.child(currentUid)
+                .child(farmId)
+                .addListenerForSingleValueEvent(
+                        new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
 
+                                if (dataSnapshot.exists()){
+
+                                    followedFarmButton.setVisibility(View.VISIBLE);
+                                    followFarmBtn.setVisibility(View.GONE);
+
+                                } else {
+
+                                    followedFarmButton.setVisibility(View.GONE);
+                                    followFarmBtn.setVisibility(View.VISIBLE);
+
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        }
+                );
+
+
+        loadCurrentFarm();
 
     }
 
@@ -108,6 +137,17 @@ public class FarmDetails extends AppCompatActivity {
                                 String theFarmSponsorDuration = dataSnapshot.child("sponsorDuration").getValue().toString();
                                 String theFarmUnitsLeft = dataSnapshot.child("unitsAvailable").getValue().toString();
                                 final String theFarmImage = dataSnapshot.child("farmImage").getValue().toString();
+                                final String theFarmState = dataSnapshot.child("farmState").getValue().toString();
+
+                                if (theFarmState.equalsIgnoreCase("Now Selling")){
+
+                                    addToCartBtn.setEnabled(true);
+
+                                } else {
+
+                                    addToCartBtn.setEnabled(false);
+
+                                }
 
                                 if (!theFarmImage.equalsIgnoreCase("")){
 
@@ -156,15 +196,30 @@ public class FarmDetails extends AppCompatActivity {
 
                                 totalPay.setText(Common.convertToPrice(FarmDetails.this, totalResult));
 
+                                final int unitsAvail = Integer.parseInt(theFarmUnitsLeft);
+
+                                if (unitsAvail == 0){
+
+                                    addToCartBtn.setEnabled(false);
+
+                                } else {
+
+                                    addToCartBtn.setEnabled(true);
+
+                                }
 
                                 /*---   UNIT NUMBERS   ---*/
                                 increaseUnitNumber.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        unitNumberText ++;
-                                        unitNumber.setText(String.valueOf(unitNumberText));
 
-                                        calculateChanges(unitNumberText, theFarmUnitPrice, theFarmROI);
+                                        if (unitNumberText < unitsAvail) {
+                                            unitNumberText++;
+                                            unitNumber.setText(String.valueOf(unitNumberText));
+
+                                            calculateChanges(unitNumberText, theFarmUnitPrice, theFarmROI);
+
+                                        }
                                     }
                                 });
 
@@ -320,6 +375,7 @@ public class FarmDetails extends AppCompatActivity {
         long totalCalculation = theCalculatedPrice * theFixedRoi / 100;
         long totalResult = totalCalculation + theCalculatedPrice;
 
+        unitPrice.setText(Common.convertToPrice(FarmDetails.this, theCalculatedPrice));
         totalPay.setText(Common.convertToPrice(FarmDetails.this, totalResult));
     }
 }

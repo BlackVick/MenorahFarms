@@ -161,7 +161,7 @@
 
                         <LinearLayout
                             android:layout_width="0dp"
-                            android:layout_weight="6"
+                            android:layout_weight="5"
                             android:layout_height="wrap_content"
                             android:orientation="vertical">
 
@@ -187,7 +187,7 @@
 
                         <LinearLayout
                             android:layout_width="0dp"
-                            android:layout_weight="4"
+                            android:layout_weight="5"
                             android:layout_height="wrap_content"
                             android:orientation="vertical">
 
@@ -206,7 +206,7 @@
                                 android:background="@drawable/number_button_bacground">
 
                                 <RelativeLayout
-                                    android:layout_width="35dp"
+                                    android:layout_width="30dp"
                                     android:layout_height="28dp">
 
                                     <ImageView
@@ -219,7 +219,7 @@
                                 </RelativeLayout>
 
                                 <RelativeLayout
-                                    android:layout_width="45dp"
+                                    android:layout_width="40dp"
                                     android:layout_height="28dp"
                                     android:background="@color/colorPrimary">
 
@@ -235,7 +235,7 @@
                                 </RelativeLayout>
 
                                 <RelativeLayout
-                                    android:layout_width="35dp"
+                                    android:layout_width="30dp"
                                     android:layout_height="28dp">
 
                                     <ImageView
@@ -318,7 +318,8 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/new_login_button"
                     android:layout_margin="3dp"
-                    android:id="@+id/followFarmButton">
+                    android:id="@+id/followFarmButton"
+                    android:visibility="gone">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -329,6 +330,31 @@
                         android:textColor="@color/white"
                         android:textStyle="bold"
                         android:drawableStart="@drawable/ic_follow_farm_white"
+                        android:drawablePadding="10dp"
+                        android:paddingTop="20dp"
+                        android:paddingBottom="20dp"
+                        android:gravity="center"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/new_login_button"
+                    android:layout_margin="3dp"
+                    android:id="@+id/followedFarmButton"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="Followed"
+                        android:textSize="17sp"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        android:drawableStart="@drawable/ic_followed"
                         android:drawablePadding="10dp"
                         android:paddingTop="20dp"
                         android:paddingBottom="20dp"

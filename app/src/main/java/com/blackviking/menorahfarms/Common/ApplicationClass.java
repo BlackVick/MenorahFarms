@@ -28,9 +28,7 @@ public class ApplicationClass extends Application {
 
     public static final String CHANNEL_1_ID = "FeedChannel";
     public static final String CHANNEL_2_ID = "AdminChannel";
-    public static final String CHANNEL_3_ID = "AccountChannel";
-    public static final String CHANNEL_4_ID = "GamersChannel";
-    public static final String CHANNEL_5_ID = "SkitChannel";
+    public static final String CHANNEL_3_ID = "SponsoredChannel";
 
     @Override
     public void onCreate() {
@@ -60,7 +58,7 @@ public class ApplicationClass extends Application {
         built.setLoggingEnabled(true);
         Picasso.setSingletonInstance(built);
 
-        //createNotificationChannels();
+        createNotificationChannels();
 
     }
 
@@ -110,36 +108,10 @@ public class ApplicationClass extends Application {
             channel3.setDescription("Account Channel");
 
 
-
-            NotificationChannel channel4 = new NotificationChannel(
-                    CHANNEL_4_ID,
-                    "GamersChannel",
-                    NotificationManager.IMPORTANCE_DEFAULT
-            );
-            channel1.enableVibration(true);
-            channel1.enableLights(true);
-            channel1.setShowBadge(true);
-            channel4.setDescription("Gamers Channel");
-
-
-
-            NotificationChannel channel5 = new NotificationChannel(
-                    CHANNEL_5_ID,
-                    "SkitChannel",
-                    NotificationManager.IMPORTANCE_DEFAULT
-            );
-            channel1.enableVibration(true);
-            channel1.enableLights(true);
-            channel1.setShowBadge(true);
-            channel5.setDescription("Skit Channel");
-
-
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(channel1);
             manager.createNotificationChannel(channel2);
             manager.createNotificationChannel(channel3);
-            manager.createNotificationChannel(channel4);
-            manager.createNotificationChannel(channel5);
         }
 
     }

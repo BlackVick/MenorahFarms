@@ -3,6 +3,7 @@ package com.blackviking.menorahfarms.AccountMenus;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -10,6 +11,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
+import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Models.BankModel;
 import com.blackviking.menorahfarms.R;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -116,7 +118,7 @@ public class BankDetails extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                if (!parent.getItemAtPosition(position).equals("Gender")){
+                if (!parent.getItemAtPosition(position).equals("Bank")){
 
                     selectedBank = parent.getItemAtPosition(position).toString();
 
@@ -144,7 +146,12 @@ public class BankDetails extends AppCompatActivity {
         updateProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateChanges();
+
+                if (Common.isConnectedToInternet(getBaseContext())) {
+                    updateChanges();
+                } else {
+                    Common.showErrorDialog(BankDetails.this, "No Internet Access !");
+                }
             }
         });
     }
@@ -159,29 +166,39 @@ public class BankDetails extends AppCompatActivity {
         String theNewAccountName = profileAccountName.getText().toString().trim();
         String theNewAccountNumber = profileAccountNumber.getText().toString().trim();
 
-
-        final Map<String, Object> userMap = new HashMap<>();
-        userMap.put("bank", selectedBank);
-        userMap.put("accountName", theNewAccountName);
-        userMap.put("accountNumber", theNewAccountNumber);
+        if (!TextUtils.isEmpty(theNewAccountName) && !TextUtils.isEmpty(theNewAccountNumber)
+                && !selectedBank.equalsIgnoreCase("Bank") && !selectedBank.equalsIgnoreCase("")) {
 
 
-        userRef.child(currentUid)
-                .updateChildren(userMap)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
+            final Map<String, Object> userMap = new HashMap<>();
+            userMap.put("bank", selectedBank);
+            userMap.put("accountName", theNewAccountName);
+            userMap.put("accountNumber", theNewAccountNumber);
 
-                        mDialog.dismiss();
-                        finish();
 
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
+            userRef.child(currentUid)
+                    .updateChildren(userMap)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
 
-            }
-        });
+                            mDialog.dismiss();
+                            finish();
+
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+
+                }
+            });
+
+        } else {
+
+            mDialog.dismiss();
+            Common.showErrorDialog(BankDetails.this, "Please Enter All Details Correctly");
+
+        }
 
     }
 }

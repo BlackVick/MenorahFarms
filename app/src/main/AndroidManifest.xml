@@ -21,9 +21,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".NewsDetail"></activity>
-        <activity android:name=".AdminDetails.StudentRequestDetails" />
-        <activity android:name=".AdminDetails.DueSponsorshipDetail" />
 
         <service
             android:name=".Services.SponsorshipMonitor"
@@ -37,27 +34,21 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".AdminDash" />
-        <activity android:name=".Sponsorship.SponsorshipDetails" />
-        <activity android:name=".CartAndHistory.HistoryDetails" />
-        <activity android:name=".FarmDescription" />
-        <activity android:name=".AccountMenus.StudentDetails" />
-        <activity android:name=".FarmDetails" />
-        <activity android:name=".About" />
-        <activity android:name=".AccountMenus.SocialMedia" />
-        <activity android:name=".AccountMenus.NextOfKin" />
-        <activity android:name=".AccountMenus.BankDetails" />
-        <activity android:name=".AccountMenus.ContactDetails" />
-        <activity android:name=".AccountMenus.PersonalDetails" />
-        <activity android:name=".CartAndHistory.SponsorshipHistory" />
-        <activity android:name=".CartAndHistory.Cart" />
-        <activity android:name=".DashboardMenu.Faq" />
-        <activity android:name=".DashboardMenu.AccountManager" />
-        <activity android:name=".DashboardMenu.FarmUpdates" />
+        <service
+            android:name=".Notification.MyFirebaseMessaging"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+
         <activity
             android:name=".Splash"
             android:configChanges="orientation"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -146,6 +137,86 @@
             android:name=".HomeActivities.FarmShop"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".DashboardMenu.FarmUpdates"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".DashboardMenu.AccountManager"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".DashboardMenu.Faq"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".CartAndHistory.Cart"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".CartAndHistory.SponsorshipHistory"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".AccountMenus.PersonalDetails"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".AccountMenus.ContactDetails"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".AccountMenus.BankDetails"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".AccountMenus.NextOfKin"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".AccountMenus.SocialMedia"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".About"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".FarmDetails"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".AccountMenus.StudentDetails"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".FarmDescription"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".CartAndHistory.HistoryDetails"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Sponsorship.SponsorshipDetails"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".AdminDash"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".AdminDetails.DueSponsorshipDetail"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".AdminDetails.StudentRequestDetails"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".NewsDetail"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

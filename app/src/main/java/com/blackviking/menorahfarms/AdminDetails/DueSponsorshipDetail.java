@@ -11,9 +11,14 @@ import android.widget.Toast;
 
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Models.SponsoredFarmModel;
+import com.blackviking.menorahfarms.Notification.APIService;
+import com.blackviking.menorahfarms.Notification.DataMessage;
+import com.blackviking.menorahfarms.Notification.MyResponse;
 import com.blackviking.menorahfarms.R;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -26,6 +31,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Response;
 
 public class DueSponsorshipDetail extends AppCompatActivity {
 
@@ -42,6 +50,9 @@ public class DueSponsorshipDetail extends AppCompatActivity {
     private String userId, sponsorshipId, dueSponsorshipId;
     private SponsoredFarmModel currentSponsorship;
 
+
+    private APIService mService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +61,10 @@ public class DueSponsorshipDetail extends AppCompatActivity {
 
         /*---   INTENT DATA   ---*/
         dueSponsorshipId = getIntent().getStringExtra("DueSponsorshipId");
+
+
+        /*---   FCM   ---*/
+        mService = Common.getFCMService();
 
 
         /*---   FIREBASE   ---*/
@@ -259,5 +274,43 @@ public class DueSponsorshipDetail extends AppCompatActivity {
     }
 
     private void sendNotification() {
+
+        final Date todayDate = Calendar.getInstance().getTime();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy  hh:mm");
+        String todayString = formatter.format(todayDate);
+
+        Map<String, Object> notificationMap = new HashMap<>();
+        notificationMap.put("topic", "Sponsorship");
+        notificationMap.put("message", "Your sponsorship with Reference Number " + theDueRefNumber + " has been settled.");
+        notificationMap.put("time", todayString);
+
+
+        notificationRef.child(userId)
+                .push()
+                .setValue(notificationMap)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Map<String, String> dataSend = new HashMap<>();
+                        dataSend.put("title", "Sponsorship");
+                        dataSend.put("message", "Your sponsorship with Reference Number " + theDueRefNumber + " has been settled.");
+                        DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(userId).toString(), dataSend);
+
+                        mService.sendNotification(dataMessage)
+                                .enqueue(new retrofit2.Callback<MyResponse>() {
+                                    @Override
+                                    public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<MyResponse> call, Throwable t) {
+                                    }
+                                });
+                    }
+                });
+
+        finish();
+
     }
 }

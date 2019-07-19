@@ -1,16 +1,32 @@
 package com.blackviking.menorahfarms.HomeActivities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,23 +36,48 @@ import com.blackviking.menorahfarms.AccountMenus.NextOfKin;
 import com.blackviking.menorahfarms.AccountMenus.PersonalDetails;
 import com.blackviking.menorahfarms.AccountMenus.SocialMedia;
 import com.blackviking.menorahfarms.AccountMenus.StudentDetails;
+import com.blackviking.menorahfarms.BuildConfig;
 import com.blackviking.menorahfarms.CartAndHistory.Cart;
 import com.blackviking.menorahfarms.CartAndHistory.SponsorshipHistory;
+import com.blackviking.menorahfarms.Common.Common;
+import com.blackviking.menorahfarms.Common.Permissions;
 import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.SignIn;
 import com.facebook.login.LoginManager;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
+import com.theartofdev.edmodo.cropper.CropImage;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import dmax.dialog.SpotsDialog;
+import id.zelory.compressor.Compressor;
 import io.paperdb.Paper;
 
 public class Account extends AppCompatActivity {
@@ -50,8 +91,10 @@ public class Account extends AppCompatActivity {
     private CircleImageView userAvatar;
     //private ProgressBar profileProgress;
 
-    private LinearLayout verifiedLayout;
+    private ScrollView verifiedLayout;
     private RelativeLayout unverifiedLayout;
+    private ImageView reloadPage;
+    private Button resendActivationBtn;
 
     private LinearLayout personalDetailsLayout, contactDetailsLayout, bankDetailsLayout, nextOfKinLayout, socialMediaLayout, studentProfileLayout, historyLayout, logOutLayout;
 
@@ -59,6 +102,16 @@ public class Account extends AppCompatActivity {
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference userRef;
     private String currentUid, loginType;
+
+    private android.app.AlertDialog mDialog;
+
+    private static final int VERIFY_PERMISSIONS_REQUEST = 757;
+    private static final int CAMERA_REQUEST_CODE = 656;
+    private static final int GALLERY_REQUEST_CODE = 665;
+    private Uri imageUri;
+    private FirebaseStorage storage = FirebaseStorage.getInstance();
+    private StorageReference imageRef;
+    private String originalImageUrl, thumbDownloadUrl;
 
 
     private String theUserMail, theFirstName, theLastName, theProfilePicture,
@@ -74,6 +127,7 @@ public class Account extends AppCompatActivity {
 
         /*---   FIREBASE   ---*/
         userRef = db.getReference("Users");
+        imageRef = storage.getReference("ProfileImages");
         if (mAuth.getCurrentUser() != null)
             currentUid = mAuth.getCurrentUser().getUid();
 
@@ -106,8 +160,10 @@ public class Account extends AppCompatActivity {
         historyLayout = (LinearLayout)findViewById(R.id.historyLayout);
         logOutLayout = (LinearLayout)findViewById(R.id.logOutLayout);
 
-        verifiedLayout = (LinearLayout)findViewById(R.id.verifiedLayout);
+        verifiedLayout = (ScrollView)findViewById(R.id.verifiedLayout);
         unverifiedLayout = (RelativeLayout)findViewById(R.id.unverifiedLayout);
+        reloadPage = (ImageView)findViewById(R.id.reloadPage);
+        resendActivationBtn = (Button)findViewById(R.id.resendActivationBtn);
 
 
         /*---   BOTTOM NAV   ---*/
@@ -150,11 +206,6 @@ public class Account extends AppCompatActivity {
 
             }
         });
-
-
-        /*---   CURRENT USER   ---*/
-
-        setCurrentUser();
 
 
         /*---   CART   ---*/
@@ -265,10 +316,88 @@ public class Account extends AppCompatActivity {
             }
         });
 
+        /*---   PERMISSIONS HANDLER   ---*/
+        if (checkPermissionsArray(Permissions.PERMISSIONS)){
 
 
+        } else {
+
+            verifyPermissions(Permissions.PERMISSIONS);
+
+        }
 
 
+        /*---   CURRENT USER   ---*/
+        setCurrentUser();
+
+        if (mAuth.getCurrentUser().isEmailVerified()){
+
+            verifiedLayout.setVisibility(View.VISIBLE);
+            unverifiedLayout.setVisibility(View.GONE);
+
+        } else {
+
+            verifiedLayout.setVisibility(View.GONE);
+            unverifiedLayout.setVisibility(View.VISIBLE);
+
+            resendActivationBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mAuth.getCurrentUser().sendEmailVerification();
+                }
+            });
+
+            reloadPage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    reloadThePage();
+                }
+            });
+
+        }
+
+
+    }
+
+    private void reloadThePage() {
+
+        mAuth.getCurrentUser().reload().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+
+                if (mAuth.getCurrentUser().isEmailVerified()){
+
+                    verifiedLayout.setVisibility(View.VISIBLE);
+                    unverifiedLayout.setVisibility(View.GONE);
+
+                } else {
+
+                    verifiedLayout.setVisibility(View.GONE);
+                    unverifiedLayout.setVisibility(View.VISIBLE);
+
+                    resendActivationBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            mAuth.getCurrentUser().sendEmailVerification();
+                        }
+                    });
+
+                    reloadPage.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            reloadThePage();
+                        }
+                    });
+
+                }
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
 
     }
 
@@ -331,11 +460,19 @@ public class Account extends AppCompatActivity {
                                             }
                                         });
 
+
                             } else {
 
                                 userAvatar.setImageResource(R.drawable.profile);
 
                             }
+
+                            userAvatar.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    showUploadDialog();
+                                }
+                            });
 
                             if (loginType.equalsIgnoreCase("Email")) {
 
@@ -362,6 +499,305 @@ public class Account extends AppCompatActivity {
         //setProfileProgress();
 
 
+    }
+
+    private void showUploadDialog() {
+        final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.image_source_choice,null);
+
+        final ImageView cameraPick = (ImageView) viewOptions.findViewById(R.id.cameraPick);
+        final ImageView galleryPick = (ImageView) viewOptions.findViewById(R.id.galleryPick);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+
+        alertDialog.getWindow().setGravity(Gravity.BOTTOM);
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        WindowManager.LayoutParams layoutParams = alertDialog.getWindow().getAttributes();
+        //layoutParams.x = 100; // left margin
+        layoutParams.y = 100; // bottom margin
+        alertDialog.getWindow().setAttributes(layoutParams);
+
+        cameraPick.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (Common.isConnectedToInternet(getBaseContext())){
+
+                    openCamera();
+
+                }else {
+
+                    Common.showErrorDialog(Account.this, "No Internet Access !");
+                }
+                alertDialog.dismiss();
+
+            }
+        });
+
+        galleryPick.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openGallery();
+                alertDialog.dismiss();
+            }
+        });
+        alertDialog.show();
+    }
+
+    private void openGallery() {
+
+        Intent pickPhoto = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(pickPhoto , GALLERY_REQUEST_CODE);
+
+    }
+
+    private void openCamera() {
+
+        final long date = System.currentTimeMillis();
+
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        File file=getOutputMediaFile(1);
+        imageUri = FileProvider.getUriForFile(
+                this,
+                BuildConfig.APPLICATION_ID + ".provider",
+                file);
+
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+        startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
+
+    }
+
+    private void verifyPermissions(String[] permissions) {
+
+        ActivityCompat.requestPermissions(
+                this,
+                permissions,
+                VERIFY_PERMISSIONS_REQUEST
+        );
+    }
+
+    private boolean checkPermissionsArray(String[] permissions) {
+
+        for (int i = 0; i < permissions.length; i++){
+
+            String check = permissions[i];
+            if (!checkPermissions(check)){
+                return false;
+            }
+
+        }
+        return true;
+    }
+
+    private boolean checkPermissions(String permission) {
+
+        int permissionRequest = ActivityCompat.checkSelfPermission(this, permission);
+
+        if (permissionRequest != PackageManager.PERMISSION_GRANTED){
+
+            return false;
+        } else {
+
+            return true;
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK){
+
+            CropImage.activity(imageUri)
+                    .setAspectRatio(1, 1)
+                    .start(Account.this);
+
+
+        }
+
+        if (requestCode == GALLERY_REQUEST_CODE && resultCode == RESULT_OK){
+
+            if (data.getData() != null) {
+                imageUri = data.getData();
+
+                CropImage.activity(imageUri)
+                        .setAspectRatio(1, 1)
+                        .start(Account.this);
+            }
+
+        }
+
+
+
+
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+
+                if (Common.isConnectedToInternet(getBaseContext())) {
+
+                    mDialog = new SpotsDialog(this, "Upload In Progress . . .");
+                    mDialog.setCancelable(false);
+                    mDialog.setCanceledOnTouchOutside(false);
+                    mDialog.show();
+
+                    Uri resultUri = result.getUri();
+                    String imgURI = resultUri.toString();
+
+                    final long date = System.currentTimeMillis();
+                    final String dateShitFmt = String.valueOf(date);
+
+                    File thumb_filepath = new File(resultUri.getPath());
+
+
+                    try {
+                        Bitmap thumb_bitmap = new Compressor(this)
+                                .setMaxWidth(450)
+                                .setMaxHeight(450)
+                                .setQuality(70)
+                                .compressToBitmap(thumb_filepath);
+
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        thumb_bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+                        final byte[] thumb_byte = baos.toByteArray();
+
+                        final StorageReference imageRef1 = imageRef.child("FullImages").child(dateShitFmt + ".jpg");
+
+                        final StorageReference imageThumbRef1 = imageRef.child("Thumbnails").child(dateShitFmt + ".jpg");
+
+                        final UploadTask originalUpload = imageRef1.putFile(resultUri);
+
+                        mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                            @Override
+                            public void onCancel(DialogInterface dialog) {
+                                imageUri = null;
+                                originalUpload.cancel();
+                            }
+                        });
+
+                        originalUpload.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                                if (task.isSuccessful()) {
+
+                                    originalImageUrl = task.getResult().getDownloadUrl().toString();
+                                    final UploadTask uploadTask = imageThumbRef1.putBytes(thumb_byte);
+
+                                    mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                        @Override
+                                        public void onCancel(DialogInterface dialog) {
+                                            imageUri = null;
+                                            uploadTask.cancel();
+                                        }
+                                    });
+
+                                    uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumb_task) {
+
+                                            thumbDownloadUrl = thumb_task.getResult().getDownloadUrl().toString();
+
+                                            if (thumb_task.isSuccessful()) {
+
+                                                mDialog.dismiss();
+                                                updateImage(originalImageUrl, thumbDownloadUrl);
+
+                                            } else {
+                                                Toast.makeText(Account.this, "Upload Failed. Please Try Again", Toast.LENGTH_SHORT).show();
+                                                mDialog.dismiss();
+                                                imageUri = null;
+                                            }
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+
+                                        }
+                                    });
+
+                                } else {
+
+                                    Toast.makeText(Account.this, "Upload Failed. Please Try Again", Toast.LENGTH_SHORT).show();
+                                    mDialog.dismiss();
+                                    imageUri = null;
+
+                                }
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+
+                            }
+                        });
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                } else {
+
+                    Common.showErrorDialog(Account.this, "No Internet Access ! Please, try again later.");
+
+                }
+
+
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+            }
+        }
+
+    }
+
+    private void updateImage(String originalImageUrl, String thumbDownloadUrl) {
+
+        Map<String, Object> profilePicMap = new HashMap<>();
+        profilePicMap.put("profilePicture", originalImageUrl);
+        profilePicMap.put("profilePictureThumb", thumbDownloadUrl);
+
+        userRef.child(currentUid)
+                .updateChildren(profilePicMap)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
+    }
+
+    private File getOutputMediaFile(int type){
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "Campus Rush");
+
+        /**Create the storage directory if it does not exist*/
+        if (! mediaStorageDir.exists()){
+            if (! mediaStorageDir.mkdirs()){
+                return null;
+            }
+        }
+
+        /**Create a media file name*/
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File mediaFile;
+        if (type == 1){
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+                    "IMG_"+ timeStamp + ".png");
+        } else {
+            return null;
+        }
+
+        return mediaFile;
     }
 
     private void setProfileProgress() {

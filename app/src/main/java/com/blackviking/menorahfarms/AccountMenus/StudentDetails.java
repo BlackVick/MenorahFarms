@@ -15,6 +15,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -185,7 +186,11 @@ public class StudentDetails extends AppCompatActivity {
         updateProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateChanges();
+                if (Common.isConnectedToInternet(getBaseContext())) {
+                    updateChanges();
+                } else {
+                    Common.showErrorDialog(StudentDetails.this, "No Internet Access !");
+                }
             }
         });
     }
@@ -328,106 +333,114 @@ public class StudentDetails extends AppCompatActivity {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
 
-                mDialog = new SpotsDialog(this, "Upload In Progress . . .");
-                mDialog.setCancelable(false);
-                mDialog.setCanceledOnTouchOutside(false);
-                mDialog.show();
+                if (Common.isConnectedToInternet(getBaseContext())) {
 
-                Uri resultUri = result.getUri();
-                String imgURI = resultUri.toString();
-                setImage(imgURI, studentId);
+                    mDialog = new SpotsDialog(this, "Upload In Progress . . .");
+                    mDialog.setCancelable(false);
+                    mDialog.setCanceledOnTouchOutside(false);
+                    mDialog.show();
 
-                final long date = System.currentTimeMillis();
-                final String dateShitFmt = String.valueOf(date);
+                    Uri resultUri = result.getUri();
+                    String imgURI = resultUri.toString();
+                    setImage(imgURI, studentId);
 
-                File thumb_filepath = new File(resultUri.getPath());
+                    final long date = System.currentTimeMillis();
+                    final String dateShitFmt = String.valueOf(date);
+
+                    File thumb_filepath = new File(resultUri.getPath());
 
 
-                try {
-                    Bitmap thumb_bitmap = new Compressor(this)
-                            .setMaxWidth(450)
-                            .setMaxHeight(450)
-                            .setQuality(70)
-                            .compressToBitmap(thumb_filepath);
+                    try {
+                        Bitmap thumb_bitmap = new Compressor(this)
+                                .setMaxWidth(450)
+                                .setMaxHeight(450)
+                                .setQuality(70)
+                                .compressToBitmap(thumb_filepath);
 
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    thumb_bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
-                    final byte[] thumb_byte = baos.toByteArray();
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        thumb_bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+                        final byte[] thumb_byte = baos.toByteArray();
 
-                    final StorageReference imageRef1 = imageRef.child("FullImages").child(dateShitFmt + ".jpg");
+                        final StorageReference imageRef1 = imageRef.child("FullImages").child(dateShitFmt + ".jpg");
 
-                    final StorageReference imageThumbRef1 = imageRef.child("Thumbnails").child(dateShitFmt + ".jpg");
+                        final StorageReference imageThumbRef1 = imageRef.child("Thumbnails").child(dateShitFmt + ".jpg");
 
-                    final UploadTask originalUpload = imageRef1.putFile(resultUri);
+                        final UploadTask originalUpload = imageRef1.putFile(resultUri);
 
-                    mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                        @Override
-                        public void onCancel(DialogInterface dialog) {
-                            imageUri = null;
-                            originalUpload.cancel();
-                        }
-                    });
+                        mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                            @Override
+                            public void onCancel(DialogInterface dialog) {
+                                imageUri = null;
+                                originalUpload.cancel();
+                            }
+                        });
 
-                    originalUpload.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                            if (task.isSuccessful()) {
+                        originalUpload.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                                if (task.isSuccessful()) {
 
-                                originalImageUrl = task.getResult().getDownloadUrl().toString();
-                                final UploadTask uploadTask = imageThumbRef1.putBytes(thumb_byte);
+                                    originalImageUrl = task.getResult().getDownloadUrl().toString();
+                                    final UploadTask uploadTask = imageThumbRef1.putBytes(thumb_byte);
 
-                                mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                                    @Override
-                                    public void onCancel(DialogInterface dialog) {
-                                        imageUri = null;
-                                        uploadTask.cancel();
-                                    }
-                                });
+                                    mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                        @Override
+                                        public void onCancel(DialogInterface dialog) {
+                                            imageUri = null;
+                                            uploadTask.cancel();
+                                        }
+                                    });
 
-                                uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumb_task) {
+                                    uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumb_task) {
 
-                                        thumbDownloadUrl = thumb_task.getResult().getDownloadUrl().toString();
+                                            thumbDownloadUrl = thumb_task.getResult().getDownloadUrl().toString();
 
-                                        if (thumb_task.isSuccessful()){
+                                            if (thumb_task.isSuccessful()) {
 
-                                            mDialog.dismiss();
+                                                mDialog.dismiss();
 
-                                        } else {
+                                            } else {
+                                                Toast.makeText(StudentDetails.this, "Upload Failed. Please Try Again", Toast.LENGTH_SHORT).show();
+                                                mDialog.dismiss();
+                                                imageUri = null;
+                                            }
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
                                             Toast.makeText(StudentDetails.this, "Upload Failed. Please Try Again", Toast.LENGTH_SHORT).show();
                                             mDialog.dismiss();
                                             imageUri = null;
                                         }
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(StudentDetails.this, "Upload Failed. Please Try Again", Toast.LENGTH_SHORT).show();
-                                        mDialog.dismiss();
-                                        imageUri = null;
-                                    }
-                                });
+                                    });
 
-                            } else {
+                                } else {
 
+                                    Toast.makeText(StudentDetails.this, "Upload Failed. Please Try Again", Toast.LENGTH_SHORT).show();
+                                    mDialog.dismiss();
+                                    imageUri = null;
+
+                                }
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
                                 Toast.makeText(StudentDetails.this, "Upload Failed. Please Try Again", Toast.LENGTH_SHORT).show();
                                 mDialog.dismiss();
                                 imageUri = null;
-
                             }
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(StudentDetails.this, "Upload Failed. Please Try Again", Toast.LENGTH_SHORT).show();
-                            mDialog.dismiss();
-                            imageUri = null;
-                        }
-                    });
+                        });
 
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                } else {
+
+                    Common.showErrorDialog(StudentDetails.this, "No Internet Access ! Please, try again later.");
+
                 }
 
 
@@ -502,31 +515,40 @@ public class StudentDetails extends AppCompatActivity {
         String theNewSchoolName = schoolName.getText().toString().trim();
         String theNewDepartment = schoolDepartment.getText().toString().trim();
 
+        if (!TextUtils.isEmpty(theNewSchoolName) && !TextUtils.isEmpty(theNewDepartment)
+        && !originalImageUrl.equalsIgnoreCase("") || originalImageUrl != null) {
 
-        final Map<String, Object> userMap = new HashMap<>();
-        userMap.put("schoolName", theNewSchoolName);
-        userMap.put("department", theNewDepartment);
-        userMap.put("studentId", originalImageUrl);
-        userMap.put("studentIdThumb", thumbDownloadUrl);
-        userMap.put("approval", "pending");
+            final Map<String, Object> userMap = new HashMap<>();
+            userMap.put("schoolName", theNewSchoolName);
+            userMap.put("department", theNewDepartment);
+            userMap.put("studentId", originalImageUrl);
+            userMap.put("studentIdThumb", thumbDownloadUrl);
+            userMap.put("approval", "pending");
 
 
-        schoolRef.child(currentUid)
-                .setValue(userMap)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
+            schoolRef.child(currentUid)
+                    .setValue(userMap)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
 
-                        mDialog.dismiss();
-                        finish();
+                            mDialog.dismiss();
+                            finish();
 
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
 
-            }
-        });
+                }
+            });
+
+        } else {
+
+            mDialog.dismiss();
+            Common.showErrorDialog(StudentDetails.this, "Please Enter All Required Details !");
+
+        }
 
     }
 

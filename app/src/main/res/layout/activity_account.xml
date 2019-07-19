@@ -13,40 +13,21 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/navLayout">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:id="@+id/actionBarLayout"
-            android:layout_marginTop="7dp">
-
-            <ImageView
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:layout_marginEnd="15dp"
-                android:layout_marginTop="15dp"
-                android:id="@+id/cartButton"
-                android:src="@drawable/ic_menorah_cart_green"
-                android:layout_alignParentEnd="true"/>
-
-        </RelativeLayout>
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="4dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
             android:weightSum="10"
-            android:id="@+id/userLayout"
-            android:layout_below="@id/actionBarLayout">
+            android:id="@+id/userLayout">
 
             <RelativeLayout
                 android:layout_width="0dp"
-                android:layout_weight="3"
+                android:layout_weight="2.5"
                 android:layout_height="match_parent"
-                android:padding="10dp">
+                android:padding="5dp">
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:layout_width="match_parent"
@@ -61,19 +42,19 @@
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_weight="7"
+                android:layout_weight="6.5"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:orientation="vertical"
-                android:layout_marginStart="10dp"
-                android:layout_marginBottom="7dp"
-                android:layout_marginTop="4dp">
+                android:layout_marginStart="5dp"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text=""
-                    android:textSize="23sp"
+                    android:textSize="22sp"
                     android:textColor="@color/white"
                     android:id="@+id/userFullName"/>
 
@@ -81,7 +62,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text=""
-                    android:textSize="14sp"
+                    android:textSize="13sp"
                     android:textColor="@color/white"
                     android:id="@+id/userEmail"
                     android:layout_marginTop="6dp"/>
@@ -97,7 +78,7 @@
                     android:paddingEnd="15dp"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
-                    android:layout_margin="6dp"
+                    android:layout_margin="3dp"
                     android:id="@+id/changePasswordButton"
                     android:visibility="invisible"/>
 
@@ -116,6 +97,17 @@
 
             </LinearLayout>
 
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:padding="5dp"
+                android:layout_marginEnd="3dp"
+                android:layout_marginTop="3dp"
+                android:id="@+id/cartButton"
+                android:src="@drawable/ic_menorah_cart_green"/>
+
         </LinearLayout>
 
         <RelativeLayout
@@ -133,13 +125,15 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:id="@+id/verifiedLayout"
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
-                    <TextView
+                    <!--<TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text="Your profile is 15% complete"
+                        android:text=""
                         android:textSize="13sp"
                         android:textColor="@color/black"
                         android:layout_marginTop="10dp"
@@ -160,7 +154,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="0.4dp"
                         android:layout_marginTop="15dp"
-                        android:background="@color/black"/>
+                        android:background="@color/black"/>-->
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -185,8 +179,8 @@
                                 android:layout_height="wrap_content"
                                 app:cardCornerRadius="15dp"
                                 app:cardElevation="7dp"
-                                android:layout_marginStart="8dp"
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginStart="12dp"
+                                android:layout_marginEnd="12dp"
                                 app:cardBackgroundColor="@color/offWhite"
                                 android:layout_gravity="center">
 
@@ -225,8 +219,8 @@
                                 android:layout_height="wrap_content"
                                 app:cardCornerRadius="15dp"
                                 app:cardElevation="7dp"
-                                android:layout_marginStart="8dp"
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginStart="12dp"
+                                android:layout_marginEnd="12dp"
                                 app:cardBackgroundColor="@color/offWhite"
                                 android:layout_gravity="center">
 
@@ -265,8 +259,8 @@
                                 android:layout_height="wrap_content"
                                 app:cardCornerRadius="15dp"
                                 app:cardElevation="7dp"
-                                android:layout_marginStart="8dp"
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginStart="12dp"
+                                android:layout_marginEnd="12dp"
                                 app:cardBackgroundColor="@color/offWhite"
                                 android:layout_gravity="center">
 
@@ -316,8 +310,8 @@
                                 android:layout_height="wrap_content"
                                 app:cardCornerRadius="15dp"
                                 app:cardElevation="7dp"
-                                android:layout_marginStart="8dp"
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginStart="12dp"
+                                android:layout_marginEnd="12dp"
                                 app:cardBackgroundColor="@color/offWhite"
                                 android:layout_gravity="center">
 
@@ -356,8 +350,8 @@
                                 android:layout_height="wrap_content"
                                 app:cardCornerRadius="15dp"
                                 app:cardElevation="7dp"
-                                android:layout_marginStart="8dp"
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginStart="12dp"
+                                android:layout_marginEnd="12dp"
                                 app:cardBackgroundColor="@color/offWhite"
                                 android:layout_gravity="center">
 
@@ -396,8 +390,8 @@
                                 android:layout_height="wrap_content"
                                 app:cardCornerRadius="15dp"
                                 app:cardElevation="7dp"
-                                android:layout_marginStart="8dp"
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginStart="12dp"
+                                android:layout_marginEnd="12dp"
                                 app:cardBackgroundColor="@color/offWhite"
                                 android:layout_gravity="center">
 
@@ -447,8 +441,8 @@
                                 android:layout_height="wrap_content"
                                 app:cardCornerRadius="15dp"
                                 app:cardElevation="7dp"
-                                android:layout_marginStart="8dp"
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginStart="12dp"
+                                android:layout_marginEnd="12dp"
                                 app:cardBackgroundColor="@color/offWhite"
                                 android:layout_gravity="center">
 
@@ -487,8 +481,8 @@
                                 android:layout_height="wrap_content"
                                 app:cardCornerRadius="15dp"
                                 app:cardElevation="7dp"
-                                android:layout_marginStart="8dp"
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginStart="12dp"
+                                android:layout_marginEnd="12dp"
                                 app:cardBackgroundColor="@color/offWhite"
                                 android:layout_gravity="center">
 
@@ -517,6 +511,15 @@
                     </LinearLayout>
 
                 </LinearLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/unverifiedLayout">
+
+
+
+                </RelativeLayout>
 
             </ScrollView>
 

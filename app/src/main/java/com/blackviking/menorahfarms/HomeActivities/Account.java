@@ -4,12 +4,15 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.blackviking.menorahfarms.AccountMenus.BankDetails;
 import com.blackviking.menorahfarms.AccountMenus.ContactDetails;
@@ -19,6 +22,7 @@ import com.blackviking.menorahfarms.AccountMenus.SocialMedia;
 import com.blackviking.menorahfarms.AccountMenus.StudentDetails;
 import com.blackviking.menorahfarms.CartAndHistory.Cart;
 import com.blackviking.menorahfarms.CartAndHistory.SponsorshipHistory;
+import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.SignIn;
 import com.facebook.login.LoginManager;
@@ -40,11 +44,14 @@ public class Account extends AppCompatActivity {
     private LinearLayout homeSwitch, dashboardSwitch, farmstoreSwitch, accountSwitch;
     private TextView homeText, dashboardText, farmstoreText, accountText;
 
-    private TextView userName, userEmail, profileProgressText;
+    private TextView userName, userEmail; //profileProgressText;
     private ImageView cartButton;
     private Button resetPassword;
     private CircleImageView userAvatar;
-    private ProgressBar profileProgress;
+    //private ProgressBar profileProgress;
+
+    private LinearLayout verifiedLayout;
+    private RelativeLayout unverifiedLayout;
 
     private LinearLayout personalDetailsLayout, contactDetailsLayout, bankDetailsLayout, nextOfKinLayout, socialMediaLayout, studentProfileLayout, historyLayout, logOutLayout;
 
@@ -52,6 +59,12 @@ public class Account extends AppCompatActivity {
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference userRef;
     private String currentUid, loginType;
+
+
+    private String theUserMail, theFirstName, theLastName, theProfilePicture,
+    theFacebook, theInstagram, theTwitter, theLinkedIn, thePhone, theBirthday, theGender,
+    theNationality, theAddress, theCity, theState, theBank, theAccountName, theAccountNumber,
+    theKinMail, theKinName, theKinrelationship, theKinPhone, theKinAddress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,12 +90,12 @@ public class Account extends AppCompatActivity {
 
         userName = (TextView)findViewById(R.id.userFullName);
         userEmail = (TextView)findViewById(R.id.userEmail);
-        profileProgressText = (TextView)findViewById(R.id.profileProgressText);
+        //profileProgressText = (TextView)findViewById(R.id.profileProgressText);
         cartButton = (ImageView)findViewById(R.id.cartButton);
         resetPassword = (Button)findViewById(R.id.changePasswordButton);
         resetPassword.setEnabled(false);
         userAvatar = (CircleImageView)findViewById(R.id.userAvatar);
-        profileProgress = (ProgressBar)findViewById(R.id.profileProgress);
+        //profileProgress = (ProgressBar)findViewById(R.id.profileProgress);
 
         personalDetailsLayout = (LinearLayout)findViewById(R.id.personalDetailsLayout);
         contactDetailsLayout = (LinearLayout)findViewById(R.id.contactDetailsLayout);
@@ -92,6 +105,9 @@ public class Account extends AppCompatActivity {
         studentProfileLayout = (LinearLayout)findViewById(R.id.studentProfileLayout);
         historyLayout = (LinearLayout)findViewById(R.id.historyLayout);
         logOutLayout = (LinearLayout)findViewById(R.id.logOutLayout);
+
+        verifiedLayout = (LinearLayout)findViewById(R.id.verifiedLayout);
+        unverifiedLayout = (RelativeLayout)findViewById(R.id.unverifiedLayout);
 
 
         /*---   BOTTOM NAV   ---*/
@@ -137,66 +153,8 @@ public class Account extends AppCompatActivity {
 
 
         /*---   CURRENT USER   ---*/
-        userRef.child(currentUid)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        String userFirstName = dataSnapshot.child("firstName").getValue().toString();
-                        String userLastName = dataSnapshot.child("lastName").getValue().toString();
-                        final String profilePicture = dataSnapshot.child("profilePictureThumb").getValue().toString();
-                        final String theUserEmail = dataSnapshot.child("email").getValue().toString();
-                        loginType = dataSnapshot.child("signUpMode").getValue().toString();
-
-                        userName.setText(userFirstName + " " + userLastName);
-                        userEmail.setText(theUserEmail);
-
-                        if (!profilePicture.equalsIgnoreCase("")){
-
-                            Picasso.get()
-                                    .load(profilePicture)
-                                    .networkPolicy(NetworkPolicy.OFFLINE)
-                                    .placeholder(R.drawable.profile)
-                                    .into(userAvatar, new Callback() {
-                                        @Override
-                                        public void onSuccess() {
-
-                                        }
-
-                                        @Override
-                                        public void onError(Exception e) {
-                                            Picasso.get()
-                                                    .load(profilePicture)
-                                                    .placeholder(R.drawable.profile)
-                                                    .into(userAvatar);
-                                        }
-                                    });
-
-                        } else {
-
-                            userAvatar.setImageResource(R.drawable.profile);
-
-                        }
-
-                        if (loginType.equalsIgnoreCase("Email")){
-
-                            resetPassword.setVisibility(View.VISIBLE);
-                            resetPassword.setEnabled(true);
-
-                        } else {
-
-                            resetPassword.setVisibility(View.INVISIBLE);
-                            resetPassword.setEnabled(false);
-
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
+        setCurrentUser();
 
 
         /*---   CART   ---*/
@@ -310,15 +268,275 @@ public class Account extends AppCompatActivity {
 
 
 
-        setProfileProgress();
+
+
+    }
+
+    private void setCurrentUser() {
+
+        userRef.child(currentUid)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        UserModel currentUser = dataSnapshot.getValue(UserModel.class);
+
+                        if (currentUser != null) {
+                            theFirstName = currentUser.getFirstName();
+                            theLastName = currentUser.getLastName();
+                            theUserMail = currentUser.getEmail();
+                            theProfilePicture = currentUser.getProfilePictureThumb();
+                            theFacebook = currentUser.getFacebook();
+                            theInstagram = currentUser.getInstagram();
+                            theTwitter = currentUser.getTwitter();
+                            theLinkedIn = currentUser.getLinkedIn();
+                            thePhone = currentUser.getPhone();
+                            theBirthday = currentUser.getBirthday();
+                            theGender = currentUser.getGender();
+                            theNationality = currentUser.getNationality();
+                            theAddress = currentUser.getAddress();
+                            theCity = currentUser.getCity();
+                            theState = currentUser.getState();
+                            theBank = currentUser.getBank();
+                            theAccountName = currentUser.getAccountName();
+                            theAccountNumber = currentUser.getAccountNumber();
+                            theKinMail = currentUser.getKinEmail();
+                            theKinName = currentUser.getKinName();
+                            theKinrelationship = currentUser.getKinRelationship();
+                            theKinPhone = currentUser.getKinPhone();
+                            theKinAddress = currentUser.getKinAddress();
+                            loginType = currentUser.getSignUpMode();
+
+                            userName.setText(theFirstName + " " + theLastName);
+                            userEmail.setText(theUserMail);
+
+                            if (!theProfilePicture.equalsIgnoreCase("")) {
+
+                                Picasso.get()
+                                        .load(theProfilePicture)
+                                        .networkPolicy(NetworkPolicy.OFFLINE)
+                                        .placeholder(R.drawable.profile)
+                                        .into(userAvatar, new Callback() {
+                                            @Override
+                                            public void onSuccess() {
+
+                                            }
+
+                                            @Override
+                                            public void onError(Exception e) {
+                                                Picasso.get()
+                                                        .load(theProfilePicture)
+                                                        .placeholder(R.drawable.profile)
+                                                        .into(userAvatar);
+                                            }
+                                        });
+
+                            } else {
+
+                                userAvatar.setImageResource(R.drawable.profile);
+
+                            }
+
+                            if (loginType.equalsIgnoreCase("Email")) {
+
+                                resetPassword.setVisibility(View.VISIBLE);
+                                resetPassword.setEnabled(true);
+
+                            } else {
+
+                                resetPassword.setVisibility(View.INVISIBLE);
+                                resetPassword.setEnabled(false);
+
+                            }
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+        //setProfileProgress();
+
 
     }
 
     private void setProfileProgress() {
 
-        Drawable draw = getResources().getDrawable(R.drawable.progress_drawable);
-        profileProgress.setProgressDrawable(draw);
-        profileProgress.setProgress(40);
+        String[] theArray = {theUserMail, theFirstName, theLastName, theProfilePicture,
+                theFacebook, theInstagram, theTwitter, theLinkedIn, thePhone, theBirthday, theGender,
+                theNationality, theAddress, theCity, theState, theBank, theAccountName, theAccountNumber,
+                theKinMail, theKinName, theKinrelationship, theKinPhone, theKinAddress};
+
+        int profileProgressInt = 0;
+
+        if (!theUserMail.equalsIgnoreCase("")){
+
+            profileProgressInt++;
+
+        }
+
+        if (!TextUtils.isEmpty(theFirstName)){
+
+            profileProgressInt++;
+
+        }
+
+        if (!TextUtils.isEmpty(theLastName)){
+
+            profileProgressInt++;
+
+        }
+
+        if (!TextUtils.isEmpty(theProfilePicture)){
+
+            profileProgressInt++;
+
+        }
+
+        if (!TextUtils.isEmpty(theFacebook)){
+
+            profileProgressInt++;
+
+        }
+
+        if (!TextUtils.isEmpty(theInstagram)){
+
+            profileProgressInt++;
+
+        }
+
+        if (!TextUtils.isEmpty(theTwitter)){
+
+            profileProgressInt++;
+
+        }
+
+        if (!TextUtils.isEmpty(theLinkedIn)){
+
+            profileProgressInt++;
+
+        }
+
+        if (!TextUtils.isEmpty(thePhone)){
+
+            profileProgressInt++;
+
+        }
+
+        if (!TextUtils.isEmpty(theBirthday)){
+
+            profileProgressInt++;
+
+        }
+
+        if (!TextUtils.isEmpty(theGender)){
+
+            profileProgressInt++;
+
+        }
+
+        if (!TextUtils.isEmpty(theNationality)){
+
+            profileProgressInt++;
+
+        }
+
+        if (!TextUtils.isEmpty(theAddress)){
+
+            profileProgressInt++;
+
+        }
+
+        if (!TextUtils.isEmpty(theCity)){
+
+            profileProgressInt++;
+
+        }
+
+        if (!TextUtils.isEmpty(theState)){
+
+            profileProgressInt++;
+
+        }
+
+        if (!TextUtils.isEmpty(theBank)){
+
+            profileProgressInt++;
+
+        }
+
+        if (!TextUtils.isEmpty(theAccountName)){
+
+            profileProgressInt++;
+
+        }
+
+        if (!TextUtils.isEmpty(theAccountNumber)){
+
+            profileProgressInt++;
+
+        }
+
+        if (!TextUtils.isEmpty(theKinMail)){
+
+            profileProgressInt++;
+
+        }
+
+        if (!TextUtils.isEmpty(theKinName)){
+
+            profileProgressInt++;
+
+        }
+
+        if (!TextUtils.isEmpty(theKinrelationship)){
+
+            profileProgressInt++;
+
+        }
+
+        if (!TextUtils.isEmpty(theKinPhone)){
+
+            profileProgressInt++;
+
+        }
+
+        if (!TextUtils.isEmpty(theKinAddress)){
+
+            profileProgressInt++;
+
+        } else {
+
+            /*int calcdProgress = profileProgressInt / theArray.length;
+            int percentedTotal = calcdProgress * 100;
+
+            profileProgressText.setText("Your profile is " + String.valueOf(percentedTotal) + "% complete.");
+
+            Drawable draw = getResources().getDrawable(R.drawable.progress_drawable);
+            profileProgress.setProgressDrawable(draw);
+            profileProgress.setProgress(percentedTotal);*/
+
+        }
+
+
+        /*for (int i = 0; i < theArray.length; i++){
+
+            Toast.makeText(this, ""+theArray[i], Toast.LENGTH_SHORT).show();
+
+            *//*if (!TextUtils.isEmpty(theArray[i]))
+                profileProgressInt++;
+
+
+
+            *//*
+
+        }*/
+
+
 
     }
 }

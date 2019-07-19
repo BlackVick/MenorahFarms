@@ -20,6 +20,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -78,6 +81,12 @@ public class FarmDetails extends AppCompatActivity {
         unitNumber = (TextView)findViewById(R.id.unitNumber);
         unitNumber.setText(String.valueOf(unitNumberText));
 
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         loadCurrentFarm();
 
@@ -98,6 +107,30 @@ public class FarmDetails extends AppCompatActivity {
                                 final String theFarmUnitPrice = dataSnapshot.child("pricePerUnit").getValue().toString();
                                 String theFarmSponsorDuration = dataSnapshot.child("sponsorDuration").getValue().toString();
                                 String theFarmUnitsLeft = dataSnapshot.child("unitsAvailable").getValue().toString();
+                                final String theFarmImage = dataSnapshot.child("farmImage").getValue().toString();
+
+                                if (!theFarmImage.equalsIgnoreCase("")){
+
+                                    Picasso.get()
+                                            .load(theFarmImage)
+                                            .networkPolicy(NetworkPolicy.OFFLINE)
+                                            .placeholder(R.drawable.menorah_placeholder)
+                                            .into(farmImage, new Callback() {
+                                                @Override
+                                                public void onSuccess() {
+
+                                                }
+
+                                                @Override
+                                                public void onError(Exception e) {
+                                                    Picasso.get()
+                                                            .load(theFarmImage)
+                                                            .placeholder(R.drawable.menorah_placeholder)
+                                                            .into(farmImage);
+                                                }
+                                            });
+
+                                }
 
 
                                 farmType.setText(theFarmType);

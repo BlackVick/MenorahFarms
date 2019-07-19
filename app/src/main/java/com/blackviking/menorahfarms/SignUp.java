@@ -313,6 +313,8 @@ public class SignUp extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()){
 
+                            mAuth.getCurrentUser().sendEmailVerification();
+
                             currentUid = mAuth.getCurrentUser().getUid();
                             authed.child(currentUid)
                                     .child("userEmail")
@@ -439,6 +441,8 @@ public class SignUp extends AppCompatActivity {
                             final FirebaseUser user = mAuth.getCurrentUser();
 
                             if (user != null) {
+
+                                mAuth.getCurrentUser().sendEmailVerification();
 
                                 currentUid = user.getUid();
 
@@ -581,6 +585,8 @@ public class SignUp extends AppCompatActivity {
                             final FirebaseUser user = mAuth.getCurrentUser();
 
                             if (user != null) {
+
+                                mAuth.getCurrentUser().sendEmailVerification();
 
                                 currentUid = user.getUid();
 

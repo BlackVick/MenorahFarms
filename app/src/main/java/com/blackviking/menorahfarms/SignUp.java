@@ -735,11 +735,13 @@ public class SignUp extends AppCompatActivity {
 
             } else {
 
+                mDialog.dismiss();
                 Toast.makeText(this, "Google Sign In Failed", Toast.LENGTH_SHORT).show();
 
             }
 
         } else {
+
 
             mCallbackManager.onActivityResult(requestCode, resultCode, data);
 

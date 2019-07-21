@@ -266,7 +266,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:src="@drawable/ic_menorah_sponsored_farms"
-                                android:padding="14dp"
+                                android:padding="15dp"
                                 android:adjustViewBounds="true"
                                 android:layout_gravity="center"/>
 
@@ -279,7 +279,7 @@
                             android:layout_height="wrap_content"
                             android:text="Sponsored Farms"
                             android:textColor="@color/black"
-                            android:textSize="15sp"
+                            android:textSize="13sp"
                             android:layout_margin="6dp"/>
 
                     </LinearLayout>
@@ -306,7 +306,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:src="@drawable/ic_menorah_farms_on_watch"
-                                android:padding="10dp"
+                                android:padding="15dp"
                                 android:adjustViewBounds="true"
                                 android:layout_gravity="center"/>
 
@@ -319,7 +319,7 @@
                             android:layout_height="wrap_content"
                             android:text="Followed Farms"
                             android:textColor="@color/black"
-                            android:textSize="15sp"
+                            android:textSize="13sp"
                             android:layout_margin="6dp"/>
 
                     </LinearLayout>
@@ -346,7 +346,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:src="@drawable/ic_menorah_farm_updates"
-                                android:padding="10dp"
+                                android:padding="15dp"
                                 android:adjustViewBounds="true"
                                 android:layout_gravity="center"/>
 
@@ -359,7 +359,7 @@
                             android:layout_height="wrap_content"
                             android:text="Farm Updates"
                             android:textColor="@color/black"
-                            android:textSize="15sp"
+                            android:textSize="13sp"
                             android:layout_margin="6dp"/>
 
                     </LinearLayout>
@@ -397,7 +397,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:src="@drawable/ic_menorah_all_farms"
-                                android:padding="10dp"
+                                android:padding="15dp"
                                 android:adjustViewBounds="true"
                                 android:layout_gravity="center"/>
 
@@ -410,7 +410,7 @@
                             android:layout_height="wrap_content"
                             android:text="See All Farms"
                             android:textColor="@color/black"
-                            android:textSize="15sp"
+                            android:textSize="13sp"
                             android:layout_margin="6dp"/>
 
                     </LinearLayout>
@@ -437,7 +437,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:src="@drawable/ic_menorah_project_manager"
-                                android:padding="10dp"
+                                android:padding="15dp"
                                 android:adjustViewBounds="true"
                                 android:layout_gravity="center"/>
 
@@ -450,7 +450,7 @@
                             android:layout_height="wrap_content"
                             android:text="Project Manager"
                             android:textColor="@color/black"
-                            android:textSize="15sp"
+                            android:textSize="13sp"
                             android:layout_margin="6dp"/>
 
                     </LinearLayout>
@@ -477,7 +477,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:src="@drawable/ic_menorah_faq"
-                                android:padding="10dp"
+                                android:padding="15dp"
                                 android:adjustViewBounds="true"
                                 android:layout_gravity="center"/>
 
@@ -490,7 +490,7 @@
                             android:layout_height="wrap_content"
                             android:text="Notifications"
                             android:textColor="@color/black"
-                            android:textSize="15sp"
+                            android:textSize="13sp"
                             android:layout_margin="6dp"/>
 
                     </LinearLayout>
@@ -528,7 +528,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:src="@drawable/ic_menorah_faq"
-                                android:padding="10dp"
+                                android:padding="15dp"
                                 android:adjustViewBounds="true"
                                 android:layout_gravity="center"/>
 
@@ -541,7 +541,7 @@
                             android:layout_height="wrap_content"
                             android:text="FAQ"
                             android:textColor="@color/black"
-                            android:textSize="15sp"
+                            android:textSize="13sp"
                             android:layout_margin="6dp"/>
 
                     </LinearLayout>
@@ -568,7 +568,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:src="@drawable/ic_menorah_faq"
-                                android:padding="10dp"
+                                android:padding="15dp"
                                 android:adjustViewBounds="true"
                                 android:layout_gravity="center"/>
 
@@ -581,7 +581,7 @@
                             android:layout_height="wrap_content"
                             android:text="About"
                             android:textColor="@color/black"
-                            android:textSize="15sp"
+                            android:textSize="13sp"
                             android:layout_margin="6dp"/>
 
                     </LinearLayout>
@@ -609,7 +609,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:src="@drawable/ic_menorah_faq"
-                                android:padding="10dp"
+                                android:padding="15dp"
                                 android:adjustViewBounds="true"
                                 android:layout_gravity="center"/>
 
@@ -622,7 +622,7 @@
                             android:layout_height="wrap_content"
                             android:text="Admin"
                             android:textColor="@color/black"
-                            android:textSize="15sp"
+                            android:textSize="13sp"
                             android:layout_margin="6dp"/>
 
                     </LinearLayout>

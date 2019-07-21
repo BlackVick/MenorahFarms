@@ -8,8 +8,9 @@
     tools:context=".SignUp">
 
     <ImageView
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:padding="1dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_margin="20dp"
@@ -46,24 +47,23 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Create your free account"
-                android:textSize="25sp"
+                android:textSize="22sp"
                 android:textColor="@color/black"
                 android:textStyle="bold"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:layout_marginStart="15dp"
                 android:layout_marginEnd="35dp"
-                android:layout_marginBottom="5dp"
                 android:gravity="start"/>
 
             <com.rengwuxian.materialedittext.MaterialEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="10dp"
+                android:paddingTop="5dp"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
-                android:layout_marginStart="30dp"
-                android:layout_marginEnd="30dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="5dp"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:gravity="start"
@@ -83,19 +83,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="0.4dp"
                 android:background="@color/black"
-                android:layout_marginBottom="5dp"
-                android:layout_marginStart="30dp"
-                android:layout_marginEnd="30dp"/>
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"/>
 
             <com.rengwuxian.materialedittext.MaterialEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="10dp"
+                android:paddingTop="5dp"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
-                android:layout_marginStart="30dp"
-                android:layout_marginEnd="30dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="5dp"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:gravity="start"
@@ -115,19 +114,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="0.4dp"
                 android:background="@color/black"
-                android:layout_marginBottom="5dp"
-                android:layout_marginStart="30dp"
-                android:layout_marginEnd="30dp"/>
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"/>
 
             <com.rengwuxian.materialedittext.MaterialEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="10dp"
+                android:paddingTop="5dp"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
-                android:layout_marginStart="30dp"
-                android:layout_marginEnd="30dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="5dp"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:gravity="start"
@@ -147,24 +145,23 @@
                 android:layout_width="match_parent"
                 android:layout_height="0.4dp"
                 android:background="@color/black"
-                android:layout_marginBottom="5dp"
-                android:layout_marginStart="30dp"
-                android:layout_marginEnd="30dp"/>
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:weightSum="10"
-                android:layout_marginStart="30dp"
-                android:layout_marginEnd="30dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
                 android:layout_marginTop="5dp">
 
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:layout_width="0dp"
                     android:layout_weight="9"
                     android:layout_height="wrap_content"
-                    android:paddingTop="10dp"
+                    android:paddingTop="5dp"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
                     android:textColor="@color/black"
@@ -185,6 +182,7 @@
                 <ImageView
                     android:layout_width="0dp"
                     android:layout_weight="1"
+                    android:padding="3dp"
                     android:layout_height="match_parent"
                     android:src="@drawable/ic_visible_password"
                     android:layout_gravity="center"
@@ -197,9 +195,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="0.4dp"
                 android:background="@color/black"
-                android:layout_marginBottom="4dp"
-                android:layout_marginStart="30dp"
-                android:layout_marginEnd="30dp"/>
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -208,8 +205,8 @@
                 android:text="By signing up, you agree with our terms and conditions."
                 android:textColor="@color/black"
                 android:textSize="16sp"
-                android:layout_marginStart="30dp"
-                android:layout_marginEnd="30dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
                 android:layout_marginTop="15dp"/>
 
             <Button
@@ -220,7 +217,7 @@
                 android:layout_marginStart="30dp"
                 android:layout_marginEnd="30dp"
                 android:layout_marginTop="15dp"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="5dp"
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 android:gravity="center"
@@ -235,13 +232,13 @@
                 android:textSize="17sp"
                 android:textColor="@color/black"
                 android:gravity="center"
-                android:layout_margin="10dp"/>
+                android:layout_margin="5dp"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:layout_marginBottom="10dp"
                 android:weightSum="2">
 
@@ -251,8 +248,8 @@
                     android:layout_height="wrap_content">
 
                     <ImageView
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:background="@drawable/social_btn_back"
                         android:src="@drawable/google_sign_in"
                         android:adjustViewBounds="true"
@@ -269,8 +266,8 @@
                     android:layout_height="wrap_content">
 
                     <ImageView
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:background="@drawable/social_btn_back"
                         android:src="@drawable/facebook_sign_in"
                         android:adjustViewBounds="true"

@@ -27,7 +27,6 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".DashboardMenu.Notifications" />
 
         <service
             android:name=".Services.CheckForSponsorship"
@@ -205,6 +204,10 @@
             android:name=".AdminDash"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".DashboardMenu.Notifications"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".AdminDetails.DueSponsorshipDetail"
             android:configChanges="orientation"

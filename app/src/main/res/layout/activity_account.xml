@@ -189,7 +189,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
                                     android:src="@drawable/ic_menorah_personal_details"
-                                    android:padding="15dp"
+                                    android:padding="18dp"
                                     android:adjustViewBounds="true"
                                     android:layout_gravity="center"/>
 
@@ -202,7 +202,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="Personal Details"
                                 android:textColor="@color/black"
-                                android:textSize="15sp"
+                                android:textSize="13sp"
                                 android:layout_margin="6dp"/>
 
                         </LinearLayout>
@@ -229,7 +229,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
                                     android:src="@drawable/ic_menorah_contact_details"
-                                    android:padding="15dp"
+                                    android:padding="18dp"
                                     android:adjustViewBounds="true"
                                     android:layout_gravity="center"/>
 
@@ -242,7 +242,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="Contact Details"
                                 android:textColor="@color/black"
-                                android:textSize="15sp"
+                                android:textSize="13sp"
                                 android:layout_margin="6dp"/>
 
                         </LinearLayout>
@@ -269,7 +269,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
                                     android:src="@drawable/ic_menorah_bank_details"
-                                    android:padding="15dp"
+                                    android:padding="18dp"
                                     android:adjustViewBounds="true"
                                     android:layout_gravity="center"/>
 
@@ -282,7 +282,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="Bank Details"
                                 android:textColor="@color/black"
-                                android:textSize="15sp"
+                                android:textSize="13sp"
                                 android:layout_margin="6dp"/>
 
                         </LinearLayout>
@@ -320,7 +320,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
                                     android:src="@drawable/ic_menorah_next_of_kin"
-                                    android:padding="15dp"
+                                    android:padding="18dp"
                                     android:adjustViewBounds="true"
                                     android:layout_gravity="center"/>
 
@@ -333,7 +333,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="Next Of Kin Details"
                                 android:textColor="@color/black"
-                                android:textSize="15sp"
+                                android:textSize="13sp"
                                 android:layout_margin="6dp"/>
 
                         </LinearLayout>
@@ -360,7 +360,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
                                     android:src="@drawable/ic_menorah_social_details"
-                                    android:padding="15dp"
+                                    android:padding="18dp"
                                     android:adjustViewBounds="true"
                                     android:layout_gravity="center"/>
 
@@ -373,7 +373,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="Social Media Details"
                                 android:textColor="@color/black"
-                                android:textSize="15sp"
+                                android:textSize="13sp"
                                 android:layout_margin="6dp"/>
 
                         </LinearLayout>
@@ -400,7 +400,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
                                     android:src="@drawable/ic_menorah_faq"
-                                    android:padding="10dp"
+                                    android:padding="18dp"
                                     android:adjustViewBounds="true"
                                     android:layout_gravity="center"/>
 
@@ -413,7 +413,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="Student Details"
                                 android:textColor="@color/black"
-                                android:textSize="15sp"
+                                android:textSize="13sp"
                                 android:layout_margin="6dp"/>
 
                         </LinearLayout>
@@ -451,7 +451,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
                                     android:src="@drawable/ic_menorah_personal_details"
-                                    android:padding="15dp"
+                                    android:padding="18dp"
                                     android:adjustViewBounds="true"
                                     android:layout_gravity="center"/>
 
@@ -464,7 +464,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="History"
                                 android:textColor="@color/black"
-                                android:textSize="15sp"
+                                android:textSize="13sp"
                                 android:layout_margin="6dp"/>
 
                         </LinearLayout>
@@ -491,7 +491,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
                                     android:src="@drawable/ic_menorah_logout"
-                                    android:padding="15dp"
+                                    android:padding="25dp"
                                     android:adjustViewBounds="true"
                                     android:layout_gravity="center"/>
 
@@ -504,7 +504,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="Log Out"
                                 android:textColor="@color/black"
-                                android:textSize="15sp"
+                                android:textSize="13sp"
                                 android:layout_margin="6dp"/>
 
                         </LinearLayout>

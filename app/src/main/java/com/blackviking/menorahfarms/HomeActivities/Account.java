@@ -55,6 +55,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -295,6 +296,7 @@ public class Account extends AppCompatActivity {
                     mAuth.signOut();
                     LoginManager.getInstance().logOut();
 
+                    FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
                     Intent signoutIntent = new Intent(Account.this, SignIn.class);
                     signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(signoutIntent);
@@ -305,6 +307,8 @@ public class Account extends AppCompatActivity {
                     Paper.book().destroy();
 
                     mAuth.signOut();
+
+                    FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
 
                     Intent signoutIntent = new Intent(Account.this, SignIn.class);
                     signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);

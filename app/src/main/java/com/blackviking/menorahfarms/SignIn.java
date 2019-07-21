@@ -44,6 +44,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import java.util.Arrays;
@@ -447,8 +448,6 @@ public class SignIn extends AppCompatActivity {
 
                             mDialog.dismiss();
                             Toast.makeText(SignIn.this, ""+task.getException(), Toast.LENGTH_SHORT).show();
-                            Toast.makeText(SignIn.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
 
                         }
 
@@ -471,6 +470,7 @@ public class SignIn extends AppCompatActivity {
 
             } else {
 
+                mDialog.dismiss();
                 Toast.makeText(this, "Google Sign In Failed", Toast.LENGTH_SHORT).show();
 
             }
@@ -489,6 +489,8 @@ public class SignIn extends AppCompatActivity {
             String currentUid = user.getUid();
 
             Paper.book().write(Common.USER_ID, currentUid);
+
+            FirebaseMessaging.getInstance().subscribeToTopic(currentUid);
 
             Intent goToHome = new Intent(SignIn.this, Dashboard.class);
             goToHome.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);

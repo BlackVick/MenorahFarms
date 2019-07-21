@@ -166,8 +166,8 @@ public class BankDetails extends AppCompatActivity {
         String theNewAccountName = profileAccountName.getText().toString().trim();
         String theNewAccountNumber = profileAccountNumber.getText().toString().trim();
 
-        if (!TextUtils.isEmpty(theNewAccountName) && !TextUtils.isEmpty(theNewAccountNumber)
-                && !selectedBank.equalsIgnoreCase("Bank") && !selectedBank.equalsIgnoreCase("")) {
+        if (!TextUtils.isEmpty(theNewAccountName) || !TextUtils.isEmpty(theNewAccountNumber)
+                || !selectedBank.equalsIgnoreCase("Bank")) {
 
 
             final Map<String, Object> userMap = new HashMap<>();

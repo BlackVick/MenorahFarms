@@ -50,13 +50,13 @@ public class Faq extends AppCompatActivity {
             webView.setWebViewClient(new WebViewClient() {
                 @Override
                 public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-                    Common.showErrorDialog(Faq.this, "Error Communicating With Server !");
+                    Common.showErrorDialog(Faq.this, "Error Communicating With Server !", Faq.this);
                 }
             });
 
         } else {
 
-            Common.showErrorDialog(Faq.this, "No Internet Access !");
+            Common.showErrorDialog(Faq.this, "No Internet Access !", Faq.this);
 
         }
 

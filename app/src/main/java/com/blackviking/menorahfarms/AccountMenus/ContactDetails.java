@@ -96,7 +96,7 @@ public class ContactDetails extends AppCompatActivity {
                 if (Common.isConnectedToInternet(getBaseContext())) {
                     updateChanges();
                 } else {
-                    Common.showErrorDialog(ContactDetails.this, "No Internet Access !");
+                    Common.showErrorDialog(ContactDetails.this, "No Internet Access !", ContactDetails.this);
                 }
             }
         });

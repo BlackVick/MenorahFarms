@@ -189,7 +189,7 @@ public class StudentDetails extends AppCompatActivity {
                 if (Common.isConnectedToInternet(getBaseContext())) {
                     updateChanges();
                 } else {
-                    Common.showErrorDialog(StudentDetails.this, "No Internet Access !");
+                    Common.showErrorDialog(StudentDetails.this, "No Internet Access !", StudentDetails.this);
                 }
             }
         });
@@ -226,7 +226,7 @@ public class StudentDetails extends AppCompatActivity {
 
                 }else {
 
-                    Common.showErrorDialog(StudentDetails.this, "No Internet Access !");
+                    Common.showErrorDialog(StudentDetails.this, "No Internet Access !", StudentDetails.this);
                 }
                 alertDialog.dismiss();
 
@@ -439,7 +439,7 @@ public class StudentDetails extends AppCompatActivity {
 
                 } else {
 
-                    Common.showErrorDialog(StudentDetails.this, "No Internet Access ! Please, try again later.");
+                    Common.showErrorDialog(StudentDetails.this, "No Internet Access ! Please, try again later.", StudentDetails.this);
 
                 }
 
@@ -546,7 +546,7 @@ public class StudentDetails extends AppCompatActivity {
         } else {
 
             mDialog.dismiss();
-            Common.showErrorDialog(StudentDetails.this, "Please Enter All Required Details !");
+            Common.showErrorDialog(StudentDetails.this, "Please Enter All Required Details !", StudentDetails.this);
 
         }
 

@@ -101,7 +101,7 @@ public class NextOfKin extends AppCompatActivity {
                 if (Common.isConnectedToInternet(getBaseContext())) {
                     updateChanges();
                 } else {
-                    Common.showErrorDialog(NextOfKin.this, "No Internet Access !");
+                    Common.showErrorDialog(NextOfKin.this, "No Internet Access !", NextOfKin.this);
                 }
             }
         });

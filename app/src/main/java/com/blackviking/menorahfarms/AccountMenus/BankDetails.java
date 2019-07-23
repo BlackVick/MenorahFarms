@@ -150,7 +150,7 @@ public class BankDetails extends AppCompatActivity {
                 if (Common.isConnectedToInternet(getBaseContext())) {
                     updateChanges();
                 } else {
-                    Common.showErrorDialog(BankDetails.this, "No Internet Access !");
+                    Common.showErrorDialog(BankDetails.this, "No Internet Access !", BankDetails.this);
                 }
             }
         });
@@ -166,9 +166,28 @@ public class BankDetails extends AppCompatActivity {
         String theNewAccountName = profileAccountName.getText().toString().trim();
         String theNewAccountNumber = profileAccountNumber.getText().toString().trim();
 
-        if (!TextUtils.isEmpty(theNewAccountName) || !TextUtils.isEmpty(theNewAccountNumber)
-                || !selectedBank.equalsIgnoreCase("Bank")) {
 
+        if (TextUtils.isEmpty(theNewAccountName)){
+
+            mDialog.dismiss();
+            Common.showErrorDialog(BankDetails.this, "Please Enter Account Holder Name", BankDetails.this);
+
+        } else if (TextUtils.isEmpty(theNewAccountNumber)){
+
+            mDialog.dismiss();
+            Common.showErrorDialog(BankDetails.this, "Please Enter Account Number", BankDetails.this);
+
+        } else if (selectedBank.equalsIgnoreCase("")){
+
+            mDialog.dismiss();
+            Common.showErrorDialog(BankDetails.this, "Please Select A Bank", BankDetails.this);
+
+        } else if (selectedBank.equalsIgnoreCase("Bank")){
+
+            mDialog.dismiss();
+            Common.showErrorDialog(BankDetails.this, "Please Select A Valid Bank", BankDetails.this);
+
+        } else {
 
             final Map<String, Object> userMap = new HashMap<>();
             userMap.put("bank", selectedBank);
@@ -192,11 +211,6 @@ public class BankDetails extends AppCompatActivity {
 
                 }
             });
-
-        } else {
-
-            mDialog.dismiss();
-            Common.showErrorDialog(BankDetails.this, "Please Enter All Details Correctly");
 
         }
 

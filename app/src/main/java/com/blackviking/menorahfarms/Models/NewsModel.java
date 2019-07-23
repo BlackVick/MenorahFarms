@@ -8,17 +8,19 @@ public class NewsModel {
     private String newsContent;
     private String newsCreator;
     private long newsTime;
+    private String newsLink;
 
     public NewsModel() {
     }
 
-    public NewsModel(String newsTopic, String newsImage, String newsImageThumb, String newsContent, String newsCreator, long newsTime) {
+    public NewsModel(String newsTopic, String newsImage, String newsImageThumb, String newsContent, String newsCreator, long newsTime, String newsLink) {
         this.newsTopic = newsTopic;
         this.newsImage = newsImage;
         this.newsImageThumb = newsImageThumb;
         this.newsContent = newsContent;
         this.newsCreator = newsCreator;
         this.newsTime = newsTime;
+        this.newsLink = newsLink;
     }
 
     public String getNewsTopic() {
@@ -67,5 +69,13 @@ public class NewsModel {
 
     public void setNewsTime(long newsTime) {
         this.newsTime = newsTime;
+    }
+
+    public String getNewsLink() {
+        return newsLink;
+    }
+
+    public void setNewsLink(String newsLink) {
+        this.newsLink = newsLink;
     }
 }

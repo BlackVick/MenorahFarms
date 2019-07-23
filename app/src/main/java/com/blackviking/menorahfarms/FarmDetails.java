@@ -1,11 +1,16 @@
 package com.blackviking.menorahfarms;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,6 +45,7 @@ public class FarmDetails extends AppCompatActivity {
     private ImageView decreaseUnitNumber, increaseUnitNumber;
     private TextView unitNumber, farmDescription;
     private RelativeLayout followFarmBtn, addToCartBtn, followedFarmButton;
+    private LinearLayout farmNumber;
 
     private int unitNumberText = 1;
 
@@ -81,6 +87,7 @@ public class FarmDetails extends AppCompatActivity {
         increaseUnitNumber = (ImageView)findViewById(R.id.increaseUnitNumber);
         unitNumber = (TextView)findViewById(R.id.unitNumber);
         unitNumber.setText(String.valueOf(unitNumberText));
+        farmNumber = (LinearLayout)findViewById(R.id.farmNumber);
 
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,11 +148,13 @@ public class FarmDetails extends AppCompatActivity {
 
                                 if (theFarmState.equalsIgnoreCase("Now Selling")){
 
-                                    addToCartBtn.setEnabled(true);
+                                    addToCartBtn.setVisibility(View.VISIBLE);
+                                    farmNumber.setVisibility(View.VISIBLE);
 
                                 } else {
 
-                                    addToCartBtn.setEnabled(false);
+                                    addToCartBtn.setVisibility(View.GONE);
+                                    farmNumber.setVisibility(View.GONE);
 
                                 }
 
@@ -200,11 +209,13 @@ public class FarmDetails extends AppCompatActivity {
 
                                 if (unitsAvail == 0){
 
-                                    addToCartBtn.setEnabled(false);
+                                    addToCartBtn.setVisibility(View.GONE);
+                                    farmNumber.setVisibility(View.GONE);
 
                                 } else {
 
-                                    addToCartBtn.setEnabled(true);
+                                    addToCartBtn.setVisibility(View.VISIBLE);
+                                    farmNumber.setVisibility(View.VISIBLE);
 
                                 }
 
@@ -268,7 +279,15 @@ public class FarmDetails extends AppCompatActivity {
                                     @Override
                                     public void onClick(View v) {
 
-                                        addToCart(unitNumberText, theFarmUnitPrice, theFarmROI);
+                                        if (Common.isConnectedToInternet(getBaseContext())) {
+
+                                            addToCart(unitNumberText, theFarmUnitPrice, theFarmROI);
+
+                                        } else {
+
+                                            Common.showErrorDialog(FarmDetails.this, "No Internet Access", FarmDetails.this);
+
+                                        }
 
                                     }
                                 });
@@ -285,36 +304,88 @@ public class FarmDetails extends AppCompatActivity {
 
     }
 
-    private void addToCart(int unitNumberText, String theFarmUnitPrice, String theFarmROI) {
-
-        long theFixedPricePerUnit = Long.parseLong(theFarmUnitPrice);
-        int theFixedRoi = Integer.parseInt(theFarmROI);
-
-        /*---   CALCULATION   ---*/
-        long theCalculatedPrice = theFixedPricePerUnit * unitNumberText;
-        long totalCalculation = theCalculatedPrice * theFixedRoi / 100;
-        long totalResult = totalCalculation + theCalculatedPrice;
-
-        Map<String, Object> cartMap = new HashMap<>();
-        cartMap.put("totalPrice", theCalculatedPrice);
-        cartMap.put("totalPayout", totalResult);
-        cartMap.put("farmId", farmId);
-        cartMap.put("units", unitNumberText);
+    private void addToCart(final int unitNumberText, final String theFarmUnitPrice, final String theFarmROI) {
 
         cartRef.child(currentUid)
-                .push()
-                .setValue(cartMap)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                .orderByChild("farmId")
+                .equalTo(farmId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onSuccess(Void aVoid) {
-                        finish();
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
+                    public void onDataChange(DataSnapshot dataSnapshot) {
 
+                        if (!dataSnapshot.exists()){
+
+                            long theFixedPricePerUnit = Long.parseLong(theFarmUnitPrice);
+                            int theFixedRoi = Integer.parseInt(theFarmROI);
+
+                            /*---   CALCULATION   ---*/
+                            long theCalculatedPrice = theFixedPricePerUnit * unitNumberText;
+                            long totalCalculation = theCalculatedPrice * theFixedRoi / 100;
+                            long totalResult = totalCalculation + theCalculatedPrice;
+
+                            Map<String, Object> cartMap = new HashMap<>();
+                            cartMap.put("totalPrice", theCalculatedPrice);
+                            cartMap.put("totalPayout", totalResult);
+                            cartMap.put("farmId", farmId);
+                            cartMap.put("units", unitNumberText);
+
+                            cartRef.child(currentUid)
+                                    .push()
+                                    .setValue(cartMap)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            showAffirmDialog();
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+
+                                }
+                            });
+
+                        } else {
+
+                            Common.showErrorDialog(FarmDetails.this, "This farm has already been added to your cart.", FarmDetails.this);
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+    }
+
+    private void showAffirmDialog() {
+
+        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(FarmDetails.this).create();
+        LayoutInflater inflater = FarmDetails.this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.dialog_layout,null);
+
+        final TextView message = (TextView) viewOptions.findViewById(R.id.dialogMessage);
+        final Button okButton = (Button) viewOptions.findViewById(R.id.dialogButton);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        message.setText("Added to cart successfully");
+
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+                finish();
             }
         });
+
+        alertDialog.show();
 
     }
 
@@ -327,7 +398,7 @@ public class FarmDetails extends AppCompatActivity {
 
                         if (dataSnapshot.child(farmId).exists()){
 
-                            Common.showErrorDialog(FarmDetails.this, "You are already following this farm !");
+                            Common.showErrorDialog(FarmDetails.this, "You are already following this farm !", FarmDetails.this);
 
                         } else {
 

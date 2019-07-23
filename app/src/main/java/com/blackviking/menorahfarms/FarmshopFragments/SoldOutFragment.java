@@ -2,6 +2,8 @@ package com.blackviking.menorahfarms.FarmshopFragments;
 
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -10,9 +12,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.blackviking.menorahfarms.AccountMenus.StudentDetails;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.FarmDetails;
 import com.blackviking.menorahfarms.Interface.ItemClickListener;
@@ -137,7 +141,7 @@ public class SoldOutFragment extends Fragment {
 
                                 } else {
 
-                                    Common.showErrorDialog(getContext(), "Only Students Can Access This Farm Type !");
+                                    openAcadaDialog();
 
                                 }
                             }
@@ -206,6 +210,42 @@ public class SoldOutFragment extends Fragment {
             }
         };
         soldOutRecycler.setAdapter(adapter);
+
+    }
+
+    private void openAcadaDialog() {
+
+        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(getContext()).create();
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.acada_cash_layout,null);
+
+        final Button cancel = (Button) viewOptions.findViewById(R.id.cancelAcada);
+        final Button proceed = (Button) viewOptions.findViewById(R.id.proceedAcada);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        proceed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+                Intent studentRegIntent = new Intent(getContext(), StudentDetails.class);
+                startActivity(studentRegIntent);
+                getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.cancel();
+            }
+        });
+
+        alertDialog.show();
 
     }
 

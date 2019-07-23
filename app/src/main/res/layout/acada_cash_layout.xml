@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:corner_radius="4dp"
+    android:layout_margin="20dp"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:layout_margin="10dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/warningLayout">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="AcadaCash Farms"
+            android:gravity="center"
+            android:textColor="@color/colorAccent"
+            android:textSize="25sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="AcadaCash Farms for students are only available for sponsorship to verified students. \n\nWould you like to switch your account to a student account now?"
+            android:gravity="center"
+            android:textColor="@color/grey"
+            android:textSize="15sp"
+            android:layout_marginTop="10dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_below="@+id/warningLayout"
+        android:weightSum="2">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginBottom="10dp"
+            android:id="@+id/cancelAcada"
+            android:background="@drawable/cancel_ring"
+            android:text="NO"
+            android:textStyle="bold"
+            android:textSize="17sp"
+            android:textColor="@color/red"/>
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginBottom="10dp"
+            android:id="@+id/proceedAcada"
+            android:background="@drawable/read_more_ring"
+            android:text="YES"
+            android:textStyle="bold"
+            android:textSize="17sp"
+            android:textColor="@color/colorPrimary"/>
+
+    </LinearLayout>
+
+</com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout>

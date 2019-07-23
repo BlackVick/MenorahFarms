@@ -123,7 +123,7 @@ public class SignIn extends AppCompatActivity {
 
                 } else {
 
-                    Common.showErrorDialog(SignIn.this, "No Internet Access !");
+                    Common.showErrorDialog(SignIn.this, "No Internet Access !", SignIn.this);
 
                 }
             }
@@ -161,7 +161,7 @@ public class SignIn extends AppCompatActivity {
 
                 } else {
 
-                    Common.showErrorDialog(SignIn.this, "No Internet Access !");
+                    Common.showErrorDialog(SignIn.this, "No Internet Access !", SignIn.this);
 
                 }
             }
@@ -185,7 +185,7 @@ public class SignIn extends AppCompatActivity {
 
                 } else {
 
-                    Common.showErrorDialog(SignIn.this, "No Internet Access !");
+                    Common.showErrorDialog(SignIn.this, "No Internet Access !", SignIn.this);
 
                 }
             }
@@ -206,7 +206,7 @@ public class SignIn extends AppCompatActivity {
                     resetThePassword();
 
                 } else {
-                    Common.showErrorDialog(SignIn.this, "No Internet Access !");
+                    Common.showErrorDialog(SignIn.this, "No Internet Access !", SignIn.this);
                 }
             }
         });
@@ -302,7 +302,7 @@ public class SignIn extends AppCompatActivity {
         ).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Common.showErrorDialog(SignIn.this, "Sign in failed, please check provided details and try again later");
+                Common.showErrorDialog(SignIn.this, "Sign in failed, please check provided details and try again later", SignIn.this);
                 mDialog.dismiss();
             }
         });
@@ -317,7 +317,7 @@ public class SignIn extends AppCompatActivity {
 
         } else {
 
-            Common.showErrorDialog(SignIn.this, "Process Failed");
+            Common.showErrorDialog(SignIn.this, "Process Failed", SignIn.this);
             mAuth.signOut();
             mDialog.dismiss();
 
@@ -343,12 +343,12 @@ public class SignIn extends AppCompatActivity {
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()){
 
-                                Common.showErrorDialog(SignIn.this, "Password Reset Instructions Have Been Sent To Your Mail !");
+                                Common.showErrorDialog(SignIn.this, "Password Reset Instructions Have Been Sent To Your Mail !", SignIn.this);
                                 mDialog.dismiss();
 
                             } else {
 
-                                Common.showErrorDialog(SignIn.this, "Password Reset Failed !");
+                                Common.showErrorDialog(SignIn.this, "Password Reset Failed !", SignIn.this);
                                 mDialog.dismiss();
 
                             }
@@ -384,7 +384,7 @@ public class SignIn extends AppCompatActivity {
 
                                     } else {
 
-                                        Common.showErrorDialog(SignIn.this, "This Account Does Not Exist Yet, Please Sign Up And Try Again Later");
+                                        Common.showErrorDialog(SignIn.this, "This Account Does Not Exist Yet, Please Sign Up And Try Again Later", SignIn.this);
                                         mDialog.dismiss();
 
                                     }
@@ -430,7 +430,7 @@ public class SignIn extends AppCompatActivity {
 
                                     } else {
 
-                                        Common.showErrorDialog(SignIn.this, "This Account Does Not Exist Yet, Please Sign Up And Try Again Later");
+                                        Common.showErrorDialog(SignIn.this, "This Account Does Not Exist Yet, Please Sign Up And Try Again Later", SignIn.this);
                                         mDialog.dismiss();
                                         mAuth.signOut();
 

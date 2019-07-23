@@ -1,11 +1,20 @@
 package com.blackviking.menorahfarms.Common;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AlertDialog;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
+import com.blackviking.menorahfarms.AccountMenus.StudentDetails;
 import com.blackviking.menorahfarms.Notification.APIService;
 import com.blackviking.menorahfarms.Notification.RetrofitClient;
 import com.blackviking.menorahfarms.R;
@@ -91,21 +100,29 @@ public class Common {
 
 
     /*---   WARNING DIALOG   ---*/
-    public static void showErrorDialog(Context context, String theWarning){
+    public static void showErrorDialog(Context context, String theWarning, Activity activity){
 
-        AlertDialog alertDialog = new AlertDialog.Builder(context)
-                .setTitle("Attention !")
-                .setIcon(R.drawable.ic_attention_icon)
-                .setMessage(theWarning)
-                .setPositiveButton("OKAY", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .create();
+        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(context).create();
+        LayoutInflater inflater = activity.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.dialog_layout,null);
+
+        final TextView message = (TextView) viewOptions.findViewById(R.id.dialogMessage);
+        final Button okButton = (Button) viewOptions.findViewById(R.id.dialogButton);
+
+        alertDialog.setView(viewOptions);
 
         alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        message.setText(theWarning);
+
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        });
 
         alertDialog.show();
 

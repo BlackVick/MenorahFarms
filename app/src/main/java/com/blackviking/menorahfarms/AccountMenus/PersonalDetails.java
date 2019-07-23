@@ -142,7 +142,7 @@ public class PersonalDetails extends AppCompatActivity {
                 if (Common.isConnectedToInternet(getBaseContext())) {
                     updateChanges();
                 } else {
-                    Common.showErrorDialog(PersonalDetails.this, "No Internet Access !");
+                    Common.showErrorDialog(PersonalDetails.this, "No Internet Access !", PersonalDetails.this);
                 }
             }
         });

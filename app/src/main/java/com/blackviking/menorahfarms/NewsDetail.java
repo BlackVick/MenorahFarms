@@ -1,10 +1,12 @@
 package com.blackviking.menorahfarms;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.blackviking.menorahfarms.Common.GetTimeAgo;
 import com.blackviking.menorahfarms.Models.NewsModel;
@@ -57,15 +59,6 @@ public class NewsDetail extends AppCompatActivity {
             }
         });
 
-
-        shareButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
-
         loadCurrentFeed();
 
     }
@@ -114,6 +107,27 @@ public class NewsDetail extends AppCompatActivity {
                                             });
 
                                 }
+
+                                shareButton.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+
+                                        if (!currentNews.getNewsLink().equalsIgnoreCase("")) {
+
+                                            Intent i = new Intent(android.content.Intent.ACTION_SEND);
+                                            i.setType("text/plain");
+                                            i.putExtra(android.content.Intent.EXTRA_SUBJECT, "Menorah Article Share");
+                                            i.putExtra(android.content.Intent.EXTRA_TEXT, "Get Updated with the Menorah Monthly Farm Articles. \nRead more here >>  " + currentNews.getNewsLink());
+                                            startActivity(Intent.createChooser(i, "Share via"));
+
+                                        } else {
+
+                                            Toast.makeText(NewsDetail.this, "News has no link yet, try again later", Toast.LENGTH_SHORT).show();
+
+                                        }
+
+                                    }
+                                });
 
                             }
 

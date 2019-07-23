@@ -98,7 +98,7 @@ public class SocialMedia extends AppCompatActivity {
                 if (Common.isConnectedToInternet(getBaseContext())) {
                     updateChanges();
                 } else {
-                    Common.showErrorDialog(SocialMedia.this, "No Internet Access !");
+                    Common.showErrorDialog(SocialMedia.this, "No Internet Access !", SocialMedia.this);
                 }
             }
         });

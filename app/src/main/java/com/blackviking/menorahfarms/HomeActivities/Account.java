@@ -72,6 +72,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -86,11 +87,11 @@ public class Account extends AppCompatActivity {
     private LinearLayout homeSwitch, dashboardSwitch, farmstoreSwitch, accountSwitch;
     private TextView homeText, dashboardText, farmstoreText, accountText;
 
-    private TextView userName, userEmail; //profileProgressText;
+    private TextView userName, userEmail, profileProgressText;
     private ImageView cartButton;
     private Button resetPassword;
     private CircleImageView userAvatar;
-    //private ProgressBar profileProgress;
+    private ProgressBar profileProgress;
 
     private ScrollView verifiedLayout;
     private RelativeLayout unverifiedLayout;
@@ -115,10 +116,9 @@ public class Account extends AppCompatActivity {
     private String originalImageUrl, thumbDownloadUrl;
 
 
-    private String theUserMail, theFirstName, theLastName, theProfilePicture,
-    theFacebook, theInstagram, theTwitter, theLinkedIn, thePhone, theBirthday, theGender,
-    theNationality, theAddress, theCity, theState, theBank, theAccountName, theAccountNumber,
-    theKinMail, theKinName, theKinrelationship, theKinPhone, theKinAddress;
+    private String theUserMail, theFirstName, theLastName, theProfilePicture;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,12 +145,12 @@ public class Account extends AppCompatActivity {
 
         userName = (TextView)findViewById(R.id.userFullName);
         userEmail = (TextView)findViewById(R.id.userEmail);
-        //profileProgressText = (TextView)findViewById(R.id.profileProgressText);
+        profileProgressText = (TextView)findViewById(R.id.profileProgressText);
         cartButton = (ImageView)findViewById(R.id.cartButton);
         resetPassword = (Button)findViewById(R.id.changePasswordButton);
         resetPassword.setEnabled(false);
         userAvatar = (CircleImageView)findViewById(R.id.userAvatar);
-        //profileProgress = (ProgressBar)findViewById(R.id.profileProgress);
+        profileProgress = (ProgressBar)findViewById(R.id.profileProgress);
 
         personalDetailsLayout = (LinearLayout)findViewById(R.id.personalDetailsLayout);
         contactDetailsLayout = (LinearLayout)findViewById(R.id.contactDetailsLayout);
@@ -419,25 +419,6 @@ public class Account extends AppCompatActivity {
                             theLastName = currentUser.getLastName();
                             theUserMail = currentUser.getEmail();
                             theProfilePicture = currentUser.getProfilePictureThumb();
-                            theFacebook = currentUser.getFacebook();
-                            theInstagram = currentUser.getInstagram();
-                            theTwitter = currentUser.getTwitter();
-                            theLinkedIn = currentUser.getLinkedIn();
-                            thePhone = currentUser.getPhone();
-                            theBirthday = currentUser.getBirthday();
-                            theGender = currentUser.getGender();
-                            theNationality = currentUser.getNationality();
-                            theAddress = currentUser.getAddress();
-                            theCity = currentUser.getCity();
-                            theState = currentUser.getState();
-                            theBank = currentUser.getBank();
-                            theAccountName = currentUser.getAccountName();
-                            theAccountNumber = currentUser.getAccountNumber();
-                            theKinMail = currentUser.getKinEmail();
-                            theKinName = currentUser.getKinName();
-                            theKinrelationship = currentUser.getKinRelationship();
-                            theKinPhone = currentUser.getKinPhone();
-                            theKinAddress = currentUser.getKinAddress();
                             loginType = currentUser.getSignUpMode();
 
                             userName.setText(theFirstName + " " + theLastName);
@@ -500,7 +481,7 @@ public class Account extends AppCompatActivity {
                     }
                 });
 
-        //setProfileProgress();
+        setProfileProgress();
 
 
     }
@@ -536,7 +517,7 @@ public class Account extends AppCompatActivity {
 
                 }else {
 
-                    Common.showErrorDialog(Account.this, "No Internet Access !");
+                    Common.showErrorDialog(Account.this, "No Internet Access !", Account.this);
                 }
                 alertDialog.dismiss();
 
@@ -747,7 +728,7 @@ public class Account extends AppCompatActivity {
 
                 } else {
 
-                    Common.showErrorDialog(Account.this, "No Internet Access ! Please, try again later.");
+                    Common.showErrorDialog(Account.this, "No Internet Access ! Please, try again later.", Account.this);
 
                 }
 
@@ -806,175 +787,94 @@ public class Account extends AppCompatActivity {
 
     private void setProfileProgress() {
 
-        String[] theArray = {theUserMail, theFirstName, theLastName, theProfilePicture,
-                theFacebook, theInstagram, theTwitter, theLinkedIn, thePhone, theBirthday, theGender,
-                theNationality, theAddress, theCity, theState, theBank, theAccountName, theAccountNumber,
-                theKinMail, theKinName, theKinrelationship, theKinPhone, theKinAddress};
+        userRef.child(currentUid)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-        int profileProgressInt = 0;
+                        String profileFirstName = dataSnapshot.child("firstName").getValue().toString();
+                        String profileLastName = dataSnapshot.child("lastName").getValue().toString();
+                        String profileUserMail = dataSnapshot.child("email").getValue().toString();
+                        String profilePix = dataSnapshot.child("profilePictureThumb").getValue().toString();
+                        String profileFacebook = dataSnapshot.child("facebook").getValue().toString();
+                        String profileInstagram = dataSnapshot.child("instagram").getValue().toString();
+                        String profileTwitter = dataSnapshot.child("twitter").getValue().toString();
+                        String profileLinkedIn = dataSnapshot.child("linkedIn").getValue().toString();
+                        String profilePhone = dataSnapshot.child("phone").getValue().toString();
+                        String profileBirthday = dataSnapshot.child("birthday").getValue().toString();
+                        String profileGender = dataSnapshot.child("gender").getValue().toString();
+                        String profileNatinality = dataSnapshot.child("nationality").getValue().toString();
+                        String profileAddress = dataSnapshot.child("address").getValue().toString();
+                        String profileCity = dataSnapshot.child("city").getValue().toString();
+                        String profileState = dataSnapshot.child("state").getValue().toString();
+                        String profileBank = dataSnapshot.child("bank").getValue().toString();
+                        String profileAccountName = dataSnapshot.child("accountName").getValue().toString();
+                        String profileAccountNumber = dataSnapshot.child("accountNumber").getValue().toString();
+                        String profileKinName = dataSnapshot.child("kinName").getValue().toString();
+                        String profileKinMail = dataSnapshot.child("kinEmail").getValue().toString();
+                        String profileKinRelationship = dataSnapshot.child("kinRelationship").getValue().toString();
+                        String profileKinPhone = dataSnapshot.child("kinPhone").getValue().toString();
+                        String profileKinAddress = dataSnapshot.child("kinAddress").getValue().toString();
 
-        if (!theUserMail.equalsIgnoreCase("")){
 
-            profileProgressInt++;
+                        String[] theArray = {profileFirstName, profileLastName, profileUserMail, profilePix,
+                                profileFacebook, profileInstagram, profileTwitter, profileLinkedIn, profilePhone, profileBirthday, profileGender,
+                                profileNatinality, profileAddress, profileCity, profileState, profileBank, profileAccountName, profileAccountNumber,
+                                profileKinName, profileKinMail, profileKinRelationship, profileKinPhone, profileKinAddress};
 
-        }
 
-        if (!TextUtils.isEmpty(theFirstName)){
+                        int profileProgressInt = 0;
+                        ArrayList<String> list = new ArrayList<>();
+                        int totalResult;
+                        
+                        int calcResult = 0;
 
-            profileProgressInt++;
+                        for (int i = 0; i < 23; i++){
 
-        }
+                            if (!theArray[i].equalsIgnoreCase("")) {
 
-        if (!TextUtils.isEmpty(theLastName)){
+                                list.add(theArray[i]);
 
-            profileProgressInt++;
+                            }
 
-        }
+                        }
 
-        if (!TextUtils.isEmpty(theProfilePicture)){
+                        calcResult = (list.size() * 100) / 23;
 
-            profileProgressInt++;
 
-        }
+                        profileProgressText.setText("Your profile is " + String.valueOf(calcResult) + "% complete.");
 
-        if (!TextUtils.isEmpty(theFacebook)){
+                        Drawable draw = getResources().getDrawable(R.drawable.progress_drawable);
+                        profileProgress.setProgressDrawable(draw);
+                        profileProgress.setProgress(calcResult);
 
-            profileProgressInt++;
+                        if (calcResult < 70){
 
-        }
+                            Common.showErrorDialog(Account.this, "We advise that users complete their profile by providing all required details, so we can serve you better. \n\nThank you", Account.this);
 
-        if (!TextUtils.isEmpty(theInstagram)){
+                        }
 
-            profileProgressInt++;
 
-        }
 
-        if (!TextUtils.isEmpty(theTwitter)){
 
-            profileProgressInt++;
 
-        }
+                    }
 
-        if (!TextUtils.isEmpty(theLinkedIn)){
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-            profileProgressInt++;
+                    }
+                });
 
-        }
 
-        if (!TextUtils.isEmpty(thePhone)){
 
-            profileProgressInt++;
 
-        }
 
-        if (!TextUtils.isEmpty(theBirthday)){
 
-            profileProgressInt++;
 
-        }
 
-        if (!TextUtils.isEmpty(theGender)){
 
-            profileProgressInt++;
 
-        }
-
-        if (!TextUtils.isEmpty(theNationality)){
-
-            profileProgressInt++;
-
-        }
-
-        if (!TextUtils.isEmpty(theAddress)){
-
-            profileProgressInt++;
-
-        }
-
-        if (!TextUtils.isEmpty(theCity)){
-
-            profileProgressInt++;
-
-        }
-
-        if (!TextUtils.isEmpty(theState)){
-
-            profileProgressInt++;
-
-        }
-
-        if (!TextUtils.isEmpty(theBank)){
-
-            profileProgressInt++;
-
-        }
-
-        if (!TextUtils.isEmpty(theAccountName)){
-
-            profileProgressInt++;
-
-        }
-
-        if (!TextUtils.isEmpty(theAccountNumber)){
-
-            profileProgressInt++;
-
-        }
-
-        if (!TextUtils.isEmpty(theKinMail)){
-
-            profileProgressInt++;
-
-        }
-
-        if (!TextUtils.isEmpty(theKinName)){
-
-            profileProgressInt++;
-
-        }
-
-        if (!TextUtils.isEmpty(theKinrelationship)){
-
-            profileProgressInt++;
-
-        }
-
-        if (!TextUtils.isEmpty(theKinPhone)){
-
-            profileProgressInt++;
-
-        }
-
-        if (!TextUtils.isEmpty(theKinAddress)){
-
-            profileProgressInt++;
-
-        } else {
-
-            /*int calcdProgress = profileProgressInt / theArray.length;
-            int percentedTotal = calcdProgress * 100;
-
-            profileProgressText.setText("Your profile is " + String.valueOf(percentedTotal) + "% complete.");
-
-            Drawable draw = getResources().getDrawable(R.drawable.progress_drawable);
-            profileProgress.setProgressDrawable(draw);
-            profileProgress.setProgress(percentedTotal);*/
-
-        }
-
-
-        /*for (int i = 0; i < theArray.length; i++){
-
-            Toast.makeText(this, ""+theArray[i], Toast.LENGTH_SHORT).show();
-
-            *//*if (!TextUtils.isEmpty(theArray[i]))
-                profileProgressInt++;
-
-
-
-            *//*
-
-        }*/
 
 
 

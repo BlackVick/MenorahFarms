@@ -104,7 +104,7 @@ public class Registration extends AppCompatActivity {
 
                 } else {
 
-                    Common.showErrorDialog(Registration.this, "No Internet Access !");
+                    Common.showErrorDialog(Registration.this, "No Internet Access !", Registration.this);
 
                 }
             }
@@ -164,7 +164,7 @@ public class Registration extends AppCompatActivity {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             mDialog.dismiss();
-                            Common.showErrorDialog(Registration.this, "Error Occurred, Please Try Again Later.");
+                            Common.showErrorDialog(Registration.this, "Error Occurred, Please Try Again Later.", Registration.this);
                         }
                     }
             );

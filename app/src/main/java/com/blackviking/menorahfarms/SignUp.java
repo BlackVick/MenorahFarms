@@ -136,7 +136,7 @@ public class SignUp extends AppCompatActivity {
 
                 } else {
 
-                    Common.showErrorDialog(SignUp.this, "No Internet Access !");
+                    Common.showErrorDialog(SignUp.this, "No Internet Access !", SignUp.this);
 
                 }
             }
@@ -174,7 +174,7 @@ public class SignUp extends AppCompatActivity {
 
                 } else {
 
-                    Common.showErrorDialog(SignUp.this, "No Internet Access !");
+                    Common.showErrorDialog(SignUp.this, "No Internet Access !", SignUp.this);
 
                 }
             }
@@ -196,7 +196,7 @@ public class SignUp extends AppCompatActivity {
 
                 } else {
 
-                    Common.showErrorDialog(SignUp.this, "No Internet Access !");
+                    Common.showErrorDialog(SignUp.this, "No Internet Access !", SignUp.this);
 
                 }
             }
@@ -329,7 +329,7 @@ public class SignUp extends AppCompatActivity {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
 
-                                    Common.showErrorDialog(SignUp.this, "Authentication Could Not Be Registered. Please Try Again Later.");
+                                    Common.showErrorDialog(SignUp.this, "Authentication Could Not Be Registered. Please Try Again Later.", SignUp.this);
                                     if (mAuth.getCurrentUser() != null){
 
                                         mDialog.dismiss();
@@ -344,7 +344,7 @@ public class SignUp extends AppCompatActivity {
                         } else {
 
                             mDialog.dismiss();
-                            Common.showErrorDialog(SignUp.this, "An Unknown Error Occurred While Signing Up With Email. Provided Mail Might Already Exist Or Be Invalid. Please Try Again Later !");
+                            Common.showErrorDialog(SignUp.this, "An Unknown Error Occurred While Signing Up With Email. Provided Mail Might Already Exist Or Be Invalid. Please Try Again Later !", SignUp.this);
 
                         }
                     }
@@ -402,7 +402,7 @@ public class SignUp extends AppCompatActivity {
                 @Override
                 public void onFailure(@NonNull Exception e) {
 
-                    Common.showErrorDialog(SignUp.this, "Something Went Wrong. Please Try Again Later.");
+                    Common.showErrorDialog(SignUp.this, "Something Went Wrong. Please Try Again Later.", SignUp.this);
                     if (mAuth.getCurrentUser() != null){
 
                         mDialog.dismiss();
@@ -417,7 +417,7 @@ public class SignUp extends AppCompatActivity {
 
         } else {
 
-            Common.showErrorDialog(SignUp.this, "Process Failed");
+            Common.showErrorDialog(SignUp.this, "Process Failed", SignUp.this);
             mDialog.dismiss();
 
         }
@@ -453,7 +453,7 @@ public class SignUp extends AppCompatActivity {
                                         if (dataSnapshot.child(currentUid).exists()){
 
                                             mDialog.dismiss();
-                                            Common.showErrorDialog(SignUp.this, "A User Has Already Registered With This Account, Log In Instead");
+                                            Common.showErrorDialog(SignUp.this, "A User Has Already Registered With This Account, Log In Instead", SignUp.this);
                                             mAuth.signOut();
 
                                         } else {
@@ -471,7 +471,7 @@ public class SignUp extends AppCompatActivity {
                                                 @Override
                                                 public void onFailure(@NonNull Exception e) {
 
-                                                    Common.showErrorDialog(SignUp.this, "Authentication Could Not Be Registered. Please Try Again Later.");
+                                                    Common.showErrorDialog(SignUp.this, "Authentication Could Not Be Registered. Please Try Again Later.", SignUp.this);
                                                     if (mAuth.getCurrentUser() != null){
 
                                                         mDialog.dismiss();
@@ -495,7 +495,7 @@ public class SignUp extends AppCompatActivity {
 
                             } else {
 
-                                Common.showErrorDialog(SignUp.this, "Error Occurred, Please try Again Later");
+                                Common.showErrorDialog(SignUp.this, "Error Occurred, Please try Again Later", SignUp.this);
                                 mDialog.dismiss();
 
                             }
@@ -503,7 +503,7 @@ public class SignUp extends AppCompatActivity {
                         } else {
 
                             mDialog.dismiss();
-                            Common.showErrorDialog(SignUp.this, "Authentication Failed. Please Try Again Later");
+                            Common.showErrorDialog(SignUp.this, "Authentication Failed. Please Try Again Later", SignUp.this);
 
                         }
 
@@ -558,7 +558,7 @@ public class SignUp extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Exception e) {
 
-                Common.showErrorDialog(SignUp.this, "Something Went Wrong. Please Try Again Later.");
+                Common.showErrorDialog(SignUp.this, "Something Went Wrong. Please Try Again Later.", SignUp.this);
                 if (mAuth.getCurrentUser() != null) {
 
                     mDialog.dismiss();
@@ -597,7 +597,7 @@ public class SignUp extends AppCompatActivity {
                                         if (dataSnapshot.child(currentUid).exists()){
 
                                             mDialog.dismiss();
-                                            Common.showErrorDialog(SignUp.this, "A User Has Already Registered With This Account, Log In Instead");
+                                            Common.showErrorDialog(SignUp.this, "A User Has Already Registered With This Account, Log In Instead", SignUp.this);
                                             mAuth.signOut();
                                             LoginManager.getInstance().logOut();
 
@@ -616,7 +616,7 @@ public class SignUp extends AppCompatActivity {
                                                 @Override
                                                 public void onFailure(@NonNull Exception e) {
 
-                                                    Common.showErrorDialog(SignUp.this, "Authentication Could Not Be Registered. Please Try Again Later.");
+                                                    Common.showErrorDialog(SignUp.this, "Authentication Could Not Be Registered. Please Try Again Later.", SignUp.this);
                                                     if (mAuth.getCurrentUser() != null){
 
                                                         mDialog.dismiss();
@@ -640,7 +640,7 @@ public class SignUp extends AppCompatActivity {
 
                             } else {
 
-                                Common.showErrorDialog(SignUp.this, "Error Occurred, Please try Again Later");
+                                Common.showErrorDialog(SignUp.this, "Error Occurred, Please try Again Later", SignUp.this);
                                 mDialog.dismiss();
 
                             }
@@ -704,7 +704,7 @@ public class SignUp extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Exception e) {
 
-                Common.showErrorDialog(SignUp.this, "Something Went Wrong. Please Try Again Later.");
+                Common.showErrorDialog(SignUp.this, "Something Went Wrong. Please Try Again Later.", SignUp.this);
                 if (mAuth.getCurrentUser() != null) {
 
                     mDialog.dismiss();

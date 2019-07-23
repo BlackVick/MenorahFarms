@@ -232,7 +232,7 @@ public class Cart extends AppCompatActivity {
                                         if (Common.isConnectedToInternet(getBaseContext())) {
                                             openDeleteDialog(adapter.getRef(viewHolder.getAdapterPosition()).getKey());
                                         } else {
-                                            Common.showErrorDialog(Cart.this, "No Internet Access !");
+                                            Common.showErrorDialog(Cart.this, "No Internet Access !", Cart.this);
                                         }
                                     }
                                 });
@@ -290,7 +290,7 @@ public class Cart extends AppCompatActivity {
                                             alertDialog.show();
 
                                         } else {
-                                            Common.showErrorDialog(Cart.this, "No Internet Access !");
+                                            Common.showErrorDialog(Cart.this, "No Internet Access !", Cart.this);
                                         }
                                     }
                                 });
@@ -369,7 +369,7 @@ public class Cart extends AppCompatActivity {
                                             .setPublicKey(publicKey)
                                             .setEncryptionKey(encryptionKey)
                                             .setTxRef(paymentReference)
-                                            .acceptAccountPayments(true)
+                                            .acceptAccountPayments(false)
                                             .acceptCardPayments(true)
                                             .onStagingEnv(false)
                                             .isPreAuth(true)
@@ -379,7 +379,7 @@ public class Cart extends AppCompatActivity {
 
                                 } else {
 
-                                    Common.showErrorDialog(Cart.this, "Units Left For Sale On Farm Can Not Serve Your Request. Please Go Back To The Farm Store To Make Other Requests");
+                                    Common.showErrorDialog(Cart.this, "Units Left For Sale On Farm Can Not Serve Your Request. Please Go Back To The Farm Store To Make Other Requests", Cart.this);
 
                                 }
 

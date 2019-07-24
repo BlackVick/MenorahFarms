@@ -334,7 +334,6 @@ public class SignUp extends AppCompatActivity {
 
                                         mDialog.dismiss();
                                         mAuth.signOut();
-                                        mAuth.getCurrentUser().delete();
 
 
                                     }
@@ -408,7 +407,6 @@ public class SignUp extends AppCompatActivity {
                         mDialog.dismiss();
                         authed.child(currentUid).removeValue();
                         mAuth.signOut();
-                        mAuth.getCurrentUser().delete();
 
                     }
 
@@ -476,7 +474,6 @@ public class SignUp extends AppCompatActivity {
 
                                                         mDialog.dismiss();
                                                         mAuth.signOut();
-                                                        mAuth.getCurrentUser().delete();
 
 
                                                     }
@@ -564,7 +561,6 @@ public class SignUp extends AppCompatActivity {
                     mDialog.dismiss();
                     authed.child(currentUid).removeValue();
                     mAuth.signOut();
-                    mAuth.getCurrentUser().delete();
 
                 }
 
@@ -622,7 +618,6 @@ public class SignUp extends AppCompatActivity {
                                                         mDialog.dismiss();
                                                         mAuth.signOut();
                                                         LoginManager.getInstance().logOut();
-                                                        mAuth.getCurrentUser().delete();
 
                                                     }
                                                 }
@@ -711,7 +706,6 @@ public class SignUp extends AppCompatActivity {
                     authed.child(currentUid).removeValue();
                     mAuth.signOut();
                     LoginManager.getInstance().logOut();
-                    mAuth.getCurrentUser().delete();
 
                 }
 

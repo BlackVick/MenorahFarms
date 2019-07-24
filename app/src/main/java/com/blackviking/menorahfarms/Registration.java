@@ -196,7 +196,6 @@ public class Registration extends AppCompatActivity {
             authed.child(currentUid).removeValue();
             LoginManager.getInstance().logOut();
             mAuth.signOut();
-            mAuth.getCurrentUser().delete();
             finish();
 
         } else {
@@ -204,7 +203,6 @@ public class Registration extends AppCompatActivity {
             userRef.child(currentUid).removeValue();
             authed.child(currentUid).removeValue();
             mAuth.signOut();
-            mAuth.getCurrentUser().delete();
             finish();
 
         }

@@ -43,7 +43,7 @@ public class Dashboard extends AppCompatActivity {
     private ImageView cartButton;
     private CircleImageView userAvatar;
     private RelativeLayout goToFarmstoreButton;
-    private LinearLayout sponsoredFarmsLayout, farmsToWatchLayout, farmUpdatesLayout, allFarmsLayout, projectManagerLayout, notificationLayout, faqLayout, about, adminLayout;
+    private RelativeLayout sponsoredFarmsLayout, farmsToWatchLayout, farmUpdatesLayout, allFarmsLayout, projectManagerLayout, notificationLayout, faqLayout, adminLayout;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference userRef, sponsoredRef;
@@ -81,15 +81,14 @@ public class Dashboard extends AppCompatActivity {
         cartButton = (ImageView)findViewById(R.id.userCart);
         userAvatar = (CircleImageView)findViewById(R.id.userAvatar);
         goToFarmstoreButton = (RelativeLayout)findViewById(R.id.goToFarmstoreButton);
-        sponsoredFarmsLayout = (LinearLayout)findViewById(R.id.sponsoredFarmsLayout);
-        farmsToWatchLayout = (LinearLayout)findViewById(R.id.farmsToWatchLayout);
-        farmUpdatesLayout = (LinearLayout)findViewById(R.id.farmUpdatesLayout);
-        allFarmsLayout = (LinearLayout)findViewById(R.id.allFarmsLayout);
-        projectManagerLayout = (LinearLayout)findViewById(R.id.projectManagerLayout);
-        notificationLayout = (LinearLayout)findViewById(R.id.notificationLayout);
-        faqLayout = (LinearLayout)findViewById(R.id.faqLayout);
-        about = (LinearLayout)findViewById(R.id.aboutLayout);
-        adminLayout = (LinearLayout)findViewById(R.id.adminLayout);
+        sponsoredFarmsLayout = (RelativeLayout)findViewById(R.id.sponsoredFarmsLayout);
+        farmsToWatchLayout = (RelativeLayout)findViewById(R.id.farmsToWatchLayout);
+        farmUpdatesLayout = (RelativeLayout)findViewById(R.id.farmUpdatesLayout);
+        allFarmsLayout = (RelativeLayout)findViewById(R.id.allFarmsLayout);
+        projectManagerLayout = (RelativeLayout)findViewById(R.id.projectManagerLayout);
+        notificationLayout = (RelativeLayout)findViewById(R.id.notificationLayout);
+        faqLayout = (RelativeLayout)findViewById(R.id.faqLayout);
+        adminLayout = (RelativeLayout)findViewById(R.id.adminLayout);
 
 
         /*---   BOTTOM NAV   ---*/
@@ -187,7 +186,8 @@ public class Dashboard extends AppCompatActivity {
 
                         } else {
 
-                            adminLayout.setVisibility(View.GONE);
+                            adminLayout.setVisibility(View.INVISIBLE);
+                            adminLayout.setEnabled(false);
 
                         }
 
@@ -391,7 +391,7 @@ public class Dashboard extends AppCompatActivity {
             }
         });
 
-        about.setOnClickListener(new View.OnClickListener() {
+        /*about.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -400,6 +400,6 @@ public class Dashboard extends AppCompatActivity {
                 overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
 
             }
-        });
+        });*/
     }
 }

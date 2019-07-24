@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     app:corner_radius="7dp"
     android:layout_margin="20dp"
+    android:padding="15dp"
     android:background="@color/white">
 
     <ScrollView
@@ -37,6 +38,17 @@
                 android:textSize="14sp"
                 android:textColor="@color/black"
                 android:id="@+id/termsText"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Please note that, by proceeding from this point, you agree to all stated terms above."
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:gravity="start"/>
 
         </LinearLayout>
 

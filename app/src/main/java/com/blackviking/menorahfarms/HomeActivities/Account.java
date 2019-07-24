@@ -98,7 +98,7 @@ public class Account extends AppCompatActivity {
     private ImageView reloadPage;
     private Button resendActivationBtn;
 
-    private LinearLayout personalDetailsLayout, contactDetailsLayout, bankDetailsLayout, nextOfKinLayout, socialMediaLayout, studentProfileLayout, historyLayout, logOutLayout;
+    private RelativeLayout personalDetailsLayout, contactDetailsLayout, bankDetailsLayout, nextOfKinLayout, socialMediaLayout, studentProfileLayout, historyLayout, logOutLayout;
 
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
@@ -152,14 +152,14 @@ public class Account extends AppCompatActivity {
         userAvatar = (CircleImageView)findViewById(R.id.userAvatar);
         profileProgress = (ProgressBar)findViewById(R.id.profileProgress);
 
-        personalDetailsLayout = (LinearLayout)findViewById(R.id.personalDetailsLayout);
-        contactDetailsLayout = (LinearLayout)findViewById(R.id.contactDetailsLayout);
-        bankDetailsLayout = (LinearLayout)findViewById(R.id.bankDetailsLayout);
-        nextOfKinLayout = (LinearLayout)findViewById(R.id.nextOfKinLayout);
-        socialMediaLayout = (LinearLayout)findViewById(R.id.socialMediaLayout);
-        studentProfileLayout = (LinearLayout)findViewById(R.id.studentProfileLayout);
-        historyLayout = (LinearLayout)findViewById(R.id.historyLayout);
-        logOutLayout = (LinearLayout)findViewById(R.id.logOutLayout);
+        personalDetailsLayout = (RelativeLayout)findViewById(R.id.personalDetailsLayout);
+        contactDetailsLayout = (RelativeLayout)findViewById(R.id.contactDetailsLayout);
+        bankDetailsLayout = (RelativeLayout)findViewById(R.id.bankDetailsLayout);
+        nextOfKinLayout = (RelativeLayout)findViewById(R.id.nextOfKinLayout);
+        socialMediaLayout = (RelativeLayout)findViewById(R.id.socialMediaLayout);
+        studentProfileLayout = (RelativeLayout)findViewById(R.id.studentProfileLayout);
+        historyLayout = (RelativeLayout)findViewById(R.id.historyLayout);
+        logOutLayout = (RelativeLayout)findViewById(R.id.logOutLayout);
 
         verifiedLayout = (ScrollView)findViewById(R.id.verifiedLayout);
         unverifiedLayout = (RelativeLayout)findViewById(R.id.unverifiedLayout);

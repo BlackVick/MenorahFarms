@@ -391,48 +391,30 @@ public class FarmDetails extends AppCompatActivity {
 
     private void followFarm() {
 
+        final long date = System.currentTimeMillis();
+        final SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yy");
+        final String dateString = sdf.format(date);
+
+        Map<String, Object> followedMap = new HashMap<>();
+        followedMap.put("dateFollowed", dateString);
+
         followedRef.child(currentUid)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+                .child(farmId)
+                .setValue(followedMap)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+                    public void onSuccess(Void aVoid) {
 
-                        if (dataSnapshot.child(farmId).exists()){
-
-                            Common.showErrorDialog(FarmDetails.this, "You are already following this farm !", FarmDetails.this);
-
-                        } else {
-
-                            final long date = System.currentTimeMillis();
-                            final SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yy");
-                            final String dateString = sdf.format(date);
-
-                            Map<String, Object> followedMap = new HashMap<>();
-                            followedMap.put("dateFollowed", dateString);
-
-                            followedRef.child(currentUid)
-                                    .child(farmId)
-                                    .setValue(followedMap)
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            Toast.makeText(FarmDetails.this, "Followed", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-
-                                }
-                            });
-
-                        }
+                        followFarmBtn.setVisibility(View.GONE);
+                        followedFarmButton.setVisibility(View.VISIBLE);
 
                     }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
+            }
+        });
 
     }
 

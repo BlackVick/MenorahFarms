@@ -200,7 +200,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scrollbars="none"
-            android:padding="10dp">
+            android:padding="5dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -236,396 +236,422 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="140dp"
                     android:orientation="horizontal"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginEnd="2dp"
                     android:layout_marginTop="25dp"
                     android:layout_marginBottom="14dp"
                     android:weightSum="3">
 
-                    <LinearLayout
+                    <RelativeLayout
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:id="@+id/sponsoredFarmsLayout">
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="4dp"
+                        android:id="@+id/sponsoredFarmsLayout"
+                        android:background="@drawable/menu_back"
+                        android:elevation="2dp">
 
-                        <android.support.v7.widget.CardView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:cardCornerRadius="15dp"
-                            app:cardElevation="7dp"
-                            android:layout_marginStart="12dp"
-                            android:layout_marginEnd="12dp"
-                            app:cardBackgroundColor="@color/offWhite"
-                            android:layout_gravity="center">
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_above="@+id/sponsoredText">
 
                             <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:src="@drawable/ic_menorah_sponsored_farms"
-                                android:padding="15dp"
+                                android:layout_width="70dp"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/dash_sponsored_farms"
+                                android:padding="17dp"
                                 android:adjustViewBounds="true"
+                                android:layout_centerInParent="true"
                                 android:layout_gravity="center"/>
 
-                        </android.support.v7.widget.CardView>
+                        </RelativeLayout>
 
                         <TextView
                             android:layout_gravity="center"
                             android:gravity="center"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_alignParentBottom="true"
                             android:text="Sponsored Farms"
-                            android:textColor="@color/black"
-                            android:textSize="13sp"
-                            android:layout_margin="6dp"/>
+                            android:textColor="@color/colorAccent"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:layout_margin="6dp"
+                            android:id="@+id/sponsoredText"/>
 
-                    </LinearLayout>
+                    </RelativeLayout>
 
-                    <LinearLayout
+                    <RelativeLayout
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:id="@+id/farmsToWatchLayout">
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="4dp"
+                        android:id="@+id/farmsToWatchLayout"
+                        android:background="@drawable/menu_back"
+                        android:elevation="2dp">
 
-                        <android.support.v7.widget.CardView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:cardCornerRadius="15dp"
-                            app:cardElevation="7dp"
-                            android:layout_marginStart="12dp"
-                            android:layout_marginEnd="12dp"
-                            app:cardBackgroundColor="@color/offWhite"
-                            android:layout_gravity="center">
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_above="@+id/followedText">
 
                             <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:src="@drawable/ic_menorah_farms_on_watch"
+                                android:layout_width="70dp"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/dash_followed_farms"
                                 android:padding="15dp"
                                 android:adjustViewBounds="true"
+                                android:layout_centerInParent="true"
                                 android:layout_gravity="center"/>
 
-                        </android.support.v7.widget.CardView>
+                        </RelativeLayout>
 
                         <TextView
                             android:layout_gravity="center"
                             android:gravity="center"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_alignParentBottom="true"
                             android:text="Followed Farms"
-                            android:textColor="@color/black"
-                            android:textSize="13sp"
-                            android:layout_margin="6dp"/>
+                            android:textColor="@color/colorAccent"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:layout_margin="6dp"
+                            android:id="@+id/followedText"/>
 
-                    </LinearLayout>
+                    </RelativeLayout>
 
-                    <LinearLayout
+                    <RelativeLayout
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:id="@+id/farmUpdatesLayout">
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="4dp"
+                        android:id="@+id/farmUpdatesLayout"
+                        android:background="@drawable/menu_back"
+                        android:elevation="2dp">
 
-                        <android.support.v7.widget.CardView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:cardCornerRadius="15dp"
-                            app:cardElevation="7dp"
-                            android:layout_marginStart="12dp"
-                            android:layout_marginEnd="12dp"
-                            app:cardBackgroundColor="@color/offWhite"
-                            android:layout_gravity="center">
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_above="@+id/updateText">
 
                             <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:src="@drawable/ic_menorah_farm_updates"
-                                android:padding="15dp"
+                                android:layout_width="70dp"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/dash_farm_updates"
+                                android:padding="18dp"
                                 android:adjustViewBounds="true"
+                                android:layout_centerInParent="true"
                                 android:layout_gravity="center"/>
 
-                        </android.support.v7.widget.CardView>
+                        </RelativeLayout>
 
                         <TextView
                             android:layout_gravity="center"
                             android:gravity="center"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_alignParentBottom="true"
                             android:text="Farm Updates"
-                            android:textColor="@color/black"
-                            android:textSize="13sp"
-                            android:layout_margin="6dp"/>
+                            android:textColor="@color/colorAccent"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:layout_margin="6dp"
+                            android:id="@+id/updateText"/>
 
-                    </LinearLayout>
+                    </RelativeLayout>
 
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="140dp"
                     android:orientation="horizontal"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginEnd="2dp"
                     android:layout_marginTop="18dp"
                     android:weightSum="3">
 
-                    <LinearLayout
+                    <RelativeLayout
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:id="@+id/allFarmsLayout">
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="4dp"
+                        android:id="@+id/allFarmsLayout"
+                        android:background="@drawable/menu_back"
+                        android:elevation="2dp">
 
-                        <android.support.v7.widget.CardView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:cardCornerRadius="15dp"
-                            app:cardElevation="7dp"
-                            android:layout_marginStart="12dp"
-                            android:layout_marginEnd="12dp"
-                            app:cardBackgroundColor="@color/offWhite"
-                            android:layout_gravity="center">
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_above="@+id/allFarmsText">
 
                             <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:src="@drawable/ic_menorah_all_farms"
-                                android:padding="15dp"
+                                android:layout_width="70dp"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/dash_all_farms"
+                                android:padding="18dp"
                                 android:adjustViewBounds="true"
+                                android:layout_centerInParent="true"
                                 android:layout_gravity="center"/>
 
-                        </android.support.v7.widget.CardView>
+                        </RelativeLayout>
 
                         <TextView
                             android:layout_gravity="center"
                             android:gravity="center"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_alignParentBottom="true"
                             android:text="See All Farms"
-                            android:textColor="@color/black"
-                            android:textSize="13sp"
-                            android:layout_margin="6dp"/>
+                            android:textColor="@color/colorAccent"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:layout_margin="6dp"
+                            android:id="@+id/allFarmsText"/>
 
-                    </LinearLayout>
+                    </RelativeLayout>
 
-                    <LinearLayout
+                    <RelativeLayout
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:id="@+id/projectManagerLayout">
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="4dp"
+                        android:id="@+id/projectManagerLayout"
+                        android:background="@drawable/menu_back"
+                        android:elevation="2dp">
 
-                        <android.support.v7.widget.CardView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:cardCornerRadius="15dp"
-                            app:cardElevation="7dp"
-                            android:layout_marginStart="12dp"
-                            android:layout_marginEnd="12dp"
-                            app:cardBackgroundColor="@color/offWhite"
-                            android:layout_gravity="center">
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_above="@+id/managerText">
 
                             <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:src="@drawable/ic_menorah_project_manager"
-                                android:padding="15dp"
+                                android:layout_width="70dp"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/dash_project_manager"
+                                android:padding="18dp"
                                 android:adjustViewBounds="true"
+                                android:layout_centerInParent="true"
                                 android:layout_gravity="center"/>
 
-                        </android.support.v7.widget.CardView>
+                        </RelativeLayout>
 
                         <TextView
                             android:layout_gravity="center"
                             android:gravity="center"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_alignParentBottom="true"
                             android:text="Project Manager"
-                            android:textColor="@color/black"
-                            android:textSize="13sp"
-                            android:layout_margin="6dp"/>
+                            android:textColor="@color/colorAccent"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:layout_margin="6dp"
+                            android:id="@+id/managerText"/>
 
-                    </LinearLayout>
+                    </RelativeLayout>
 
-                    <LinearLayout
+                    <RelativeLayout
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:id="@+id/notificationLayout">
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="4dp"
+                        android:id="@+id/notificationLayout"
+                        android:background="@drawable/menu_back"
+                        android:elevation="2dp">
 
-                        <android.support.v7.widget.CardView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:cardCornerRadius="15dp"
-                            app:cardElevation="7dp"
-                            android:layout_marginStart="12dp"
-                            android:layout_marginEnd="12dp"
-                            app:cardBackgroundColor="@color/offWhite"
-                            android:layout_gravity="center">
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_above="@+id/notificationText">
 
                             <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:src="@drawable/ic_menorah_faq"
-                                android:padding="15dp"
+                                android:layout_width="70dp"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/dash_notifications"
+                                android:padding="18dp"
                                 android:adjustViewBounds="true"
+                                android:layout_centerInParent="true"
                                 android:layout_gravity="center"/>
 
-                        </android.support.v7.widget.CardView>
+                        </RelativeLayout>
 
                         <TextView
                             android:layout_gravity="center"
                             android:gravity="center"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_alignParentBottom="true"
                             android:text="Notifications"
-                            android:textColor="@color/black"
-                            android:textSize="13sp"
-                            android:layout_margin="6dp"/>
+                            android:textColor="@color/colorAccent"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:layout_margin="6dp"
+                            android:id="@+id/notificationText"/>
 
-                    </LinearLayout>
+                    </RelativeLayout>
 
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="140dp"
                     android:orientation="horizontal"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginEnd="2dp"
                     android:layout_marginTop="18dp"
+                    android:layout_marginBottom="15dp"
                     android:weightSum="3">
 
-                    <LinearLayout
+                    <RelativeLayout
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:id="@+id/faqLayout">
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="4dp"
+                        android:id="@+id/faqLayout"
+                        android:background="@drawable/menu_back"
+                        android:elevation="2dp">
 
-                        <android.support.v7.widget.CardView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:cardCornerRadius="15dp"
-                            app:cardElevation="7dp"
-                            android:layout_marginStart="12dp"
-                            android:layout_marginEnd="12dp"
-                            app:cardBackgroundColor="@color/offWhite"
-                            android:layout_gravity="center">
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_above="@+id/faqText">
 
                             <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:src="@drawable/ic_menorah_faq"
-                                android:padding="15dp"
+                                android:layout_width="70dp"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/dash_about"
+                                android:padding="18dp"
                                 android:adjustViewBounds="true"
+                                android:layout_centerInParent="true"
                                 android:layout_gravity="center"/>
 
-                        </android.support.v7.widget.CardView>
+                        </RelativeLayout>
 
                         <TextView
                             android:layout_gravity="center"
                             android:gravity="center"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_alignParentBottom="true"
                             android:text="FAQ"
-                            android:textColor="@color/black"
-                            android:textSize="13sp"
-                            android:layout_margin="6dp"/>
+                            android:textColor="@color/colorAccent"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:layout_margin="6dp"
+                            android:id="@+id/faqText"/>
 
-                    </LinearLayout>
+                    </RelativeLayout>
 
-                    <LinearLayout
+                    <RelativeLayout
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:id="@+id/aboutLayout">
-
-                        <android.support.v7.widget.CardView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:cardCornerRadius="15dp"
-                            app:cardElevation="7dp"
-                            android:layout_marginStart="12dp"
-                            android:layout_marginEnd="12dp"
-                            app:cardBackgroundColor="@color/offWhite"
-                            android:layout_gravity="center">
-
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:src="@drawable/ic_menorah_faq"
-                                android:padding="15dp"
-                                android:adjustViewBounds="true"
-                                android:layout_gravity="center"/>
-
-                        </android.support.v7.widget.CardView>
-
-                        <TextView
-                            android:layout_gravity="center"
-                            android:gravity="center"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="About"
-                            android:textColor="@color/black"
-                            android:textSize="13sp"
-                            android:layout_margin="6dp"/>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="4dp"
                         android:id="@+id/adminLayout"
-                        android:visibility="gone">
+                        android:visibility="invisible"
+                        android:background="@drawable/menu_back"
+                        android:elevation="2dp">
 
-                        <android.support.v7.widget.CardView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:cardCornerRadius="15dp"
-                            app:cardElevation="7dp"
-                            android:layout_marginStart="12dp"
-                            android:layout_marginEnd="12dp"
-                            app:cardBackgroundColor="@color/offWhite"
-                            android:layout_gravity="center">
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_above="@+id/adminText">
 
                             <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:src="@drawable/ic_menorah_faq"
-                                android:padding="15dp"
+                                android:layout_width="70dp"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/dash_admin"
+                                android:padding="18dp"
                                 android:adjustViewBounds="true"
+                                android:layout_centerInParent="true"
                                 android:layout_gravity="center"/>
 
-                        </android.support.v7.widget.CardView>
+                        </RelativeLayout>
 
                         <TextView
                             android:layout_gravity="center"
                             android:gravity="center"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_alignParentBottom="true"
                             android:text="Admin"
-                            android:textColor="@color/black"
-                            android:textSize="13sp"
+                            android:textColor="@color/colorAccent"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:layout_margin="6dp"
+                            android:id="@+id/adminText"/>
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="4dp"
+                        android:visibility="invisible"
+                        android:background="@drawable/menu_back"
+                        android:elevation="2dp">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <ImageView
+                                android:layout_width="70dp"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/dash_admin"
+                                android:padding="18dp"
+                                android:adjustViewBounds="true"
+                                android:layout_centerInParent="true"
+                                android:layout_gravity="center"/>
+
+                        </RelativeLayout>
+
+                        <TextView
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentBottom="true"
+                            android:text=""
+                            android:textColor="@color/colorAccent"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
                             android:layout_margin="6dp"/>
 
-                    </LinearLayout>
+                    </RelativeLayout>
 
                 </LinearLayout>
 

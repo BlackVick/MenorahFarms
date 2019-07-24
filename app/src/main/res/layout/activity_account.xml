@@ -161,303 +161,315 @@
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="130dp"
                         android:orientation="horizontal"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="10dp"
+                        android:layout_marginStart="2dp"
+                        android:layout_marginEnd="2dp"
                         android:layout_marginTop="25dp"
                         android:layout_marginBottom="14dp"
                         android:weightSum="3">
 
-                        <LinearLayout
+                        <RelativeLayout
                             android:layout_width="0dp"
                             android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:orientation="vertical"
-                            android:id="@+id/personalDetailsLayout">
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:id="@+id/personalDetailsLayout"
+                            android:background="@drawable/menu_back"
+                            android:elevation="2dp">
 
-                            <android.support.v7.widget.CardView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                app:cardCornerRadius="15dp"
-                                app:cardElevation="7dp"
-                                android:layout_marginStart="12dp"
-                                android:layout_marginEnd="12dp"
-                                app:cardBackgroundColor="@color/offWhite"
-                                android:layout_gravity="center">
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_above="@+id/personalText">
 
                                 <ImageView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:src="@drawable/ic_menorah_personal_details"
-                                    android:padding="18dp"
+                                    android:layout_width="70dp"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/profile_user"
+                                    android:padding="15dp"
                                     android:adjustViewBounds="true"
+                                    android:layout_centerInParent="true"
                                     android:layout_gravity="center"/>
 
-                            </android.support.v7.widget.CardView>
+                            </RelativeLayout>
 
                             <TextView
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="Personal Details"
-                                android:textColor="@color/black"
-                                android:textSize="13sp"
-                                android:layout_margin="6dp"/>
+                                android:layout_alignParentBottom="true"
+                                android:text="Personal"
+                                android:textColor="@color/colorAccent"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:layout_margin="6dp"
+                                android:id="@+id/personalText"/>
 
-                        </LinearLayout>
+                        </RelativeLayout>
 
-                        <LinearLayout
+                        <RelativeLayout
                             android:layout_width="0dp"
                             android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:orientation="vertical"
-                            android:id="@+id/contactDetailsLayout">
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:background="@drawable/menu_back"
+                            android:id="@+id/contactDetailsLayout"
+                            android:elevation="2dp">
 
-                            <android.support.v7.widget.CardView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                app:cardCornerRadius="15dp"
-                                app:cardElevation="7dp"
-                                android:layout_marginStart="12dp"
-                                android:layout_marginEnd="12dp"
-                                app:cardBackgroundColor="@color/offWhite"
-                                android:layout_gravity="center">
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_above="@+id/contactText">
 
                                 <ImageView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:src="@drawable/ic_menorah_contact_details"
-                                    android:padding="18dp"
+                                    android:layout_width="70dp"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/profile_contact"
+                                    android:padding="15dp"
                                     android:adjustViewBounds="true"
-                                    android:layout_gravity="center"/>
+                                    android:layout_centerInParent="true"/>
 
-                            </android.support.v7.widget.CardView>
+                            </RelativeLayout>
+
+                            <TextView
+                                android:gravity="center"
+                                android:layout_alignParentBottom="true"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Contact"
+                                android:textColor="@color/colorAccent"
+                                android:textStyle="bold"
+                                android:textSize="14sp"
+                                android:layout_margin="6dp"
+                                android:id="@+id/contactText"/>
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:id="@+id/bankDetailsLayout"
+                            android:background="@drawable/menu_back"
+                            android:elevation="2dp">
+
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_above="@+id/bankText">
+
+                                <ImageView
+                                    android:layout_width="70dp"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/profile_bank"
+                                    android:padding="15dp"
+                                    android:adjustViewBounds="true"
+                                    android:layout_centerInParent="true"/>
+
+                            </RelativeLayout>
 
                             <TextView
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="Contact Details"
-                                android:textColor="@color/black"
-                                android:textSize="13sp"
-                                android:layout_margin="6dp"/>
+                                android:text="Bank"
+                                android:textColor="@color/colorAccent"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:layout_margin="6dp"
+                                android:layout_alignParentBottom="true"
+                                android:id="@+id/bankText"/>
 
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:orientation="vertical"
-                            android:id="@+id/bankDetailsLayout">
-
-                            <android.support.v7.widget.CardView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                app:cardCornerRadius="15dp"
-                                app:cardElevation="7dp"
-                                android:layout_marginStart="12dp"
-                                android:layout_marginEnd="12dp"
-                                app:cardBackgroundColor="@color/offWhite"
-                                android:layout_gravity="center">
-
-                                <ImageView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:src="@drawable/ic_menorah_bank_details"
-                                    android:padding="18dp"
-                                    android:adjustViewBounds="true"
-                                    android:layout_gravity="center"/>
-
-                            </android.support.v7.widget.CardView>
-
-                            <TextView
-                                android:layout_gravity="center"
-                                android:gravity="center"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="Bank Details"
-                                android:textColor="@color/black"
-                                android:textSize="13sp"
-                                android:layout_margin="6dp"/>
-
-                        </LinearLayout>
+                        </RelativeLayout>
 
                     </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="130dp"
                         android:orientation="horizontal"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="10dp"
+                        android:layout_marginStart="2dp"
+                        android:layout_marginEnd="2dp"
                         android:layout_marginTop="18dp"
                         android:weightSum="3">
 
-                        <LinearLayout
+                        <RelativeLayout
                             android:layout_width="0dp"
                             android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:orientation="vertical"
-                            android:id="@+id/nextOfKinLayout">
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:id="@+id/nextOfKinLayout"
+                            android:background="@drawable/menu_back"
+                            android:elevation="2dp">
 
-                            <android.support.v7.widget.CardView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                app:cardCornerRadius="15dp"
-                                app:cardElevation="7dp"
-                                android:layout_marginStart="12dp"
-                                android:layout_marginEnd="12dp"
-                                app:cardBackgroundColor="@color/offWhite"
-                                android:layout_gravity="center">
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_above="@+id/kinText">
 
                                 <ImageView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:src="@drawable/ic_menorah_next_of_kin"
-                                    android:padding="18dp"
+                                    android:layout_width="70dp"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/profile_next_of_kin"
+                                    android:padding="15dp"
                                     android:adjustViewBounds="true"
-                                    android:layout_gravity="center"/>
+                                    android:layout_centerInParent="true"/>
 
-                            </android.support.v7.widget.CardView>
+                            </RelativeLayout>
 
                             <TextView
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="Next Of Kin Details"
-                                android:textColor="@color/black"
+                                android:text="Next Of Kin"
+                                android:textColor="@color/colorAccent"
                                 android:textSize="13sp"
-                                android:layout_margin="6dp"/>
+                                android:textStyle="bold"
+                                android:layout_margin="6dp"
+                                android:layout_alignParentBottom="true"
+                                android:id="@+id/kinText"/>
 
-                        </LinearLayout>
+                        </RelativeLayout>
 
-                        <LinearLayout
+                        <RelativeLayout
                             android:layout_width="0dp"
                             android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:orientation="vertical"
-                            android:id="@+id/socialMediaLayout">
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:id="@+id/socialMediaLayout"
+                            android:background="@drawable/menu_back"
+                            android:elevation="2dp">
 
-                            <android.support.v7.widget.CardView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                app:cardCornerRadius="15dp"
-                                app:cardElevation="7dp"
-                                android:layout_marginStart="12dp"
-                                android:layout_marginEnd="12dp"
-                                app:cardBackgroundColor="@color/offWhite"
-                                android:layout_gravity="center">
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_above="@+id/socialText">
 
                                 <ImageView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:src="@drawable/ic_menorah_social_details"
-                                    android:padding="18dp"
+                                    android:layout_width="70dp"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/profile_social"
+                                    android:padding="15dp"
                                     android:adjustViewBounds="true"
-                                    android:layout_gravity="center"/>
+                                    android:layout_centerInParent="true"/>
 
-                            </android.support.v7.widget.CardView>
+                            </RelativeLayout>
 
                             <TextView
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="Social Media Details"
-                                android:textColor="@color/black"
-                                android:textSize="13sp"
-                                android:layout_margin="6dp"/>
+                                android:text="Social"
+                                android:textColor="@color/colorAccent"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:layout_margin="6dp"
+                                android:layout_alignParentBottom="true"
+                                android:id="@+id/socialText"/>
 
-                        </LinearLayout>
+                        </RelativeLayout>
 
-                        <LinearLayout
+                        <RelativeLayout
                             android:layout_width="0dp"
                             android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:orientation="vertical"
-                            android:id="@+id/studentProfileLayout">
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:id="@+id/studentProfileLayout"
+                            android:background="@drawable/menu_back"
+                            android:elevation="2dp">
 
-                            <android.support.v7.widget.CardView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                app:cardCornerRadius="15dp"
-                                app:cardElevation="7dp"
-                                android:layout_marginStart="12dp"
-                                android:layout_marginEnd="12dp"
-                                app:cardBackgroundColor="@color/offWhite"
-                                android:layout_gravity="center">
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_above="@+id/studentText">
 
                                 <ImageView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:src="@drawable/ic_menorah_faq"
-                                    android:padding="18dp"
+                                    android:layout_width="70dp"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/profile_student"
+                                    android:padding="15dp"
                                     android:adjustViewBounds="true"
-                                    android:layout_gravity="center"/>
+                                    android:layout_centerInParent="true"/>
 
-                            </android.support.v7.widget.CardView>
+                            </RelativeLayout>
 
                             <TextView
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="Student Details"
-                                android:textColor="@color/black"
-                                android:textSize="13sp"
-                                android:layout_margin="6dp"/>
+                                android:text="Student"
+                                android:textColor="@color/colorAccent"
+                                android:textStyle="bold"
+                                android:textSize="14sp"
+                                android:layout_margin="6dp"
+                                android:layout_alignParentBottom="true"
+                                android:id="@+id/studentText"/>
 
-                        </LinearLayout>
+                        </RelativeLayout>
 
                     </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="130dp"
                         android:orientation="horizontal"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="10dp"
+                        android:layout_marginStart="2dp"
+                        android:layout_marginEnd="2dp"
                         android:layout_marginTop="18dp"
+                        android:layout_marginBottom="15dp"
                         android:weightSum="3">
 
-                        <LinearLayout
+                        <RelativeLayout
                             android:layout_width="0dp"
                             android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:orientation="vertical"
-                            android:id="@+id/historyLayout">
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:id="@+id/historyLayout"
+                            android:background="@drawable/menu_back"
+                            android:elevation="2dp">
 
-                            <android.support.v7.widget.CardView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                app:cardCornerRadius="15dp"
-                                app:cardElevation="7dp"
-                                android:layout_marginStart="12dp"
-                                android:layout_marginEnd="12dp"
-                                app:cardBackgroundColor="@color/offWhite"
-                                android:layout_gravity="center">
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_above="@+id/historyTextText">
 
                                 <ImageView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:src="@drawable/ic_menorah_personal_details"
+                                    android:layout_width="70dp"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/profile_history"
                                     android:padding="18dp"
                                     android:adjustViewBounds="true"
-                                    android:layout_gravity="center"/>
+                                    android:layout_centerInParent="true"/>
 
-                            </android.support.v7.widget.CardView>
+                            </RelativeLayout>
 
                             <TextView
                                 android:layout_gravity="center"
@@ -465,39 +477,41 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:text="History"
-                                android:textColor="@color/black"
-                                android:textSize="13sp"
-                                android:layout_margin="6dp"/>
+                                android:textColor="@color/colorAccent"
+                                android:textStyle="bold"
+                                android:textSize="14sp"
+                                android:layout_margin="6dp"
+                                android:layout_alignParentBottom="true"
+                                android:id="@+id/historyTextText"/>
 
-                        </LinearLayout>
+                        </RelativeLayout>
 
-                        <LinearLayout
+                        <RelativeLayout
                             android:layout_width="0dp"
                             android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:orientation="vertical"
-                            android:id="@+id/logOutLayout">
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:id="@+id/logOutLayout"
+                            android:background="@drawable/menu_back"
+                            android:elevation="2dp">
 
-                            <android.support.v7.widget.CardView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                app:cardCornerRadius="15dp"
-                                app:cardElevation="7dp"
-                                android:layout_marginStart="12dp"
-                                android:layout_marginEnd="12dp"
-                                app:cardBackgroundColor="@color/offWhite"
-                                android:layout_gravity="center">
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_above="@+id/logoutText">
 
                                 <ImageView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:src="@drawable/ic_menorah_logout"
-                                    android:padding="25dp"
+                                    android:layout_width="70dp"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/profile_logout"
+                                    android:padding="15dp"
                                     android:adjustViewBounds="true"
-                                    android:layout_gravity="center"/>
+                                    android:layout_centerInParent="true"/>
 
-                            </android.support.v7.widget.CardView>
+                            </RelativeLayout>
 
                             <TextView
                                 android:layout_gravity="center"
@@ -505,11 +519,55 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:text="Log Out"
-                                android:textColor="@color/black"
-                                android:textSize="13sp"
+                                android:textColor="@color/colorAccent"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:layout_margin="6dp"
+                                android:id="@+id/logoutText"
+                                android:layout_alignParentBottom="true"/>
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:visibility="invisible"
+                            android:background="@drawable/menu_back"
+                            android:elevation="2dp">
+
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+                                <ImageView
+                                    android:layout_width="70dp"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/dash_admin"
+                                    android:padding="18dp"
+                                    android:adjustViewBounds="true"
+                                    android:layout_centerInParent="true"
+                                    android:layout_gravity="center"/>
+
+                            </RelativeLayout>
+
+                            <TextView
+                                android:layout_gravity="center"
+                                android:gravity="center"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentBottom="true"
+                                android:text=""
+                                android:textColor="@color/colorAccent"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
                                 android:layout_margin="6dp"/>
 
-                        </LinearLayout>
+                        </RelativeLayout>
 
                     </LinearLayout>
 

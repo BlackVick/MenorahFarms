@@ -8,8 +8,8 @@
     tools:context=".SignUp">
 
     <ImageView
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="31dp"
+        android:layout_height="31dp"
         android:padding="1dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"

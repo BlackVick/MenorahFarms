@@ -405,11 +405,11 @@ public class Cart extends AppCompatActivity {
 
             } else if (resultCode == RavePayActivity.RESULT_ERROR) {
 
-                Toast.makeText(this, "ERROR " + message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Error Occurred, Please try later. " + message, Toast.LENGTH_SHORT).show();
 
             } else if (resultCode == RavePayActivity.RESULT_CANCELLED) {
 
-                Toast.makeText(this, "CANCELLED " + message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Transaction Cancelled" + message, Toast.LENGTH_SHORT).show();
 
             }
         }

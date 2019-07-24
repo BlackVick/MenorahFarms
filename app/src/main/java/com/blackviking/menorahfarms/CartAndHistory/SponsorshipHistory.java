@@ -126,4 +126,10 @@ public class SponsorshipHistory extends AppCompatActivity {
         historyRecycler.setAdapter(adapter);
 
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 }

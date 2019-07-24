@@ -113,4 +113,10 @@ public class Notifications extends AppCompatActivity {
         notificationRecycler.setAdapter(adapter);
 
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 }

@@ -186,4 +186,10 @@ public class FollowedFarms extends AppCompatActivity {
         followedFarmRecycler.setAdapter(adapter);
 
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 }

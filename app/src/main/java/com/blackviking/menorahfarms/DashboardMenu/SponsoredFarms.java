@@ -206,4 +206,10 @@ public class SponsoredFarms extends AppCompatActivity {
         sponsoredFarmsRecycler.setAdapter(adapter);
 
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 }

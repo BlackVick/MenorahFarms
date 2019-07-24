@@ -431,4 +431,10 @@ public class FarmDetails extends AppCompatActivity {
         unitPrice.setText(Common.convertToPrice(FarmDetails.this, theCalculatedPrice));
         totalPay.setText(Common.convertToPrice(FarmDetails.this, totalResult));
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 }

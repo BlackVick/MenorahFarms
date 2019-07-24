@@ -173,4 +173,10 @@ public class AccountManager extends AppCompatActivity {
                 });
 
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 }

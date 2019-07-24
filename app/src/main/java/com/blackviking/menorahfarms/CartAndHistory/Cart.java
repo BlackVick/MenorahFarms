@@ -585,4 +585,10 @@ public class Cart extends AppCompatActivity {
         alertDialog.show();
 
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 }

@@ -194,4 +194,10 @@ public class PersonalDetails extends AppCompatActivity {
 
         profileBirthday.setText(sdf.format(myCalendar.getTime()));
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 }

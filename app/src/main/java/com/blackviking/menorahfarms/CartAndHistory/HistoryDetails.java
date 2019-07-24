@@ -171,4 +171,10 @@ public class HistoryDetails extends AppCompatActivity {
         dueRefNumber.setText(theDueRefNumber);
 
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 }

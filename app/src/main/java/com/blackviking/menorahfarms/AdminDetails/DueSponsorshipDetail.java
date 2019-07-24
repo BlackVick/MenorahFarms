@@ -313,4 +313,10 @@ public class DueSponsorshipDetail extends AppCompatActivity {
         finish();
 
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 }

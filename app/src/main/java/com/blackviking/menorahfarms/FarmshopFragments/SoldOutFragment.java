@@ -76,7 +76,7 @@ public class SoldOutFragment extends Fragment {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
 
-
+                                userType = dataSnapshot.child("userPackage").getValue().toString();
 
                             }
 

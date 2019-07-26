@@ -25,6 +25,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import io.paperdb.Paper;
 import retrofit2.Call;
@@ -34,8 +35,14 @@ public class SponsorshipMonitor extends Service {
 
     FirebaseDatabase db = FirebaseDatabase.getInstance();
     DatabaseReference sponsoredFarmRef, dueSponsorRef, notificationRef, userRef;
-    String userId, endDate, todayString;
+    String userId, startDateString, endDate, todayString;
     APIService mService;
+
+
+    private Date startDate, todayDate, endDateDate;
+    private long totalSponsorshipDays, daysUsed;
+    private long sponsorDayDiff, currentDayDiff;
+    private SimpleDateFormat sdfStartDate, sdfToday, sdfStopDayDay;
 
     public SponsorshipMonitor() {
     }
@@ -72,10 +79,6 @@ public class SponsorshipMonitor extends Service {
 
         if (Common.isConnectedToInternet(getApplicationContext())){
 
-            final Date todayDate = Calendar.getInstance().getTime();
-            SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-            todayString = formatter.format(todayDate);
-
             sponsoredFarmRef.child(userId)
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -88,12 +91,9 @@ public class SponsorshipMonitor extends Service {
                                 for (DataSnapshot snap : dataSnapshot.getChildren()) {
 
                                     endDate = snap.child("cycleEndDate").getValue().toString();
+                                    startDateString = snap.child("cycleStartDate").getValue().toString();
 
-                                    if (todayString.equalsIgnoreCase(endDate)) {
-
-                                        endSponsorship(snap.getKey());
-
-                                    }
+                                    calculateDays(endDate, startDateString, snap.getKey());
 
                                 }
 
@@ -117,6 +117,47 @@ public class SponsorshipMonitor extends Service {
         } else {
 
             retryNetwork();
+
+        }
+
+    }
+
+    private void calculateDays(String endDate, String startDateString, String key) {
+
+        todayDate = Calendar.getInstance().getTime();
+        sdfToday = new SimpleDateFormat("dd-MM-yyyy");
+        todayString = sdfToday.format(todayDate);
+
+        /*---   GET START DATE   ---*/
+        sdfStartDate = new SimpleDateFormat("dd-MM-yyyy");
+        try {
+            startDate = sdfStartDate.parse(startDateString);
+
+        } catch (Exception e){
+
+        }
+
+        /*---   GET STOP DATE   ---*/
+        sdfStopDayDay = new SimpleDateFormat("dd-MM-yyyy");
+        try {
+            endDateDate = sdfStopDayDay.parse(endDate);
+
+        } catch (Exception e){
+
+        }
+
+
+        /*---   CALCULATE   ---*/
+        sponsorDayDiff = endDateDate.getTime() - startDate.getTime();
+        totalSponsorshipDays = TimeUnit.DAYS.convert(sponsorDayDiff, TimeUnit.MILLISECONDS);
+
+
+        currentDayDiff = todayDate.getTime() - startDate.getTime();
+        daysUsed = TimeUnit.DAYS.convert(currentDayDiff, TimeUnit.MILLISECONDS);
+
+        if (todayString.equalsIgnoreCase(endDate) || daysUsed > totalSponsorshipDays) {
+
+            endSponsorship(key);
 
         }
 

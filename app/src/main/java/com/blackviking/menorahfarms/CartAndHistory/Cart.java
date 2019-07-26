@@ -425,6 +425,7 @@ public class Cart extends AppCompatActivity {
                             public void onDataChange(DataSnapshot dataSnapshot) {
 
                                 String unitsAvailable = dataSnapshot.child("unitsAvailable").getValue().toString();
+                                final String farmManager = dataSnapshot.child("projectManager").getValue().toString();
 
                                 int unitsLeft = Integer.parseInt(unitsAvailable);
 
@@ -435,6 +436,30 @@ public class Cart extends AppCompatActivity {
                                 if (remainingUnit == 0){
                                     farmRef.child(currentFarmId).child("farmState").setValue("Sold Out");
                                 }
+
+                                userRef.child(currentuid)
+                                        .addListenerForSingleValueEvent(
+                                        new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                                String accountManager = dataSnapshot.child("accountManager").getValue().toString();
+
+                                                if (accountManager.equalsIgnoreCase("")){
+
+                                                    userRef.child(currentuid).child("accountManager").setValue(farmManager);
+
+                                                }
+
+                                            }
+
+                                            @Override
+                                            public void onCancelled(DatabaseError databaseError) {
+
+                                            }
+                                        }
+                                );
+
 
                             }
 

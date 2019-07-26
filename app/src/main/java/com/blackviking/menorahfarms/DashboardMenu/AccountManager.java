@@ -1,7 +1,9 @@
 package com.blackviking.menorahfarms.DashboardMenu;
 
+import android.content.ContentProviderOperation;
 import android.content.Intent;
 import android.net.Uri;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -25,14 +27,16 @@ import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class AccountManager extends AppCompatActivity {
 
     private ImageView backButton;
     private CircleImageView accountManagerAvatar;
-    private TextView accountManagerName, accountManagerAddress;
-    private Button callManagerButton, whatsappManagerButton;
+    private TextView accountManagerName;
+    private Button whatsappManagerButton;
     private RelativeLayout notEmptyLayout;
     private LinearLayout emptyLayout;
 
@@ -58,8 +62,6 @@ public class AccountManager extends AppCompatActivity {
         backButton = (ImageView)findViewById(R.id.backButton);
         accountManagerAvatar = (CircleImageView) findViewById(R.id.accountManagerAvatar);
         accountManagerName = (TextView) findViewById(R.id.accountManagerName);
-        accountManagerAddress = (TextView)findViewById(R.id.accountManagerAddress);
-        callManagerButton = (Button) findViewById(R.id.callManagerButton);
         whatsappManagerButton = (Button)findViewById(R.id.whatsappManagerButton);
         notEmptyLayout = (RelativeLayout) findViewById(R.id.notEmptyLayout);
         emptyLayout = (LinearLayout) findViewById(R.id.emptyLayout);
@@ -110,14 +112,11 @@ public class AccountManager extends AppCompatActivity {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        String theName = dataSnapshot.child("name").getValue().toString();
-                        String theAddress = dataSnapshot.child("address").getValue().toString();
+                        final String theName = dataSnapshot.child("name").getValue().toString();
                         final String theProfilePic = dataSnapshot.child("profilePicture").getValue().toString();
-                        final String thePhone = dataSnapshot.child("phone").getValue().toString();
                         final String theWhatsapp = dataSnapshot.child("whatsapp").getValue().toString();
 
                         accountManagerName.setText(theName);
-                        accountManagerAddress.setText(theAddress);
 
                         if (!theProfilePic.equalsIgnoreCase("")){
 
@@ -142,23 +141,12 @@ public class AccountManager extends AppCompatActivity {
 
                         }
 
-                        callManagerButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Intent intent = new Intent(Intent.ACTION_DIAL);
-                                intent.setData(Uri.parse("tel:"+thePhone));
-                                startActivity(intent);
-                            }
-                        });
-
                         whatsappManagerButton.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
 
-                                String whatsappUrl = "https://api.whatsapp.com/send?phone=+"+theWhatsapp;
-
                                 Intent i = new Intent(Intent.ACTION_VIEW);
-                                i.setData(Uri.parse(whatsappUrl));
+                                i.setData(Uri.parse(theWhatsapp));
                                 startActivity(i);
 
                             }
@@ -171,6 +159,69 @@ public class AccountManager extends AppCompatActivity {
 
                     }
                 });
+
+    }
+
+    private void addTelegramContact(String theWhatsapp, String theName) {
+
+        String DisplayName = theName;
+        String MobileNumber = theWhatsapp;
+        String company = "Menorah Farms";
+        String jobTitle = "Project Manager";
+
+        ArrayList<ContentProviderOperation> ops = new ArrayList < ContentProviderOperation > ();
+
+        ops.add(ContentProviderOperation.newInsert(
+                ContactsContract.RawContacts.CONTENT_URI)
+                .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
+                .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null)
+                .build());
+
+        //------------------------------------------------------ Names
+        if (DisplayName != null) {
+            ops.add(ContentProviderOperation.newInsert(
+                    ContactsContract.Data.CONTENT_URI)
+                    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+                    .withValue(ContactsContract.Data.MIMETYPE,
+                            ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+                    .withValue(
+                            ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME,
+                            DisplayName).build());
+        }
+
+        //------------------------------------------------------ Mobile Number
+        if (MobileNumber != null) {
+            ops.add(ContentProviderOperation.
+                    newInsert(ContactsContract.Data.CONTENT_URI)
+                    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+                    .withValue(ContactsContract.Data.MIMETYPE,
+                            ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+                    .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, MobileNumber)
+                    .withValue(ContactsContract.CommonDataKinds.Phone.TYPE,
+                            ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)
+                    .build());
+        }
+
+        //------------------------------------------------------ Organization
+        if (!company.equals("") && !jobTitle.equals("")) {
+            ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+                    .withValue(ContactsContract.Data.MIMETYPE,
+                            ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE)
+                    .withValue(ContactsContract.CommonDataKinds.Organization.COMPANY, company)
+                    .withValue(ContactsContract.CommonDataKinds.Organization.TYPE, ContactsContract.CommonDataKinds.Organization.TYPE_WORK)
+                    .withValue(ContactsContract.CommonDataKinds.Organization.TITLE, jobTitle)
+                    .withValue(ContactsContract.CommonDataKinds.Organization.TYPE, ContactsContract.CommonDataKinds.Organization.TYPE_WORK)
+                    .build());
+        }
+
+        // Asking the Contact provider to create a new contact
+        try {
+            getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(AccountManager.this, "Exception: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
 
     }
 

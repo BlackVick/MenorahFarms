@@ -68,11 +68,13 @@ public class FarmDescription extends AppCompatActivity {
                         String theDuration = dataSnapshot.child("sponsorDuration").getValue().toString();
                         String thePrice = dataSnapshot.child("pricePerUnit").getValue().toString();
                         String theLocation = dataSnapshot.child("farmLocation").getValue().toString();
+                        String theFarmDescription = dataSnapshot.child("farmDescription").getValue().toString();
 
                         farmDescDuration.setText(theDuration + " Months");
                         farmDescLocation.setText(theLocation);
                         farmDescROI.setText(theROI + "%");
                         farmDescUnits.setText(theUnits);
+                        farmDescTerms.setText(theFarmDescription);
 
                         long priceToLong = Long.parseLong(thePrice);
                         farmDescPrice.setText(Common.convertToPrice(FarmDescription.this, priceToLong));
@@ -85,21 +87,6 @@ public class FarmDescription extends AppCompatActivity {
                     }
                 });
 
-        termsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                String theTerms = dataSnapshot.child("terms").getValue().toString();
-
-                farmDescTerms.setText(theTerms);
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
 
     }
 

@@ -15,11 +15,13 @@ public class FarmModel {
     private String unitsSold;
     private String packaged;
     private String packagedType;
+    private String projectManager;
+    private String farmDescription;
 
     public FarmModel() {
     }
 
-    public FarmModel(String farmName, String farmLocation, String farmType, String pricePerUnit, String farmRoi, String sponsorDuration, String farmState, String farmImage, String farmImageThumb, String unitsAvailable, String unitsSold, String packaged, String packagedType) {
+    public FarmModel(String farmName, String farmLocation, String farmType, String pricePerUnit, String farmRoi, String sponsorDuration, String farmState, String farmImage, String farmImageThumb, String unitsAvailable, String unitsSold, String packaged, String packagedType, String projectManager, String farmDescription) {
         this.farmName = farmName;
         this.farmLocation = farmLocation;
         this.farmType = farmType;
@@ -33,7 +35,10 @@ public class FarmModel {
         this.unitsSold = unitsSold;
         this.packaged = packaged;
         this.packagedType = packagedType;
+        this.projectManager = projectManager;
+        this.farmDescription = farmDescription;
     }
+
 
     public String getFarmName() {
         return farmName;
@@ -137,5 +142,21 @@ public class FarmModel {
 
     public void setPackagedType(String packagedType) {
         this.packagedType = packagedType;
+    }
+
+    public String getProjectManager() {
+        return projectManager;
+    }
+
+    public void setProjectManager(String projectManager) {
+        this.projectManager = projectManager;
+    }
+
+    public String getFarmDescription() {
+        return farmDescription;
+    }
+
+    public void setFarmDescription(String farmDescription) {
+        this.farmDescription = farmDescription;
     }
 }

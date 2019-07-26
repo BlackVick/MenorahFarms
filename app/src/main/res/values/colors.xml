@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#12AA58</color>
     <color name="colorPrimaryDark">#0E753F</color>
-    <color name="colorAccent">#0F281B</color>
+    <color name="colorAccent">#03512A</color>
     <color name="bottomNavIconColor">#12AA58</color>
     <color name="buttonBackgroundStart">#45c781</color>
     <color name="buttonBackgroundMid">#3CBC4B</color>
@@ -19,6 +19,7 @@
     <color name="thickTransparentWhite">#E8FAF9F9</color>
     <color name="transparent">#00000000</color>
     <color name="red">#FF0000</color>
+    <color name="fadeRed">#F78989</color>
     <color name="bottomNavSelected">#1D0202</color>
     <color name="packageName">#E67515</color>
     <color name="ButtonAlt">#b22222</color>

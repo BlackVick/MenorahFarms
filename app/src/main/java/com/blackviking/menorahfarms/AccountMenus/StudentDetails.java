@@ -80,7 +80,7 @@ public class StudentDetails extends AppCompatActivity {
     private Uri imageUri;
     private FirebaseStorage storage = FirebaseStorage.getInstance();
     private StorageReference imageRef;
-    private String originalImageUrl, thumbDownloadUrl;
+    private String originalImageUrl = "", thumbDownloadUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -515,8 +515,22 @@ public class StudentDetails extends AppCompatActivity {
         String theNewSchoolName = schoolName.getText().toString().trim();
         String theNewDepartment = schoolDepartment.getText().toString().trim();
 
-        if (!TextUtils.isEmpty(theNewSchoolName) && !TextUtils.isEmpty(theNewDepartment)
-        && !originalImageUrl.equalsIgnoreCase("") || originalImageUrl != null) {
+        if (TextUtils.isEmpty(theNewSchoolName)){
+
+            mDialog.dismiss();
+            Common.showErrorDialog(StudentDetails.this, "Please Provide School Name !", StudentDetails.this);
+
+        } else if (TextUtils.isEmpty(theNewDepartment)) {
+
+            mDialog.dismiss();
+            Common.showErrorDialog(StudentDetails.this, "Please Department Name !", StudentDetails.this);
+
+        } else if (originalImageUrl.equalsIgnoreCase("")) {
+
+            mDialog.dismiss();
+            Common.showErrorDialog(StudentDetails.this, "Please Provide Valid ID Card Image", StudentDetails.this);
+
+        } else {
 
             final Map<String, Object> userMap = new HashMap<>();
             userMap.put("schoolName", theNewSchoolName);
@@ -542,11 +556,6 @@ public class StudentDetails extends AppCompatActivity {
 
                 }
             });
-
-        } else {
-
-            mDialog.dismiss();
-            Common.showErrorDialog(StudentDetails.this, "Please Enter All Required Details !", StudentDetails.this);
 
         }
 

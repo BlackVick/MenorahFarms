@@ -1,15 +1,21 @@
 package com.blackviking.menorahfarms.DashboardMenu;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.blackviking.menorahfarms.AccountMenus.StudentDetails;
 import com.blackviking.menorahfarms.CartAndHistory.Cart;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.FarmDetails;
@@ -20,12 +26,15 @@ import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.ViewHolders.CartViewHolder;
 import com.blackviking.menorahfarms.ViewHolders.FollowedFarmViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -163,6 +172,14 @@ public class FollowedFarms extends AppCompatActivity {
                                 }
 
 
+                                viewHolder.unfollowButton.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        openConfirmationText(adapter.getRef(viewHolder.getAdapterPosition()).getKey());
+                                    }
+                                });
+
+
                                 viewHolder.setItemClickListener(new ItemClickListener() {
                                     @Override
                                     public void onClick(View view, int position, boolean isLongClick) {
@@ -184,6 +201,52 @@ public class FollowedFarms extends AppCompatActivity {
             }
         };
         followedFarmRecycler.setAdapter(adapter);
+
+    }
+
+    private void openConfirmationText(final String key) {
+
+        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this).create();
+        LayoutInflater inflater = FollowedFarms.this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.unfollow_layout,null);
+
+        final Button cancel = (Button) viewOptions.findViewById(R.id.cancelAcada);
+        final Button proceed = (Button) viewOptions.findViewById(R.id.proceedAcada);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        proceed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                followedFarmRef.child(currentuid)
+                        .child(key)
+                        .removeValue()
+                        .addOnCompleteListener(
+                        new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                alertDialog.dismiss();
+
+                                FirebaseMessaging.getInstance().unsubscribeFromTopic(key);
+                                Toast.makeText(FollowedFarms.this, "Farm un-followed", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                );
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.cancel();
+            }
+        });
+
+        alertDialog.show();
 
     }
 

@@ -4,16 +4,17 @@ public class DueSponsorshipModel {
 
     private String user;
     private String sponsorshipId;
-    private String timeDue;
+    private Long timeDue;
 
     public DueSponsorshipModel() {
     }
 
-    public DueSponsorshipModel(String user, String sponsorshipId, String timeDue) {
+    public DueSponsorshipModel(String user, String sponsorshipId, Long timeDue) {
         this.user = user;
         this.sponsorshipId = sponsorshipId;
         this.timeDue = timeDue;
     }
+
 
     public String getUser() {
         return user;
@@ -31,11 +32,11 @@ public class DueSponsorshipModel {
         this.sponsorshipId = sponsorshipId;
     }
 
-    public String getTimeDue() {
+    public Long getTimeDue() {
         return timeDue;
     }
 
-    public void setTimeDue(String timeDue) {
+    public void setTimeDue(Long timeDue) {
         this.timeDue = timeDue;
     }
 }

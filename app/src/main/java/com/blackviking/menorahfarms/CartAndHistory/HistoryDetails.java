@@ -29,7 +29,7 @@ public class HistoryDetails extends AppCompatActivity {
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference  userRef, adminHistoryRef, historyRef, sponsoredFarmsRef;
-    private String userId, sponsorshipId, historyId;
+    private String userId, historyId;
     private HistoryModel currentSponsorship;
 
     @Override
@@ -79,8 +79,9 @@ public class HistoryDetails extends AppCompatActivity {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        userId = dataSnapshot.child("user").getValue().toString();
-                        sponsorshipId = dataSnapshot.child("sponsorshipId").getValue().toString();
+                        userId = dataSnapshot.child("sponsorshipUser").getValue().toString();
+
+                        loadAllDetails(userId);
 
                     }
 
@@ -90,10 +91,9 @@ public class HistoryDetails extends AppCompatActivity {
                     }
                 });
 
-        loadAllDetails();
     }
 
-    private void loadAllDetails() {
+    private void loadAllDetails(String userId) {
 
         userRef.child(userId)
                 .addListenerForSingleValueEvent(
@@ -139,6 +139,8 @@ public class HistoryDetails extends AppCompatActivity {
                                 theDueTotalReturn = currentSponsorship.getSponsorReturn();
                                 theDueRefNumber = currentSponsorship.getSponsorRefNumber();
 
+                                setAllValues();
+
                             }
 
                             @Override
@@ -148,7 +150,6 @@ public class HistoryDetails extends AppCompatActivity {
                         }
                 );
 
-        setAllValues();
     }
 
     private void setAllValues() {

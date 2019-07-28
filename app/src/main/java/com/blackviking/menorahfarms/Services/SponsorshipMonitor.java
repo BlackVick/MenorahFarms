@@ -80,7 +80,7 @@ public class SponsorshipMonitor extends Service {
         if (Common.isConnectedToInternet(getApplicationContext())){
 
             sponsoredFarmRef.child(userId)
-                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                    .addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -97,6 +97,8 @@ public class SponsorshipMonitor extends Service {
 
                                 }
 
+                                repeatTomorrow();
+
                             } else {
 
                                 Paper.book().write(Common.isSponsorshipMonitorRunning, false);
@@ -111,8 +113,6 @@ public class SponsorshipMonitor extends Service {
 
                         }
                     });
-
-            repeatTomorrow();
 
         } else {
 
@@ -194,7 +194,7 @@ public class SponsorshipMonitor extends Service {
 
         final Map<String, Object> notificationMap = new HashMap<>();
         notificationMap.put("topic", "Sponsorship End");
-        notificationMap.put("message", "Congratulations! You have reached the end of a sponsorship cycle. Your full return will be made into your bank account shortly.");
+        notificationMap.put("message", "Congratulations! You have reached the end of a sponsorship cycle. Your full return payment will be made into your bank account shortly.");
         notificationMap.put("time", todayString);
 
         notificationRef.child(userId)
@@ -207,7 +207,7 @@ public class SponsorshipMonitor extends Service {
 
                                 Map<String, String> dataSend = new HashMap<>();
                                 dataSend.put("title", "Sponsorship End");
-                                dataSend.put("message", "Congratulations! You have reached the end of a sponsorship cycle. Your full return will be made into your bank account shortly.");
+                                dataSend.put("message", "Congratulations! You have reached the end of a sponsorship cycle. Your full return payment will be made into your bank account shortly.");
                                 DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(userId).toString(), dataSend);
 
                                 mService.sendNotification(dataMessage)
@@ -248,6 +248,15 @@ public class SponsorshipMonitor extends Service {
 
                                     String theUserIds = snap.getKey();
 
+                                    final Map<String, Object> notificationMap = new HashMap<>();
+                                    notificationMap.put("topic", "Sponsorship End");
+                                    notificationMap.put("message", "A sponsorship cycle just ended.");
+                                    notificationMap.put("time", todayString);
+
+                                    notificationRef.child(theUserIds)
+                                            .push()
+                                            .setValue(notificationMap);
+
                                     Map<String, String> dataSend = new HashMap<>();
                                     dataSend.put("title", "Admin");
                                     dataSend.put("message", "A Cycle Just Ended. Tend to customer");
@@ -285,7 +294,7 @@ public class SponsorshipMonitor extends Service {
             public void run() {
                 startMonitor();
             }
-        }, 86400000);
+        }, 21600000);
 
     }
 

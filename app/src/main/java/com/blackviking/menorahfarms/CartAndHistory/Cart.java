@@ -65,7 +65,7 @@ public class Cart extends AppCompatActivity {
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private DatabaseReference cartRef, userRef, farmRef, sponsorshipRef, payHistoryRef, termsRef, notificationRef;
+    private DatabaseReference cartRef, userRef, farmRef, sponsorshipRef, payHistoryRef, termsRef, notificationRef, adminSponsorRef;
     private String currentuid;
     private String userFirstName, userLastName, userEmail, paymentReference;
 
@@ -91,6 +91,7 @@ public class Cart extends AppCompatActivity {
         payHistoryRef = db.getReference("TransactionHistory");
         termsRef = db.getReference("TermsAndConditions");
         notificationRef = db.getReference("Notifications");
+        adminSponsorRef = db.getReference("RunningCycles");
         if (mAuth.getCurrentUser() != null)
             currentuid = mAuth.getCurrentUser().getUid();
 
@@ -485,6 +486,21 @@ public class Cart extends AppCompatActivity {
         sponsorshipMap.put("totalAmountPaid", totalPrice);
         sponsorshipMap.put("farmId", currentFarmId);
 
+        Map<String, Object> adminSponsorshipMap = new HashMap<>();
+        adminSponsorshipMap.put("sponsorReturn", String.valueOf(currentTotalPayout));
+        adminSponsorshipMap.put("cycleEndDate", futureString);
+        adminSponsorshipMap.put("cycleStartDate", todayString);
+        adminSponsorshipMap.put("sponsorRefNumber", paymentReference);
+        adminSponsorshipMap.put("unitPrice", currentUnitPrice);
+        adminSponsorshipMap.put("sponsoredUnits", String.valueOf(currentUnits));
+        adminSponsorshipMap.put("sponsoredFarmType", currentFarmType);
+        adminSponsorshipMap.put("sponsoredFarmRoi", currentFarmRoi);
+        adminSponsorshipMap.put("sponsorshipDuration", currentDuration);
+        adminSponsorshipMap.put("startPoint", ServerValue.TIMESTAMP);
+        adminSponsorshipMap.put("totalAmountPaid", totalPrice);
+        adminSponsorshipMap.put("farmId", currentFarmId);
+        adminSponsorshipMap.put("userId", currentuid);
+
         final Map<String, Object> logMap = new HashMap<>();
         logMap.put("userName", userFirstName + " " + userLastName);
         logMap.put("userEmail", userEmail);
@@ -492,8 +508,14 @@ public class Cart extends AppCompatActivity {
         logMap.put("paymentDate", todayString);
         logMap.put("farmSponsored", currentFarmId);
 
+        DatabaseReference pushRef = adminSponsorRef.push();
+        String pushId = pushRef.getKey();
+
+        adminSponsorRef.child(pushId)
+                .setValue(adminSponsorshipMap);
+
         sponsorshipRef.child(currentuid)
-                .push()
+                .child(pushId)
                 .setValue(sponsorshipMap)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -535,8 +557,70 @@ public class Cart extends AppCompatActivity {
 
         final Map<String, Object> notificationMap = new HashMap<>();
         notificationMap.put("topic", "Sponsorship Start");
-        notificationMap.put("message", "You have successfully sponsored a farm, feel free to look around for more sponsorship opportunities.");
+        notificationMap.put("message", "You have successfully sponsored a farm, you can monitor your sponsored farm from the Sponsored Farms page.");
         notificationMap.put("time", todayString);
+
+
+        final Map<String, Object> adminNotificationMap = new HashMap<>();
+        adminNotificationMap.put("topic", "Sponsorship Start");
+        adminNotificationMap.put("message", "New Sponsorship Alert.");
+        adminNotificationMap.put("time", todayString);
+
+        userRef.orderByChild("userType")
+                .equalTo("Admin")
+                .addListenerForSingleValueEvent(
+                        new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                for (DataSnapshot snap : dataSnapshot.getChildren()){
+
+                                    final String adminKey = snap.getKey();
+
+                                    notificationRef.child(adminKey)
+                                            .push()
+                                            .setValue(adminNotificationMap)
+                                            .addOnSuccessListener(
+                                                    new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+
+                                                            Map<String, String> dataSend = new HashMap<>();
+                                                            dataSend.put("title", "Sponsorship Start");
+                                                            dataSend.put("message", "A new user just sponsored a farm.");
+                                                            DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(adminKey).toString(), dataSend);
+
+                                                            mService.sendNotification(dataMessage)
+                                                                    .enqueue(new retrofit2.Callback<MyResponse>() {
+                                                                        @Override
+                                                                        public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+
+                                                                        }
+
+                                                                        @Override
+                                                                        public void onFailure(Call<MyResponse> call, Throwable t) {
+                                                                        }
+                                                                    });
+
+                                                        }
+                                                    }
+                                            ).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+
+                                        }
+                                    });
+
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        }
+                );
 
         notificationRef.child(currentuid)
                 .push()
@@ -548,7 +632,7 @@ public class Cart extends AppCompatActivity {
 
                                 Map<String, String> dataSend = new HashMap<>();
                                 dataSend.put("title", "Sponsorship Start");
-                                dataSend.put("message", "You have successfully sponsored a farm, feel free to look around for more sponsorship opportunities.");
+                                dataSend.put("message", "You have successfully sponsored a farm, you can monitor your sponsored farm from the Sponsored Farms page.");
                                 DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(currentuid).toString(), dataSend);
 
                                 mService.sendNotification(dataMessage)

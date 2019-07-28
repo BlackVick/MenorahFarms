@@ -75,6 +75,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -102,7 +103,7 @@ public class Account extends AppCompatActivity {
 
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference userRef;
+    private DatabaseReference userRef, farmRef;
     private String currentUid, loginType;
 
     private android.app.AlertDialog mDialog;
@@ -129,6 +130,7 @@ public class Account extends AppCompatActivity {
         /*---   FIREBASE   ---*/
         userRef = db.getReference("Users");
         imageRef = storage.getReference("ProfileImages");
+        farmRef = db.getReference("Farms");
         if (mAuth.getCurrentUser() != null)
             currentUid = mAuth.getCurrentUser().getUid();
 
@@ -289,33 +291,53 @@ public class Account extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if (loginType.equalsIgnoreCase("Facebook")){
+                farmRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-                    Paper.book().destroy();
+                        for (DataSnapshot child : dataSnapshot.getChildren()){
 
-                    mAuth.signOut();
-                    LoginManager.getInstance().logOut();
+                            FirebaseMessaging.getInstance().unsubscribeFromTopic(child.getKey());
 
-                    FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
-                    Intent signoutIntent = new Intent(Account.this, SignIn.class);
-                    signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(signoutIntent);
-                    finish();
+                        }
 
-                } else {
+                        if (loginType.equalsIgnoreCase("Facebook")){
 
-                    Paper.book().destroy();
+                            Paper.book().destroy();
 
-                    mAuth.signOut();
+                            mAuth.signOut();
+                            LoginManager.getInstance().logOut();
 
-                    FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
+                            FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
+                            FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.GENERAL_NOTIFY);
+                            Intent signoutIntent = new Intent(Account.this, SignIn.class);
+                            signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(signoutIntent);
+                            finish();
 
-                    Intent signoutIntent = new Intent(Account.this, SignIn.class);
-                    signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(signoutIntent);
-                    finish();
+                        } else {
 
-                }
+                            Paper.book().destroy();
+
+                            mAuth.signOut();
+
+                            FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
+                            FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.GENERAL_NOTIFY);
+                            Intent signoutIntent = new Intent(Account.this, SignIn.class);
+                            signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(signoutIntent);
+                            finish();
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
 
             }
         });

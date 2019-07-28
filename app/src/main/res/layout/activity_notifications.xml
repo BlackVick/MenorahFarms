@@ -66,7 +66,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Your Have No Notification"
+            android:text="You Have No Notification"
             android:gravity="center"
             android:textColor="@color/colorAccent"
             android:textSize="25sp"

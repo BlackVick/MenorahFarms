@@ -180,6 +180,7 @@ public class Registration extends AppCompatActivity {
         Paper.book().write(Common.USER_ID, currentUid);
 
         FirebaseMessaging.getInstance().subscribeToTopic(currentUid);
+        FirebaseMessaging.getInstance().subscribeToTopic(Common.GENERAL_NOTIFY);
 
         Intent homeIntent = new Intent(Registration.this, Dashboard.class);
         homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);

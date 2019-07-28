@@ -25,6 +25,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -405,6 +406,8 @@ public class FarmDetails extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void aVoid) {
 
+
+                        FirebaseMessaging.getInstance().subscribeToTopic(farmId);
                         followFarmBtn.setVisibility(View.GONE);
                         followedFarmButton.setVisibility(View.VISIBLE);
 

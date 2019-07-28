@@ -3,6 +3,7 @@ package com.blackviking.menorahfarms.ViewHolders;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -14,6 +15,7 @@ public class FollowedFarmViewHolder extends RecyclerView.ViewHolder implements V
     private ItemClickListener itemClickListener;
     public ImageView followedFarmImage;
     public TextView followedFarmType, followedFarmPrice, followedFarmState, followedFarmROI;
+    public Button unfollowButton;
 
     public FollowedFarmViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -23,6 +25,7 @@ public class FollowedFarmViewHolder extends RecyclerView.ViewHolder implements V
         followedFarmPrice = (TextView) itemView.findViewById(R.id.followedFarmPrice);
         followedFarmState = (TextView) itemView.findViewById(R.id.followedFarmState);
         followedFarmROI = (TextView) itemView.findViewById(R.id.followedFarmROI);
+        unfollowButton = (Button) itemView.findViewById(R.id.unfollowButton);
 
         itemView.setOnClickListener(this);
 

@@ -77,7 +77,8 @@ public class DueSponsorships extends Fragment {
             @Override
             protected void populateViewHolder(final AdminViewHolder viewHolder, DueSponsorshipModel model, int position) {
 
-                sponsorshipRef.child(model.getSponsorshipId())
+                sponsorshipRef.child(model.getUser())
+                        .child(model.getSponsorshipId())
                         .addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {

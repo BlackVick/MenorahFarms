@@ -76,7 +76,7 @@
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:animateLayoutChanges="true"
-            android:weightSum="4">
+            android:weightSum="5">
 
             <RelativeLayout
                 android:layout_width="0dp"
@@ -151,6 +151,35 @@
                     android:adjustViewBounds="true"
                     android:padding="15dp"
                     android:id="@+id/adminNotifyImage"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:animateLayoutChanges="true"
+                android:layout_height="match_parent"
+                android:id="@+id/runningSponsorshipLayout">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/ic_current_sponsorships_green"
+                    android:adjustViewBounds="true"
+                    android:padding="17dp"
+                    android:id="@+id/runningSponsorshipImage"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="@color/red"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_alignParentEnd="true"
+                    android:layout_margin="4dp"
+                    android:id="@+id/runningSponsorshipCounter"/>
 
             </RelativeLayout>
 

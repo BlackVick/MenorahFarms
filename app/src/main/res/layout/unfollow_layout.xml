@@ -18,7 +18,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="AcadaCash Farms"
+            android:text="Un-follow Farm"
             android:gravity="center"
             android:textColor="@color/colorAccent"
             android:textSize="25sp"
@@ -27,10 +27,10 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="AcadaCash Farms for undergraduates are available only to verified undergraduates. \n\nWould you like to switch your account to a student account now?"
+            android:text="Are you sure you want to un-follow this farm?"
             android:gravity="center"
             android:textColor="@color/grey"
-            android:textSize="15sp"
+            android:textSize="17sp"
             android:layout_marginTop="10dp"/>
 
     </LinearLayout>

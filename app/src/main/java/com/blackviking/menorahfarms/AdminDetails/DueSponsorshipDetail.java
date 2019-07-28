@@ -110,6 +110,8 @@ public class DueSponsorshipDetail extends AppCompatActivity {
                         userId = dataSnapshot.child("user").getValue().toString();
                         sponsorshipId = dataSnapshot.child("sponsorshipId").getValue().toString();
 
+                        loadAllDetails(userId, sponsorshipId);
+
                     }
 
                     @Override
@@ -118,11 +120,11 @@ public class DueSponsorshipDetail extends AppCompatActivity {
                     }
                 });
 
-        loadAllDetails();
+
 
     }
 
-    private void loadAllDetails() {
+    private void loadAllDetails(String userId, String sponsorshipId) {
 
         userRef.child(userId)
                 .addListenerForSingleValueEvent(
@@ -169,6 +171,8 @@ public class DueSponsorshipDetail extends AppCompatActivity {
                                 theDueTotalReturn = currentSponsorship.getSponsorReturn();
                                 theDueRefNumber = currentSponsorship.getSponsorRefNumber();
 
+                                setAllValues();
+
                             }
 
                             @Override
@@ -178,7 +182,7 @@ public class DueSponsorshipDetail extends AppCompatActivity {
                         }
                 );
 
-        setAllValues();
+
     }
 
     private void setAllValues() {
@@ -234,7 +238,8 @@ public class DueSponsorshipDetail extends AppCompatActivity {
         historyMap.put("farmId", currentSponsorship.getFarmId());
 
         DatabaseReference pushRef = adminHistoryRef.push();
-        final String pushId= pushRef.toString();
+        final String pushId= pushRef.getKey();
+
 
         adminHistoryRef.child(pushId)
                 .setValue(historyMap)
@@ -255,21 +260,25 @@ public class DueSponsorshipDetail extends AppCompatActivity {
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
-                                                        sendNotification();
+                                                        dueSponsorshipRef.child(dueSponsorshipId)
+                                                                .removeValue().addOnCompleteListener(
+                                                                new OnCompleteListener<Void>() {
+                                                                    @Override
+                                                                    public void onComplete(@NonNull Task<Void> task) {
+
+                                                                        if (task.isComplete())
+                                                                            sendNotification();
+
+                                                                    }
+                                                                }
+                                                        );
                                                     }
                                                 });
 
                                     }
                                 });
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-
-                Toast.makeText(getApplicationContext(), "Failed", Toast.LENGTH_SHORT).show();
-
-            }
-        });
+                });
 
     }
 

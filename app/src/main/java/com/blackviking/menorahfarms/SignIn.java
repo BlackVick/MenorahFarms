@@ -384,7 +384,7 @@ public class SignIn extends AppCompatActivity {
 
                                     } else {
 
-                                        Common.showErrorDialog(SignIn.this, "This Account Does Not Exist Yet, Please Sign Up And Try Again Later", SignIn.this);
+                                        Common.showErrorDialog(SignIn.this, "This Account Does Not Exist Yet, Please Go To Sign Up Page And Try Again", SignIn.this);
                                         mDialog.dismiss();
 
                                     }
@@ -491,6 +491,7 @@ public class SignIn extends AppCompatActivity {
             Paper.book().write(Common.USER_ID, currentUid);
 
             FirebaseMessaging.getInstance().subscribeToTopic(currentUid);
+            FirebaseMessaging.getInstance().subscribeToTopic(Common.GENERAL_NOTIFY);
 
             Intent goToHome = new Intent(SignIn.this, Dashboard.class);
             goToHome.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);

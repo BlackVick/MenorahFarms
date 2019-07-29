@@ -89,17 +89,17 @@ public class OpeningSoonFragment extends Fragment {
                         }
                 );
 
-        checkNowSelling();
+        checkOpeningSoon();
 
 
         return v;
     }
 
-    private void checkNowSelling() {
+    private void checkOpeningSoon() {
 
         farmRef.orderByChild("farmState")
                 .equalTo("Opening Soon")
-                .addListenerForSingleValueEvent(
+                .addValueEventListener(
                         new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {

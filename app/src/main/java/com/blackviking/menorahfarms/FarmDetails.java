@@ -147,18 +147,6 @@ public class FarmDetails extends AppCompatActivity {
                                 final String theFarmImage = dataSnapshot.child("farmImage").getValue().toString();
                                 final String theFarmState = dataSnapshot.child("farmState").getValue().toString();
 
-                                if (theFarmState.equalsIgnoreCase("Now Selling")){
-
-                                    addToCartBtn.setVisibility(View.VISIBLE);
-                                    farmNumber.setVisibility(View.VISIBLE);
-
-                                } else {
-
-                                    addToCartBtn.setVisibility(View.GONE);
-                                    farmNumber.setVisibility(View.GONE);
-
-                                }
-
                                 if (!theFarmImage.equalsIgnoreCase("")){
 
                                     Picasso.get()
@@ -208,7 +196,7 @@ public class FarmDetails extends AppCompatActivity {
 
                                 final int unitsAvail = Integer.parseInt(theFarmUnitsLeft);
 
-                                if (unitsAvail == 0){
+                                if (unitsAvail == 0 || !theFarmState.equalsIgnoreCase("Now Selling")){
 
                                     addToCartBtn.setVisibility(View.GONE);
                                     farmNumber.setVisibility(View.GONE);

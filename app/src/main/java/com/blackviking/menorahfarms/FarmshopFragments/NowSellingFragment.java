@@ -56,7 +56,6 @@ public class NowSellingFragment extends Fragment {
         // Required empty public constructor
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -102,7 +101,7 @@ public class NowSellingFragment extends Fragment {
 
         farmRef.orderByChild("farmState")
                 .equalTo("Now Selling")
-                .addListenerForSingleValueEvent(
+                .addValueEventListener(
                         new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {

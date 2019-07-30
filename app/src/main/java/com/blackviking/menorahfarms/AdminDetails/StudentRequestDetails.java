@@ -236,7 +236,7 @@ public class StudentRequestDetails extends AppCompatActivity {
 
         Map<String, Object> notificationMap = new HashMap<>();
         notificationMap.put("topic", "Student Approval");
-        notificationMap.put("message", "Your student details were examined and a conclusion to approve your account was reached. You can now sponsor farms under acada cash.");
+        notificationMap.put("message", "Your student details have been confirmed. You can now sponsor AcadaCash farms as an undergraduate.");
         notificationMap.put("time", todayString);
 
 
@@ -248,7 +248,7 @@ public class StudentRequestDetails extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         Map<String, String> dataSend = new HashMap<>();
                         dataSend.put("title", "Student");
-                        dataSend.put("message", "Your student details were examined and a conclusion to approve your account was reached. You can now sponsor farms under acada cash.");
+                        dataSend.put("message", "Your student details have been confirmed. You can now sponsor AcadaCash farms as an undergraduate.");
                         DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(userId).toString(), dataSend);
 
                         mService.sendNotification(dataMessage)
@@ -277,7 +277,7 @@ public class StudentRequestDetails extends AppCompatActivity {
 
         Map<String, Object> notificationMap = new HashMap<>();
         notificationMap.put("topic", "Student Denial");
-        notificationMap.put("message", "Your student details were examined and a conclusion to deny your account was reached based on fake or invalid details.");
+        notificationMap.put("message", "Your student details have been denied due to invalid documents. Please contact us if you feel this is wrong.");
         notificationMap.put("time", todayString);
 
 
@@ -289,7 +289,7 @@ public class StudentRequestDetails extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         Map<String, String> dataSend = new HashMap<>();
                         dataSend.put("title", "Student");
-                        dataSend.put("message", "Your student details were examined and a conclusion to deny your account was reached based on fake or invalid details.");
+                        dataSend.put("message", "Your student details have been denied due to invalid documents. Please contact us if you feel this is wrong.");
                         DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(userId).toString(), dataSend);
 
                         mService.sendNotification(dataMessage)

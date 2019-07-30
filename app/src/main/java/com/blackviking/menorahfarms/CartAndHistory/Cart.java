@@ -324,7 +324,7 @@ public class Cart extends AppCompatActivity {
         currentCartKey = theCartKey;
 
 
-        paymentReference = userEmail + "_BVS_" + System.currentTimeMillis();
+        paymentReference = "MENORAH-SPONSORSHIP_USR_" + userEmail + "_BVS_" + System.currentTimeMillis();
 
         /*---   PRICE TO PAY   ---*/
         int thePrice = Integer.parseInt(theFarmUnitPrice);
@@ -557,7 +557,7 @@ public class Cart extends AppCompatActivity {
 
         final Map<String, Object> notificationMap = new HashMap<>();
         notificationMap.put("topic", "Sponsorship Start");
-        notificationMap.put("message", "You have successfully sponsored a farm, you can monitor your sponsored farm from the Sponsored Farms page.");
+        notificationMap.put("message", "Your payment has been received successfully and your sponsorship cycle will start shortly. You can monitor your sponsored farm from the Sponsored Farms page through your dashboard.");
         notificationMap.put("time", todayString);
 
 
@@ -632,7 +632,7 @@ public class Cart extends AppCompatActivity {
 
                                 Map<String, String> dataSend = new HashMap<>();
                                 dataSend.put("title", "Sponsorship Start");
-                                dataSend.put("message", "You have successfully sponsored a farm, you can monitor your sponsored farm from the Sponsored Farms page.");
+                                dataSend.put("message", "Your payment has been received successfully and your sponsorship cycle will start shortly. You can monitor your sponsored farm from the Sponsored Farms page through your dashboard.");
                                 DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(currentuid).toString(), dataSend);
 
                                 mService.sendNotification(dataMessage)

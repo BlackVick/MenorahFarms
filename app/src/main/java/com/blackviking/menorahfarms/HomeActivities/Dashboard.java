@@ -20,6 +20,7 @@ import com.blackviking.menorahfarms.DashboardMenu.FollowedFarms;
 import com.blackviking.menorahfarms.DashboardMenu.Notifications;
 import com.blackviking.menorahfarms.DashboardMenu.SponsoredFarms;
 import com.blackviking.menorahfarms.R;
+import com.blackviking.menorahfarms.Services.CheckForSponsorship;
 import com.blackviking.menorahfarms.Services.SponsorshipMonitor;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -204,6 +205,11 @@ public class Dashboard extends AppCompatActivity {
         isMonitorRunning = Paper.book().read(Common.isSponsorshipMonitorRunning);
 
 
+        /*---   CHECK SERVICE   ---*/
+        Intent checkSponsorship = new Intent(Dashboard.this, CheckForSponsorship.class);
+        startService(checkSponsorship);
+
+
         /*---   SPONSORED CYCLE   ---*/
         sponsoredRef.child(currentUid)
                 .addValueEventListener(
@@ -227,12 +233,12 @@ public class Dashboard extends AppCompatActivity {
                                     totalReturnsText.setText(Common.convertToPrice(Dashboard.this, totalReturn));
 
 
-                                    if (!isMonitorRunning) {
+                                    /*if (!isMonitorRunning) {
 
                                         Intent sponsorshipMonitor = new Intent(Dashboard.this, SponsorshipMonitor.class);
                                         startService(sponsorshipMonitor);
 
-                                    }
+                                    }*/
 
                                 } else {
 

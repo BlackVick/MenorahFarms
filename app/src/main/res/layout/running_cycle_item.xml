@@ -41,7 +41,7 @@
             android:id="@+id/cycleRefNumber"
             android:text=""
             android:textColor="@color/black"
-            android:textSize="12sp"
+            android:textSize="14sp"
             android:layout_marginTop="2dp"
             android:layout_marginStart="5dp"
             android:layout_marginEnd="5dp"/>
@@ -52,7 +52,7 @@
             android:id="@+id/cycleUnits"
             android:text=""
             android:textColor="@color/black"
-            android:textSize="12sp"
+            android:textSize="14sp"
             android:layout_marginTop="2dp"
             android:layout_marginStart="5dp"
             android:layout_marginEnd="5dp"/>
@@ -91,7 +91,7 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:textSize="13sp"
+                android:textSize="14sp"
                 android:textColor="@color/red"
                 android:gravity="start|center_vertical"
                 android:id="@+id/cycleStartDate"/>
@@ -101,7 +101,7 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:textSize="13sp"
+                android:textSize="14sp"
                 android:textColor="@color/colorPrimaryDark"
                 android:gravity="end|center_vertical"
                 android:id="@+id/cycleEndDate"/>

@@ -98,7 +98,7 @@ public class RunningSponsorships extends Fragment {
                 long returnToLong = Long.parseLong(model.getSponsorReturn());
 
                 viewHolder.cycleFarmType.setText(model.getSponsoredFarmType());
-                viewHolder.cycleRefNumber.setText(model.getSponsorRefNumber());
+                viewHolder.cycleRefNumber.setText("Ref: " + model.getSponsorRefNumber());
                 viewHolder.cycleUnits.setText(model.getSponsoredUnits() + " Units");
                 viewHolder.cycleAmountPaid.setText("Amount Paid: " + Common.convertToPrice(getContext(), model.getTotalAmountPaid()));
                 viewHolder.cycleReturn.setText("Return: " + Common.convertToPrice(getContext(), returnToLong));

@@ -46,7 +46,7 @@ public class DueSponsorshipDetail extends AppCompatActivity {
             theDueTotalPaid, theDueDuration, theDueStartDate, theDueEndDate, theDueTotalReturn, theDueRefNumber;
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference userRef, dueSponsorshipRef, notificationRef, adminHistoryRef, historyRef, sponsoredFarmsRef;
+    private DatabaseReference userRef, dueSponsorshipRef, notificationRef, adminHistoryRef, historyRef, sponsoredFarmsRef, adminSponsorshipRef;
     private String userId, sponsorshipId, dueSponsorshipId;
     private SponsoredFarmModel currentSponsorship;
 
@@ -74,6 +74,7 @@ public class DueSponsorshipDetail extends AppCompatActivity {
         adminHistoryRef = db.getReference("AdminHistory");
         historyRef = db.getReference("History");
         sponsoredFarmsRef = db.getReference("SponsoredFarms");
+        adminSponsorshipRef = db.getReference("RunningCycles");
 
 
         /*---   WIDGETS   ---*/
@@ -119,8 +120,6 @@ public class DueSponsorshipDetail extends AppCompatActivity {
 
                     }
                 });
-
-
 
     }
 
@@ -253,6 +252,9 @@ public class DueSponsorshipDetail extends AppCompatActivity {
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
+
+                                        adminSponsorshipRef.child(sponsorshipId)
+                                                .removeValue();
 
                                         sponsoredFarmsRef.child(userId)
                                                 .child(sponsorshipId)

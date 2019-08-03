@@ -191,6 +191,15 @@ public class SponsoredFarms extends AppCompatActivity {
                 viewHolder.sponsoredFarmRefNumber.setText(model.getSponsorRefNumber());
                 viewHolder.sponsoredFarmROI.setText(model.getSponsoredFarmRoi() + "% returns in " + model.getSponsorshipDuration() + " months.");
 
+                if (model.getStatus().equalsIgnoreCase("processing")){
+
+                    viewHolder.processing.setVisibility(View.VISIBLE);
+
+                } else {
+
+                    viewHolder.processing.setVisibility(View.GONE);
+
+                }
 
                 viewHolder.setItemClickListener(new ItemClickListener() {
                     @Override

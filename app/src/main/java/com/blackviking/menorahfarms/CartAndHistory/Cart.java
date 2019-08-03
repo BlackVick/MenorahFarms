@@ -233,7 +233,7 @@ public class Cart extends AppCompatActivity {
                                         if (Common.isConnectedToInternet(getBaseContext())) {
                                             openDeleteDialog(adapter.getRef(viewHolder.getAdapterPosition()).getKey());
                                         } else {
-                                            Common.showErrorDialog(Cart.this, "No Internet Access !", Cart.this);
+                                            showErrorDialog("No Internet Access !");
                                         }
                                     }
                                 });
@@ -291,7 +291,7 @@ public class Cart extends AppCompatActivity {
                                             alertDialog.show();
 
                                         } else {
-                                            Common.showErrorDialog(Cart.this, "No Internet Access !", Cart.this);
+                                            showErrorDialog("No Internet Access !");
                                         }
                                     }
                                 });
@@ -324,7 +324,12 @@ public class Cart extends AppCompatActivity {
         currentCartKey = theCartKey;
 
 
-        paymentReference = "MENORAH-SPONSORSHIP_USR_" + userEmail + "_BVS_" + System.currentTimeMillis();
+        char firstInit = userFirstName.charAt(0);
+        char lastInit = userLastName.charAt(0);
+
+        String initials = String.valueOf(firstInit) + String.valueOf(lastInit);
+
+        paymentReference = initials + "-MF-" + System.currentTimeMillis();
 
         /*---   PRICE TO PAY   ---*/
         int thePrice = Integer.parseInt(theFarmUnitPrice);
@@ -380,7 +385,7 @@ public class Cart extends AppCompatActivity {
 
                                 } else {
 
-                                    Common.showErrorDialog(Cart.this, "Units Left For Sale On Farm Can Not Serve Your Request. Please Go Back To The Farm Store To Make Other Requests", Cart.this);
+                                    showErrorDialog("Units Left For Sale On Farm Can Not Serve Your Request. Please Go Back To The Farm Store To Make Other Requests");
 
                                 }
 
@@ -485,6 +490,7 @@ public class Cart extends AppCompatActivity {
         sponsorshipMap.put("startPoint", ServerValue.TIMESTAMP);
         sponsorshipMap.put("totalAmountPaid", totalPrice);
         sponsorshipMap.put("farmId", currentFarmId);
+        sponsorshipMap.put("status", "sponsoring");
 
         Map<String, Object> adminSponsorshipMap = new HashMap<>();
         adminSponsorshipMap.put("sponsorReturn", String.valueOf(currentTotalPayout));
@@ -699,5 +705,34 @@ public class Cart extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         finish();
+    }
+
+    /*---   WARNING DIALOG   ---*/
+    public void showErrorDialog(String theWarning){
+
+        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.dialog_layout,null);
+
+        final TextView message = (TextView) viewOptions.findViewById(R.id.dialogMessage);
+        final Button okButton = (Button) viewOptions.findViewById(R.id.dialogButton);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        message.setText(theWarning);
+
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        });
+
+        alertDialog.show();
+
     }
 }

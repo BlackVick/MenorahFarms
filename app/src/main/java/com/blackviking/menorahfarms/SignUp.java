@@ -1,11 +1,14 @@
 package com.blackviking.menorahfarms;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.method.PasswordTransformationMethod;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
@@ -136,7 +139,7 @@ public class SignUp extends AppCompatActivity {
 
                 } else {
 
-                    Common.showErrorDialog(SignUp.this, "No Internet Access !", SignUp.this);
+                    showErrorDialog("No Internet Access !");
 
                 }
             }
@@ -174,7 +177,7 @@ public class SignUp extends AppCompatActivity {
 
                 } else {
 
-                    Common.showErrorDialog(SignUp.this, "No Internet Access !", SignUp.this);
+                    showErrorDialog("No Internet Access !");
 
                 }
             }
@@ -196,7 +199,7 @@ public class SignUp extends AppCompatActivity {
 
                 } else {
 
-                    Common.showErrorDialog(SignUp.this, "No Internet Access !", SignUp.this);
+                    showErrorDialog("No Internet Access !");
 
                 }
             }
@@ -329,7 +332,7 @@ public class SignUp extends AppCompatActivity {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
 
-                                    Common.showErrorDialog(SignUp.this, "Authentication Could Not Be Registered. Please Try Again Later.", SignUp.this);
+                                    showErrorDialog("Authentication Could Not Be Registered. Please Try Again Later.");
                                     if (mAuth.getCurrentUser() != null){
 
                                         mDialog.dismiss();
@@ -343,7 +346,7 @@ public class SignUp extends AppCompatActivity {
                         } else {
 
                             mDialog.dismiss();
-                            Common.showErrorDialog(SignUp.this, "An Unknown Error Occurred While Signing Up With Email. Provided Mail Might Already Exist Or Be Invalid. Please Try Again Later !", SignUp.this);
+                            showErrorDialog("Error Occurred While Signing Up With Email. Provided Mail May Already Exist.");
 
                         }
                     }
@@ -401,7 +404,7 @@ public class SignUp extends AppCompatActivity {
                 @Override
                 public void onFailure(@NonNull Exception e) {
 
-                    Common.showErrorDialog(SignUp.this, "Something Went Wrong. Please Try Again Later.", SignUp.this);
+                    showErrorDialog("Something Went Wrong. Please Try Again Later.");
                     if (mAuth.getCurrentUser() != null){
 
                         mDialog.dismiss();
@@ -415,7 +418,7 @@ public class SignUp extends AppCompatActivity {
 
         } else {
 
-            Common.showErrorDialog(SignUp.this, "Process Failed", SignUp.this);
+            showErrorDialog("Process Failed");
             mDialog.dismiss();
 
         }
@@ -451,7 +454,7 @@ public class SignUp extends AppCompatActivity {
                                         if (dataSnapshot.child(currentUid).exists()){
 
                                             mDialog.dismiss();
-                                            Common.showErrorDialog(SignUp.this, "A User Has Already Registered With This Account, Log In Instead", SignUp.this);
+                                            showErrorDialog("A User Has Already Registered With This Account, Log In Instead");
                                             mAuth.signOut();
 
                                         } else {
@@ -469,7 +472,7 @@ public class SignUp extends AppCompatActivity {
                                                 @Override
                                                 public void onFailure(@NonNull Exception e) {
 
-                                                    Common.showErrorDialog(SignUp.this, "Authentication Could Not Be Registered. Please Try Again Later.", SignUp.this);
+                                                    showErrorDialog("Authentication Could Not Be Registered. Please Try Again Later.");
                                                     if (mAuth.getCurrentUser() != null){
 
                                                         mDialog.dismiss();
@@ -492,7 +495,7 @@ public class SignUp extends AppCompatActivity {
 
                             } else {
 
-                                Common.showErrorDialog(SignUp.this, "Error Occurred, Please try Again Later", SignUp.this);
+                                showErrorDialog("Error Occurred, Please try Again Later");
                                 mDialog.dismiss();
 
                             }
@@ -500,7 +503,7 @@ public class SignUp extends AppCompatActivity {
                         } else {
 
                             mDialog.dismiss();
-                            Common.showErrorDialog(SignUp.this, "Authentication Failed. Please Try Again Later", SignUp.this);
+                            showErrorDialog("Authentication Failed. Please Try Again Later");
 
                         }
 
@@ -555,7 +558,7 @@ public class SignUp extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Exception e) {
 
-                Common.showErrorDialog(SignUp.this, "Something Went Wrong. Please Try Again Later.", SignUp.this);
+                showErrorDialog("Something Went Wrong. Please Try Again Later.");
                 if (mAuth.getCurrentUser() != null) {
 
                     mDialog.dismiss();
@@ -593,7 +596,7 @@ public class SignUp extends AppCompatActivity {
                                         if (dataSnapshot.child(currentUid).exists()){
 
                                             mDialog.dismiss();
-                                            Common.showErrorDialog(SignUp.this, "A User Has Already Registered With This Account, Log In Instead", SignUp.this);
+                                            showErrorDialog("A User Has Already Registered With This Email, Try Signing In");
                                             mAuth.signOut();
                                             LoginManager.getInstance().logOut();
 
@@ -612,7 +615,7 @@ public class SignUp extends AppCompatActivity {
                                                 @Override
                                                 public void onFailure(@NonNull Exception e) {
 
-                                                    Common.showErrorDialog(SignUp.this, "Authentication Could Not Be Registered. Please Try Again Later.", SignUp.this);
+                                                    showErrorDialog("Authentication Could Not Be Registered. Please Try Again Later.");
                                                     if (mAuth.getCurrentUser() != null){
 
                                                         mDialog.dismiss();
@@ -635,7 +638,7 @@ public class SignUp extends AppCompatActivity {
 
                             } else {
 
-                                Common.showErrorDialog(SignUp.this, "Error Occurred, Please try Again Later", SignUp.this);
+                                showErrorDialog("Error Occurred, Please try Again Later");
                                 mDialog.dismiss();
 
                             }
@@ -699,7 +702,7 @@ public class SignUp extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Exception e) {
 
-                Common.showErrorDialog(SignUp.this, "Something Went Wrong. Please Try Again Later.", SignUp.this);
+                showErrorDialog("Something Went Wrong. Please Try Again Later.");
                 if (mAuth.getCurrentUser() != null) {
 
                     mDialog.dismiss();
@@ -758,5 +761,34 @@ public class SignUp extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         finish();
+    }
+
+    /*---   WARNING DIALOG   ---*/
+    public void showErrorDialog(String theWarning){
+
+        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.dialog_layout,null);
+
+        final TextView message = (TextView) viewOptions.findViewById(R.id.dialogMessage);
+        final Button okButton = (Button) viewOptions.findViewById(R.id.dialogButton);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        message.setText(theWarning);
+
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        });
+
+        alertDialog.show();
+
     }
 }

@@ -1,13 +1,18 @@
 package com.blackviking.menorahfarms;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.HomeActivities.Dashboard;
@@ -104,7 +109,7 @@ public class Registration extends AppCompatActivity {
 
                 } else {
 
-                    Common.showErrorDialog(Registration.this, "No Internet Access !", Registration.this);
+                    showErrorDialog("No Internet Access !");
 
                 }
             }
@@ -164,7 +169,7 @@ public class Registration extends AppCompatActivity {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             mDialog.dismiss();
-                            Common.showErrorDialog(Registration.this, "Error Occurred, Please Try Again Later.", Registration.this);
+                            Toast.makeText(Registration.this, "Error occurred, please try again later.", Toast.LENGTH_SHORT).show();
                         }
                     }
             );
@@ -213,5 +218,34 @@ public class Registration extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         resetSignIn();
+    }
+
+    /*---   WARNING DIALOG   ---*/
+    public void showErrorDialog(String theWarning){
+
+        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.dialog_layout,null);
+
+        final TextView message = (TextView) viewOptions.findViewById(R.id.dialogMessage);
+        final Button okButton = (Button) viewOptions.findViewById(R.id.dialogButton);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        message.setText(theWarning);
+
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        });
+
+        alertDialog.show();
+
     }
 }

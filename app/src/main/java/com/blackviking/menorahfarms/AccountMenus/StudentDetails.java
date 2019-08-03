@@ -23,6 +23,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blackviking.menorahfarms.BuildConfig;
@@ -189,7 +190,7 @@ public class StudentDetails extends AppCompatActivity {
                 if (Common.isConnectedToInternet(getBaseContext())) {
                     updateChanges();
                 } else {
-                    Common.showErrorDialog(StudentDetails.this, "No Internet Access !", StudentDetails.this);
+                    showErrorDialog("No Internet Access !");
                 }
             }
         });
@@ -226,7 +227,7 @@ public class StudentDetails extends AppCompatActivity {
 
                 }else {
 
-                    Common.showErrorDialog(StudentDetails.this, "No Internet Access !", StudentDetails.this);
+                    showErrorDialog("No Internet Access !");
                 }
                 alertDialog.dismiss();
 
@@ -439,7 +440,7 @@ public class StudentDetails extends AppCompatActivity {
 
                 } else {
 
-                    Common.showErrorDialog(StudentDetails.this, "No Internet Access ! Please, try again later.", StudentDetails.this);
+                    showErrorDialog("No Internet Access ! Please, try again later.");
 
                 }
 
@@ -518,17 +519,17 @@ public class StudentDetails extends AppCompatActivity {
         if (TextUtils.isEmpty(theNewSchoolName)){
 
             mDialog.dismiss();
-            Common.showErrorDialog(StudentDetails.this, "Please Provide School Name !", StudentDetails.this);
+            showErrorDialog("Please Provide School Name !");
 
         } else if (TextUtils.isEmpty(theNewDepartment)) {
 
             mDialog.dismiss();
-            Common.showErrorDialog(StudentDetails.this, "Please Department Name !", StudentDetails.this);
+            showErrorDialog("Please Department Name !");
 
         } else if (originalImageUrl.equalsIgnoreCase("")) {
 
             mDialog.dismiss();
-            Common.showErrorDialog(StudentDetails.this, "Please Provide Valid ID Card Image", StudentDetails.this);
+            showErrorDialog("Please Provide Valid ID Card Image");
 
         } else {
 
@@ -565,5 +566,34 @@ public class StudentDetails extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         finish();
+    }
+
+    /*---   WARNING DIALOG   ---*/
+    public void showErrorDialog(String theWarning){
+
+        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.dialog_layout,null);
+
+        final TextView message = (TextView) viewOptions.findViewById(R.id.dialogMessage);
+        final Button okButton = (Button) viewOptions.findViewById(R.id.dialogButton);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        message.setText(theWarning);
+
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        });
+
+        alertDialog.show();
+
     }
 }

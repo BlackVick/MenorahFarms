@@ -7,8 +7,8 @@ android {
         applicationId "com.blackviking.menorahfarms"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 9
-        versionName "1.9 (Beta)"
+        versionCode 11
+        versionName "1.11 (Beta)"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }

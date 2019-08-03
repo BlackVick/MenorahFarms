@@ -39,7 +39,7 @@ public class FarmDetails extends AppCompatActivity {
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private DatabaseReference userRef, farmRef, followedRef, cartRef;
-    private String currentUid, userType, farmId;
+    private String currentUid, userType, farmId, farmNotiId;
 
     private ImageView backButton, farmImage;
     private TextView farmType, unitsLeft, farmLocation, farmROI, unitPrice, totalROI, totalDuration, totalPay;
@@ -146,6 +146,7 @@ public class FarmDetails extends AppCompatActivity {
                                 String theFarmUnitsLeft = dataSnapshot.child("unitsAvailable").getValue().toString();
                                 final String theFarmImage = dataSnapshot.child("farmImage").getValue().toString();
                                 final String theFarmState = dataSnapshot.child("farmState").getValue().toString();
+                                farmNotiId = dataSnapshot.child("farmNotiId").getValue().toString();
 
                                 if (!theFarmImage.equalsIgnoreCase("")){
 
@@ -274,7 +275,7 @@ public class FarmDetails extends AppCompatActivity {
 
                                         } else {
 
-                                            Common.showErrorDialog(FarmDetails.this, "No Internet Access", FarmDetails.this);
+                                            showErrorDialog("No Internet Access");
 
                                         }
 
@@ -335,7 +336,7 @@ public class FarmDetails extends AppCompatActivity {
 
                         } else {
 
-                            Common.showErrorDialog(FarmDetails.this, "This farm has already been added to your cart.", FarmDetails.this);
+                            showErrorDialog("This farm has already been added to your cart.");
 
                         }
 
@@ -395,7 +396,7 @@ public class FarmDetails extends AppCompatActivity {
                     public void onSuccess(Void aVoid) {
 
 
-                        FirebaseMessaging.getInstance().subscribeToTopic(farmId);
+                        FirebaseMessaging.getInstance().subscribeToTopic(farmNotiId);
                         followFarmBtn.setVisibility(View.GONE);
                         followedFarmButton.setVisibility(View.VISIBLE);
 
@@ -427,5 +428,34 @@ public class FarmDetails extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         finish();
+    }
+
+    /*---   WARNING DIALOG   ---*/
+    public void showErrorDialog(String theWarning){
+
+        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.dialog_layout,null);
+
+        final TextView message = (TextView) viewOptions.findViewById(R.id.dialogMessage);
+        final Button okButton = (Button) viewOptions.findViewById(R.id.dialogButton);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        message.setText(theWarning);
+
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        });
+
+        alertDialog.show();
+
     }
 }

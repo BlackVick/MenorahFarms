@@ -99,33 +99,4 @@ public class Common {
     }
 
 
-    /*---   WARNING DIALOG   ---*/
-    public static void showErrorDialog(Context context, String theWarning, Activity activity){
-
-        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(context).create();
-        LayoutInflater inflater = activity.getLayoutInflater();
-        View viewOptions = inflater.inflate(R.layout.dialog_layout,null);
-
-        final TextView message = (TextView) viewOptions.findViewById(R.id.dialogMessage);
-        final Button okButton = (Button) viewOptions.findViewById(R.id.dialogButton);
-
-        alertDialog.setView(viewOptions);
-
-        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
-        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-
-        message.setText(theWarning);
-
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-            }
-        });
-
-        alertDialog.show();
-
-    }
-
 }

@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.blackviking.menorahfarms.Interface.ItemClickListener;
@@ -14,6 +15,7 @@ public class SponsoredFarmViewHolder extends RecyclerView.ViewHolder implements 
     private ItemClickListener itemClickListener;
     public ImageView sponsoredFarmImage;
     public TextView sponsoredFarmType, sponsoredFarmPriceUnit, sponsoredFarmDate, sponsoredFarmRefNumber, sponsoredFarmROI;
+    public RelativeLayout processing;
 
     public SponsoredFarmViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -24,6 +26,7 @@ public class SponsoredFarmViewHolder extends RecyclerView.ViewHolder implements 
         sponsoredFarmDate = (TextView)itemView.findViewById(R.id.sponsoredFarmDate);
         sponsoredFarmRefNumber = (TextView)itemView.findViewById(R.id.sponsoredFarmRefNumber);
         sponsoredFarmROI = (TextView)itemView.findViewById(R.id.sponsoredFarmROI);
+        processing = (RelativeLayout) itemView.findViewById(R.id.processing);
 
         itemView.setOnClickListener(this);
     }

@@ -80,6 +80,8 @@ public class SponsorshipMonitor extends Service {
         if (Common.isConnectedToInternet(getApplicationContext())){
 
             sponsoredFarmRef.child(userId)
+                    .orderByChild("status")
+                    .equalTo("sponsoring")
                     .addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -133,31 +135,30 @@ public class SponsorshipMonitor extends Service {
         try {
             startDate = sdfStartDate.parse(startDateString);
 
+            /*---   GET STOP DATE   ---*/
+            sdfStopDayDay = new SimpleDateFormat("dd-MM-yyyy");
+            try {
+                endDateDate = sdfStopDayDay.parse(endDate);
+
+                /*---   CALCULATE   ---*/
+                sponsorDayDiff = endDateDate.getTime() - startDate.getTime();
+                totalSponsorshipDays = TimeUnit.DAYS.convert(sponsorDayDiff, TimeUnit.MILLISECONDS);
+
+
+                currentDayDiff = todayDate.getTime() - startDate.getTime();
+                daysUsed = TimeUnit.DAYS.convert(currentDayDiff, TimeUnit.MILLISECONDS);
+
+                if (daysUsed >= totalSponsorshipDays) {
+
+                    endSponsorship(key);
+
+                }
+
+            } catch (Exception e){
+
+            }
+
         } catch (Exception e){
-
-        }
-
-        /*---   GET STOP DATE   ---*/
-        sdfStopDayDay = new SimpleDateFormat("dd-MM-yyyy");
-        try {
-            endDateDate = sdfStopDayDay.parse(endDate);
-
-        } catch (Exception e){
-
-        }
-
-
-        /*---   CALCULATE   ---*/
-        sponsorDayDiff = endDateDate.getTime() - startDate.getTime();
-        totalSponsorshipDays = TimeUnit.DAYS.convert(sponsorDayDiff, TimeUnit.MILLISECONDS);
-
-
-        currentDayDiff = todayDate.getTime() - startDate.getTime();
-        daysUsed = TimeUnit.DAYS.convert(currentDayDiff, TimeUnit.MILLISECONDS);
-
-        if (todayString.equalsIgnoreCase(endDate) || daysUsed > totalSponsorshipDays) {
-
-            endSponsorship(key);
 
         }
 
@@ -169,6 +170,11 @@ public class SponsorshipMonitor extends Service {
         dueSponsorshipMap.put("user", userId);
         dueSponsorshipMap.put("sponsorshipId", key);
         dueSponsorshipMap.put("timeDue", ServerValue.TIMESTAMP);
+
+        sponsoredFarmRef.child(userId)
+                .child(key)
+                .child("status")
+                .setValue("processing");
 
         dueSponsorRef.push()
                 .setValue(dueSponsorshipMap)
@@ -194,7 +200,7 @@ public class SponsorshipMonitor extends Service {
 
         final Map<String, Object> notificationMap = new HashMap<>();
         notificationMap.put("topic", "Sponsorship End");
-        notificationMap.put("message", "Congratulations! You have reached the end of a sponsorship cycle. Your full return payment will be made into your bank account shortly.");
+        notificationMap.put("message", "Congratulations! You have reached the end of a sponsorship cycle. Your full return payment will be made into your bank account at the end of the month as stated in the terms and conditions.");
         notificationMap.put("time", todayString);
 
         notificationRef.child(userId)
@@ -207,7 +213,7 @@ public class SponsorshipMonitor extends Service {
 
                                 Map<String, String> dataSend = new HashMap<>();
                                 dataSend.put("title", "Sponsorship End");
-                                dataSend.put("message", "Congratulations! You have reached the end of a sponsorship cycle. Your full return payment will be made into your bank account shortly.");
+                                dataSend.put("message", "Congratulations! You have reached the end of a sponsorship cycle. Your full return payment will be made into your bank account at the end of the month as stated in the terms and condition.");
                                 DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(userId).toString(), dataSend);
 
                                 mService.sendNotification(dataMessage)

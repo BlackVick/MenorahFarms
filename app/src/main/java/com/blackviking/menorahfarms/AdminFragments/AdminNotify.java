@@ -1,6 +1,8 @@
 package com.blackviking.menorahfarms.AdminFragments;
 
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -14,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blackviking.menorahfarms.Common.Common;
@@ -97,7 +100,7 @@ public class AdminNotify extends Fragment {
 
                 for (DataSnapshot child : dataSnapshot.getChildren()){
 
-                    bankList.add(child.getKey());
+                    bankList.add(child.child("farmNotiId").getValue().toString());
 
                 }
 
@@ -192,7 +195,7 @@ public class AdminNotify extends Fragment {
 
             } else if (TextUtils.isEmpty(selectedTopic)) {
 
-                Common.showErrorDialog(getContext(), "Select A Topic", getActivity());
+                showErrorDialog("Select A Topic");
 
             } else {
 
@@ -242,7 +245,7 @@ public class AdminNotify extends Fragment {
 
         } else {
 
-            Common.showErrorDialog(getContext(), "No Internet Access !", getActivity());
+            showErrorDialog("No Internet Access !");
 
         }
 
@@ -339,7 +342,7 @@ public class AdminNotify extends Fragment {
 
         } else {
 
-            Common.showErrorDialog(getContext(), "No Internet Access !", getActivity());
+            showErrorDialog("No Internet Access !");
 
         }
 
@@ -422,7 +425,7 @@ public class AdminNotify extends Fragment {
 
         } else {
 
-            Common.showErrorDialog(getContext(), "No Internet Access !", getActivity());
+            showErrorDialog("No Internet Access !");
 
         }
 
@@ -502,4 +505,32 @@ public class AdminNotify extends Fragment {
 
     }
 
+    /*---   WARNING DIALOG   ---*/
+    public void showErrorDialog(String theWarning){
+
+        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(getContext()).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.dialog_layout,null);
+
+        final TextView message = (TextView) viewOptions.findViewById(R.id.dialogMessage);
+        final Button okButton = (Button) viewOptions.findViewById(R.id.dialogButton);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        message.setText(theWarning);
+
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        });
+
+        alertDialog.show();
+
+    }
 }

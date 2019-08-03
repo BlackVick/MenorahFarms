@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
+import android.widget.Toast;
 
 import com.blackviking.menorahfarms.Common.Common;
 import com.google.firebase.database.DataSnapshot;
@@ -52,11 +53,12 @@ public class CheckForSponsorship extends Service {
         if (Common.isConnectedToInternet(getApplicationContext())){
 
             /*---   SUBSCRIPTION LOT   ---*/
-            sponsoredFarmRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            sponsoredFarmRef.child(userId)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
-                    if (dataSnapshot.child(userId).exists()){
+                    if (dataSnapshot.exists()){
 
                         Intent intent = new Intent(getApplicationContext(), SponsorshipMonitor.class);
                         startService(intent);

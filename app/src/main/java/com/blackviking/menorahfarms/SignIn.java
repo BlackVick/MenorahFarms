@@ -1,11 +1,14 @@
 package com.blackviking.menorahfarms;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.method.PasswordTransformationMethod;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
@@ -123,7 +126,7 @@ public class SignIn extends AppCompatActivity {
 
                 } else {
 
-                    Common.showErrorDialog(SignIn.this, "No Internet Access !", SignIn.this);
+                    showErrorDialog("No Internet Access !");
 
                 }
             }
@@ -161,7 +164,7 @@ public class SignIn extends AppCompatActivity {
 
                 } else {
 
-                    Common.showErrorDialog(SignIn.this, "No Internet Access !", SignIn.this);
+                    showErrorDialog("No Internet Access !");
 
                 }
             }
@@ -185,7 +188,7 @@ public class SignIn extends AppCompatActivity {
 
                 } else {
 
-                    Common.showErrorDialog(SignIn.this, "No Internet Access !", SignIn.this);
+                    showErrorDialog("No Internet Access !");
 
                 }
             }
@@ -206,7 +209,7 @@ public class SignIn extends AppCompatActivity {
                     resetThePassword();
 
                 } else {
-                    Common.showErrorDialog(SignIn.this, "No Internet Access !", SignIn.this);
+                    showErrorDialog("No Internet Access !");
                 }
             }
         });
@@ -302,7 +305,7 @@ public class SignIn extends AppCompatActivity {
         ).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Common.showErrorDialog(SignIn.this, "Sign in failed, please check provided details and try again later", SignIn.this);
+                showErrorDialog("Sign in failed, please check provided details and try again later");
                 mDialog.dismiss();
             }
         });
@@ -317,7 +320,7 @@ public class SignIn extends AppCompatActivity {
 
         } else {
 
-            Common.showErrorDialog(SignIn.this, "Process Failed", SignIn.this);
+           showErrorDialog("Process Failed");
             mAuth.signOut();
             mDialog.dismiss();
 
@@ -343,12 +346,12 @@ public class SignIn extends AppCompatActivity {
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()){
 
-                                Common.showErrorDialog(SignIn.this, "Password Reset Instructions Have Been Sent To Your Mail !", SignIn.this);
+                                showErrorDialog("Password Reset Instructions Have Been Sent To Your Mail !");
                                 mDialog.dismiss();
 
                             } else {
 
-                                Common.showErrorDialog(SignIn.this, "Password Reset Failed !", SignIn.this);
+                                showErrorDialog("Password Reset Failed !");
                                 mDialog.dismiss();
 
                             }
@@ -384,7 +387,7 @@ public class SignIn extends AppCompatActivity {
 
                                     } else {
 
-                                        Common.showErrorDialog(SignIn.this, "This Account Does Not Exist Yet, Please Go To Sign Up Page And Try Again", SignIn.this);
+                                        showErrorDialog("This email account does not exist yet, please go to the sign up page and register.");
                                         mDialog.dismiss();
 
                                     }
@@ -430,7 +433,7 @@ public class SignIn extends AppCompatActivity {
 
                                     } else {
 
-                                        Common.showErrorDialog(SignIn.this, "This Account Does Not Exist Yet, Please Sign Up And Try Again Later", SignIn.this);
+                                        showErrorDialog("This email account does not exist yet, please go to the sign up page and register.");
                                         mDialog.dismiss();
                                         mAuth.signOut();
 
@@ -498,6 +501,35 @@ public class SignIn extends AppCompatActivity {
             startActivity(goToHome);
             finish();
         }
+
+    }
+
+    /*---   WARNING DIALOG   ---*/
+    public void showErrorDialog(String theWarning){
+
+        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.dialog_layout,null);
+
+        final TextView message = (TextView) viewOptions.findViewById(R.id.dialogMessage);
+        final Button okButton = (Button) viewOptions.findViewById(R.id.dialogButton);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        message.setText(theWarning);
+
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        });
+
+        alertDialog.show();
 
     }
 }

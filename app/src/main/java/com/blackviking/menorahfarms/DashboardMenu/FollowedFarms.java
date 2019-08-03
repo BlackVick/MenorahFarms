@@ -231,8 +231,26 @@ public class FollowedFarms extends AppCompatActivity {
                             public void onComplete(@NonNull Task<Void> task) {
                                 alertDialog.dismiss();
 
-                                FirebaseMessaging.getInstance().unsubscribeFromTopic(key);
-                                Toast.makeText(FollowedFarms.this, "Farm un-followed", Toast.LENGTH_SHORT).show();
+                                farmRef.child(key)
+                                        .addListenerForSingleValueEvent(
+                                                new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                                        String theNotiId = dataSnapshot.child("farmNotiId").getValue().toString();
+
+                                                        FirebaseMessaging.getInstance().unsubscribeFromTopic(theNotiId);
+                                                        Toast.makeText(FollowedFarms.this, "Farm un-followed", Toast.LENGTH_SHORT).show();
+
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(DatabaseError databaseError) {
+
+                                                    }
+                                                }
+                                        );
+
                             }
                         }
                 );

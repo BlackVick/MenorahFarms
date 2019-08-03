@@ -1,15 +1,21 @@
 package com.blackviking.menorahfarms.AccountMenus;
 
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Models.BankModel;
@@ -150,7 +156,7 @@ public class BankDetails extends AppCompatActivity {
                 if (Common.isConnectedToInternet(getBaseContext())) {
                     updateChanges();
                 } else {
-                    Common.showErrorDialog(BankDetails.this, "No Internet Access !", BankDetails.this);
+                    showErrorDialog("No Internet Access !");
                 }
             }
         });
@@ -170,22 +176,22 @@ public class BankDetails extends AppCompatActivity {
         if (TextUtils.isEmpty(theNewAccountName)){
 
             mDialog.dismiss();
-            Common.showErrorDialog(BankDetails.this, "Please Enter Account Holder Name", BankDetails.this);
+            showErrorDialog("Please Enter Account Holder Name");
 
         } else if (TextUtils.isEmpty(theNewAccountNumber)){
 
             mDialog.dismiss();
-            Common.showErrorDialog(BankDetails.this, "Please Enter Account Number", BankDetails.this);
+            showErrorDialog("Please Enter Account Number");
 
         } else if (selectedBank.equalsIgnoreCase("")){
 
             mDialog.dismiss();
-            Common.showErrorDialog(BankDetails.this, "Please Select A Bank", BankDetails.this);
+            showErrorDialog("Please Select A Bank");
 
         } else if (selectedBank.equalsIgnoreCase("Bank")){
 
             mDialog.dismiss();
-            Common.showErrorDialog(BankDetails.this, "Please Select A Valid Bank", BankDetails.this);
+            showErrorDialog("Please Select A Valid Bank");
 
         } else {
 
@@ -220,5 +226,34 @@ public class BankDetails extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         finish();
+    }
+
+    /*---   WARNING DIALOG   ---*/
+    public void showErrorDialog(String theWarning){
+
+        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.dialog_layout,null);
+
+        final TextView message = (TextView) viewOptions.findViewById(R.id.dialogMessage);
+        final Button okButton = (Button) viewOptions.findViewById(R.id.dialogButton);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        message.setText(theWarning);
+
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        });
+
+        alertDialog.show();
+
     }
 }

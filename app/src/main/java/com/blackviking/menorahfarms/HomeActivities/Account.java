@@ -297,7 +297,9 @@ public class Account extends AppCompatActivity {
 
                         for (DataSnapshot child : dataSnapshot.getChildren()){
 
-                            FirebaseMessaging.getInstance().unsubscribeFromTopic(child.getKey());
+                            String farmNotiId = child.child("farmNotiId").getValue().toString();
+
+                            FirebaseMessaging.getInstance().unsubscribeFromTopic(farmNotiId);
 
                         }
 
@@ -539,7 +541,7 @@ public class Account extends AppCompatActivity {
 
                 }else {
 
-                    Common.showErrorDialog(Account.this, "No Internet Access !", Account.this);
+                    showErrorDialog("No Internet Access !");
                 }
                 alertDialog.dismiss();
 
@@ -750,7 +752,7 @@ public class Account extends AppCompatActivity {
 
                 } else {
 
-                    Common.showErrorDialog(Account.this, "No Internet Access ! Please, try again later.", Account.this);
+                    showErrorDialog("No Internet Access ! Please, try again later.");
 
                 }
 
@@ -872,13 +874,9 @@ public class Account extends AppCompatActivity {
 
                         if (calcResult < 70){
 
-                            Common.showErrorDialog(Account.this, "We advise that users complete their profile by providing all required details, so we can serve you better. \n\nThank you", Account.this);
+                            showErrorDialog("We advise that users complete their profile by providing all required details, so we can serve you better. \n\nThank you");
 
                         }
-
-
-
-
 
                     }
 
@@ -888,17 +886,34 @@ public class Account extends AppCompatActivity {
                     }
                 });
 
+    }
+
+    /*---   WARNING DIALOG   ---*/
+    public void showErrorDialog(String theWarning){
+
+        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.dialog_layout,null);
+
+        final TextView message = (TextView) viewOptions.findViewById(R.id.dialogMessage);
+        final Button okButton = (Button) viewOptions.findViewById(R.id.dialogButton);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
 
+        message.setText(theWarning);
 
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        });
 
-
-
-
-
-
-
-
+        alertDialog.show();
 
     }
 }

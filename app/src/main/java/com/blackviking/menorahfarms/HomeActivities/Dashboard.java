@@ -206,8 +206,6 @@ public class Dashboard extends AppCompatActivity {
 
 
         /*---   CHECK SERVICE   ---*/
-        Intent checkSponsorship = new Intent(Dashboard.this, CheckForSponsorship.class);
-        startService(checkSponsorship);
 
 
         /*---   SPONSORED CYCLE   ---*/
@@ -233,12 +231,13 @@ public class Dashboard extends AppCompatActivity {
                                     totalReturnsText.setText(Common.convertToPrice(Dashboard.this, totalReturn));
 
 
-                                    /*if (!isMonitorRunning) {
 
-                                        Intent sponsorshipMonitor = new Intent(Dashboard.this, SponsorshipMonitor.class);
-                                        startService(sponsorshipMonitor);
+                                    if (!isMonitorRunning) {
 
-                                    }*/
+                                        Intent checkSponsorship = new Intent(Dashboard.this, CheckForSponsorship.class);
+                                        startService(checkSponsorship);
+
+                                    }
 
                                 } else {
 

@@ -39,7 +39,7 @@ import dmax.dialog.SpotsDialog;
 
 public class BankDetails extends AppCompatActivity {
 
-    private MaterialEditText profileAccountName, profileAccountNumber;
+    private MaterialEditText profileBankName, profileAccountName, profileAccountNumber;
     private Spinner profileBank;
     private Button updateProfile;
     private ImageView backButton;
@@ -66,6 +66,8 @@ public class BankDetails extends AppCompatActivity {
         /*---   WIDGETS   ---*/
         profileAccountName = (MaterialEditText)findViewById(R.id.profileAccountName);
         profileAccountNumber = (MaterialEditText)findViewById(R.id.profileAccountNumber);
+        profileBankName = (MaterialEditText)findViewById(R.id.profileBankName);
+        profileBankName.setEnabled(false);
         profileBank = (Spinner) findViewById(R.id.bankSpinner);
         backButton = (ImageView)findViewById(R.id.backButton);
         updateProfile = (Button)findViewById(R.id.updateProfileButton);
@@ -83,6 +85,7 @@ public class BankDetails extends AppCompatActivity {
 
                         profileAccountName.setText(theAccountName);
                         profileAccountNumber.setText(theAccountNumber);
+                        profileBankName.setText(theBank);
 
                     }
 
@@ -97,7 +100,7 @@ public class BankDetails extends AppCompatActivity {
         final List<String> bankList = new ArrayList<>();
         bankList.add(0, "Bank");
 
-        bankRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        bankRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -127,6 +130,7 @@ public class BankDetails extends AppCompatActivity {
                 if (!parent.getItemAtPosition(position).equals("Bank")){
 
                     selectedBank = parent.getItemAtPosition(position).toString();
+                    profileBankName.setText(selectedBank);
 
                 }
 

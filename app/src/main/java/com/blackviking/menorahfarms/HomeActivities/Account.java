@@ -116,10 +116,7 @@ public class Account extends AppCompatActivity {
     private StorageReference imageRef;
     private String originalImageUrl, thumbDownloadUrl;
 
-
     private String theUserMail, theFirstName, theLastName, theProfilePicture;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -358,7 +355,7 @@ public class Account extends AppCompatActivity {
         /*---   CURRENT USER   ---*/
         setCurrentUser();
 
-        if (mAuth.getCurrentUser().isEmailVerified()){
+        if (mAuth.getCurrentUser().isEmailVerified()) {
 
             verifiedLayout.setVisibility(View.VISIBLE);
             unverifiedLayout.setVisibility(View.GONE);
@@ -383,7 +380,6 @@ public class Account extends AppCompatActivity {
             });
 
         }
-
 
     }
 
@@ -495,6 +491,8 @@ public class Account extends AppCompatActivity {
 
                             }
 
+                            setProfileProgress();
+
                         }
 
                     }
@@ -504,8 +502,6 @@ public class Account extends AppCompatActivity {
 
                     }
                 });
-
-        setProfileProgress();
 
 
     }
@@ -811,80 +807,88 @@ public class Account extends AppCompatActivity {
 
     private void setProfileProgress() {
 
-        userRef.child(currentUid)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+        if (Common.isConnectedToInternet(getBaseContext())) {
 
-                        String profileFirstName = dataSnapshot.child("firstName").getValue().toString();
-                        String profileLastName = dataSnapshot.child("lastName").getValue().toString();
-                        String profileUserMail = dataSnapshot.child("email").getValue().toString();
-                        String profilePix = dataSnapshot.child("profilePictureThumb").getValue().toString();
-                        String profileFacebook = dataSnapshot.child("facebook").getValue().toString();
-                        String profileInstagram = dataSnapshot.child("instagram").getValue().toString();
-                        String profileTwitter = dataSnapshot.child("twitter").getValue().toString();
-                        String profileLinkedIn = dataSnapshot.child("linkedIn").getValue().toString();
-                        String profilePhone = dataSnapshot.child("phone").getValue().toString();
-                        String profileBirthday = dataSnapshot.child("birthday").getValue().toString();
-                        String profileGender = dataSnapshot.child("gender").getValue().toString();
-                        String profileNatinality = dataSnapshot.child("nationality").getValue().toString();
-                        String profileAddress = dataSnapshot.child("address").getValue().toString();
-                        String profileCity = dataSnapshot.child("city").getValue().toString();
-                        String profileState = dataSnapshot.child("state").getValue().toString();
-                        String profileBank = dataSnapshot.child("bank").getValue().toString();
-                        String profileAccountName = dataSnapshot.child("accountName").getValue().toString();
-                        String profileAccountNumber = dataSnapshot.child("accountNumber").getValue().toString();
-                        String profileKinName = dataSnapshot.child("kinName").getValue().toString();
-                        String profileKinMail = dataSnapshot.child("kinEmail").getValue().toString();
-                        String profileKinRelationship = dataSnapshot.child("kinRelationship").getValue().toString();
-                        String profileKinPhone = dataSnapshot.child("kinPhone").getValue().toString();
-                        String profileKinAddress = dataSnapshot.child("kinAddress").getValue().toString();
+            userRef.child(currentUid)
+                    .addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
 
-
-                        String[] theArray = {profileFirstName, profileLastName, profileUserMail, profilePix,
-                                profileFacebook, profileInstagram, profileTwitter, profileLinkedIn, profilePhone, profileBirthday, profileGender,
-                                profileNatinality, profileAddress, profileCity, profileState, profileBank, profileAccountName, profileAccountNumber,
-                                profileKinName, profileKinMail, profileKinRelationship, profileKinPhone, profileKinAddress};
+                            String profileFirstName = dataSnapshot.child("firstName").getValue().toString();
+                            String profileLastName = dataSnapshot.child("lastName").getValue().toString();
+                            String profileUserMail = dataSnapshot.child("email").getValue().toString();
+                            String profilePix = dataSnapshot.child("profilePictureThumb").getValue().toString();
+                            String profileFacebook = dataSnapshot.child("facebook").getValue().toString();
+                            String profileInstagram = dataSnapshot.child("instagram").getValue().toString();
+                            String profileTwitter = dataSnapshot.child("twitter").getValue().toString();
+                            String profileLinkedIn = dataSnapshot.child("linkedIn").getValue().toString();
+                            String profilePhone = dataSnapshot.child("phone").getValue().toString();
+                            String profileBirthday = dataSnapshot.child("birthday").getValue().toString();
+                            String profileGender = dataSnapshot.child("gender").getValue().toString();
+                            String profileNatinality = dataSnapshot.child("nationality").getValue().toString();
+                            String profileAddress = dataSnapshot.child("address").getValue().toString();
+                            String profileCity = dataSnapshot.child("city").getValue().toString();
+                            String profileState = dataSnapshot.child("state").getValue().toString();
+                            String profileBank = dataSnapshot.child("bank").getValue().toString();
+                            String profileAccountName = dataSnapshot.child("accountName").getValue().toString();
+                            String profileAccountNumber = dataSnapshot.child("accountNumber").getValue().toString();
+                            String profileKinName = dataSnapshot.child("kinName").getValue().toString();
+                            String profileKinMail = dataSnapshot.child("kinEmail").getValue().toString();
+                            String profileKinRelationship = dataSnapshot.child("kinRelationship").getValue().toString();
+                            String profileKinPhone = dataSnapshot.child("kinPhone").getValue().toString();
+                            String profileKinAddress = dataSnapshot.child("kinAddress").getValue().toString();
 
 
-                        int profileProgressInt = 0;
-                        ArrayList<String> list = new ArrayList<>();
-                        int totalResult;
-                        
-                        int calcResult = 0;
+                            String[] theArray = {profileFirstName, profileLastName, profileUserMail, profilePix,
+                                    profileFacebook, profileInstagram, profileTwitter, profileLinkedIn, profilePhone, profileBirthday, profileGender,
+                                    profileNatinality, profileAddress, profileCity, profileState, profileBank, profileAccountName, profileAccountNumber,
+                                    profileKinName, profileKinMail, profileKinRelationship, profileKinPhone, profileKinAddress};
 
-                        for (int i = 0; i < 23; i++){
 
-                            if (!theArray[i].equalsIgnoreCase("")) {
+                            int profileProgressInt = 0;
+                            ArrayList<String> list = new ArrayList<>();
+                            int totalResult;
 
-                                list.add(theArray[i]);
+                            int calcResult = 0;
+
+                            for (int i = 0; i < 23; i++) {
+
+                                if (!theArray[i].equalsIgnoreCase("")) {
+
+                                    list.add(theArray[i]);
+
+                                }
+
+                            }
+
+                            calcResult = (list.size() * 100) / 23;
+
+
+                            profileProgressText.setText("Your profile is " + String.valueOf(calcResult) + "% complete.");
+
+                            Drawable draw = getResources().getDrawable(R.drawable.progress_drawable);
+                            profileProgress.setProgressDrawable(draw);
+                            profileProgress.setProgress(calcResult);
+
+                            if (calcResult < 70) {
+
+                                showErrorDialog("We advise that users complete their profile by providing all required details, so we can serve you better. \n\nThank you");
 
                             }
 
                         }
 
-                        calcResult = (list.size() * 100) / 23;
-
-
-                        profileProgressText.setText("Your profile is " + String.valueOf(calcResult) + "% complete.");
-
-                        Drawable draw = getResources().getDrawable(R.drawable.progress_drawable);
-                        profileProgress.setProgressDrawable(draw);
-                        profileProgress.setProgress(calcResult);
-
-                        if (calcResult < 70){
-
-                            showErrorDialog("We advise that users complete their profile by providing all required details, so we can serve you better. \n\nThank you");
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
                         }
+                    });
 
-                    }
+        } else {
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+            Toast.makeText(this, "Could not get profile progress.", Toast.LENGTH_SHORT).show();
 
-                    }
-                });
+        }
 
     }
 

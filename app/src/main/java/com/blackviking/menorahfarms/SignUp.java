@@ -59,7 +59,7 @@ public class SignUp extends AppCompatActivity {
 
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private CallbackManager mCallbackManager;
-    private ImageView facebookSignIn, googleSignIn, showPassword, backButton;
+    private ImageView showPassword, backButton;
     private MaterialEditText registerFirstName, registerLastName, registerEmail, registerPassword;
     private Button signupButton;
     private TextView loginLink;
@@ -83,8 +83,6 @@ public class SignUp extends AppCompatActivity {
 
 
         /*---   WIDGETS   ---*/
-        facebookSignIn = (ImageView)findViewById(R.id.btn_fb_signUp);
-        googleSignIn = (ImageView)findViewById(R.id.googleSignUp);
         showPassword = (ImageView)findViewById(R.id.showPassword);
         backButton = (ImageView)findViewById(R.id.backButton);
         registerFirstName = (MaterialEditText)findViewById(R.id.registerFirstName);
@@ -100,86 +98,6 @@ public class SignUp extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 finish();
-            }
-        });
-
-
-        /*---   FACEBOOK INIT   ---*/
-        mCallbackManager = CallbackManager.Factory.create();
-        LoginManager.getInstance().registerCallback(mCallbackManager,
-                new FacebookCallback<LoginResult>() {
-                    @Override
-                    public void onSuccess(LoginResult loginResult) {
-                        handleFacebookAccessToken(loginResult.getAccessToken());
-
-                    }
-
-                    @Override
-                    public void onCancel() {
-                        Toast.makeText(SignUp.this, "Cancelled", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onError(FacebookException exception) {
-                        Toast.makeText(SignUp.this, ""+exception, Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-
-        facebookSignIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (Common.isConnectedToInternet(getBaseContext())) {
-
-                    mDialog = new SpotsDialog(SignUp.this, "Processing . . .");
-                    mDialog.setCancelable(false);
-                    mDialog.setCanceledOnTouchOutside(false);
-                    mDialog.show();
-                    LoginManager.getInstance().logInWithReadPermissions(SignUp.this, Arrays.asList("email", "public_profile"));
-
-                } else {
-
-                    showErrorDialog("No Internet Access !");
-
-                }
-            }
-        });
-
-
-
-        /*---   GOOGLE INIT   ---*/
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-
-        mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
-                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        Toast.makeText(SignUp.this, "Unknown Error Occurred", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-
-        googleSignIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if (Common.isConnectedToInternet(getBaseContext())) {
-
-                    mDialog = new SpotsDialog(SignUp.this, "Processing . . .");
-                    mDialog.setCancelable(false);
-                    mDialog.setCanceledOnTouchOutside(false);
-                    mDialog.show();
-                    signInWithGoogle();
-
-                } else {
-
-                    showErrorDialog("No Internet Access !");
-
-                }
             }
         });
 
@@ -346,7 +264,7 @@ public class SignUp extends AppCompatActivity {
                         } else {
 
                             mDialog.dismiss();
-                            showErrorDialog("Error Occurred While Signing Up With Email. Provided Mail May Already Exist.");
+                            showErrorDialog("Error occurred while signing up with email. Provided mail may already exist.");
 
                         }
                     }
@@ -407,6 +325,7 @@ public class SignUp extends AppCompatActivity {
                     showErrorDialog("Something Went Wrong. Please Try Again Later.");
                     if (mAuth.getCurrentUser() != null){
 
+                        mAuth.getCurrentUser().delete();
                         mDialog.dismiss();
                         authed.child(currentUid).removeValue();
                         mAuth.signOut();
@@ -646,9 +565,7 @@ public class SignUp extends AppCompatActivity {
                         } else {
 
                             mDialog.dismiss();
-                            Toast.makeText(SignUp.this, ""+task.getException(), Toast.LENGTH_SHORT).show();
-                            Toast.makeText(SignUp.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            showErrorDialog("Authentication failed. Mail associated with this facebook account may already exist, Please try again later");
                         }
 
                     }
@@ -706,6 +623,7 @@ public class SignUp extends AppCompatActivity {
                 if (mAuth.getCurrentUser() != null) {
 
                     mDialog.dismiss();
+                    mAuth.getCurrentUser().delete();
                     authed.child(currentUid).removeValue();
                     mAuth.signOut();
                     LoginManager.getInstance().logOut();
@@ -747,9 +665,10 @@ public class SignUp extends AppCompatActivity {
 
     private void updateUI(FirebaseUser user) {
 
+        mDialog.dismiss();
+
         if (user != null){
 
-            mDialog.dismiss();
             Intent finishRegIntent = new Intent(SignUp.this, Registration.class);
             startActivity(finishRegIntent);
             finish();

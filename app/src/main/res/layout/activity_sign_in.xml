@@ -149,58 +149,30 @@
             android:text="Login"
             android:id="@+id/loginButton"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="OR"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:textColor="@color/black"
-            android:layout_marginBottom="5dp"
-            android:gravity="center"/>
+
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="5dp"
-            android:weightSum="2">
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="center">
 
             <RelativeLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
                 <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="53dp"
+                    android:layout_height="53dp"
                     android:background="@drawable/social_btn_back"
                     android:src="@drawable/google_sign_in"
                     android:adjustViewBounds="true"
                     android:padding="5dp"
-                    android:layout_alignParentEnd="true"
                     android:id="@+id/googleSignIn"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"/>
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content">
-
-                <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="@drawable/social_btn_back"
-                    android:src="@drawable/facebook_sign_in"
-                    android:adjustViewBounds="true"
-                    android:padding="5dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:id="@+id/facebookSignIn"/>
 
             </RelativeLayout>
 

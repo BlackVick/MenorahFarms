@@ -198,6 +198,7 @@ public class Registration extends AppCompatActivity {
 
         if (signUpType.equalsIgnoreCase("Facebook")){
 
+            mAuth.getCurrentUser().delete();
             userRef.child(currentUid).removeValue();
             authed.child(currentUid).removeValue();
             LoginManager.getInstance().logOut();
@@ -206,6 +207,7 @@ public class Registration extends AppCompatActivity {
 
         } else {
 
+            mAuth.getCurrentUser().delete();
             userRef.child(currentUid).removeValue();
             authed.child(currentUid).removeValue();
             mAuth.signOut();

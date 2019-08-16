@@ -35,6 +35,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -51,6 +52,8 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import dmax.dialog.SpotsDialog;
 import io.paperdb.Paper;
@@ -59,16 +62,16 @@ public class SignIn extends AppCompatActivity {
 
     private MaterialEditText loginEmail, loginPassword;
     private Button loginButton;
-    private ImageView googleSignIn, facebookSignIn, showPassword;
+    private ImageView googleSignIn, showPassword;
     private TextView registerLink, recoverPassword;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference userRef, authed;
-    private CallbackManager mCallbackManager;
     private int RC_SIGN_IN = 1;
     private GoogleApiClient mGoogleApiClient;
     private android.app.AlertDialog mDialog;
     private boolean isPasswordVisible = false;
+    private String currentUid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,54 +88,9 @@ public class SignIn extends AppCompatActivity {
         loginPassword = (MaterialEditText)findViewById(R.id.loginPassword);
         loginButton = (Button)findViewById(R.id.loginButton);
         googleSignIn = (ImageView)findViewById(R.id.googleSignIn);
-        facebookSignIn = (ImageView)findViewById(R.id.facebookSignIn);
         showPassword = (ImageView)findViewById(R.id.showPassword);
         registerLink = (TextView)findViewById(R.id.registerLink);
         recoverPassword = (TextView)findViewById(R.id.recoverPassword);
-
-
-        /*---   FACEBOOK INIT   ---*/
-        mCallbackManager = CallbackManager.Factory.create();
-        LoginManager.getInstance().registerCallback(mCallbackManager,
-                new FacebookCallback<LoginResult>() {
-                    @Override
-                    public void onSuccess(LoginResult loginResult) {
-                        handleFacebookAccessToken(loginResult.getAccessToken());
-
-                    }
-
-                    @Override
-                    public void onCancel() {
-                        Toast.makeText(SignIn.this, "Cancelled", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onError(FacebookException exception) {
-                        Toast.makeText(SignIn.this, ""+exception, Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-        facebookSignIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if (Common.isConnectedToInternet(getBaseContext())) {
-
-                    mDialog = new SpotsDialog(SignIn.this, "Please Wait . . .");
-                    mDialog.setCancelable(false);
-                    mDialog.setCanceledOnTouchOutside(false);
-                    mDialog.show();
-                    LoginManager.getInstance().logInWithReadPermissions(SignIn.this, Arrays.asList("email", "public_profile"));
-
-                } else {
-
-                    showErrorDialog("No Internet Access !");
-
-                }
-            }
-        });
-
-
 
         /*---   GOOGLE INIT   ---*/
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -299,6 +257,10 @@ public class SignIn extends AppCompatActivity {
 
                             handleSignInResponse();
 
+                        } else {
+
+                            showErrorDialog("Email does not exist or has been used in a different sign in method.");
+
                         }
                     }
                 }
@@ -321,6 +283,7 @@ public class SignIn extends AppCompatActivity {
         } else {
 
            showErrorDialog("Process Failed");
+            mAuth.getCurrentUser().delete();
             mAuth.signOut();
             mDialog.dismiss();
 
@@ -387,8 +350,29 @@ public class SignIn extends AppCompatActivity {
 
                                     } else {
 
-                                        showErrorDialog("This email account does not exist yet, please go to the sign up page and register.");
-                                        mDialog.dismiss();
+                                        authed.child(user.getUid())
+                                                .child("userEmail")
+                                                .setValue(user.getEmail()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+
+                                                registerGoogleUser(user);
+
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+
+                                                showErrorDialog("Authentication Could Not Be Registered. Please Try Again Later.");
+                                                mDialog.dismiss();
+                                                if (mAuth.getCurrentUser() != null){
+
+                                                    mAuth.getCurrentUser().delete();
+                                                    mAuth.signOut();
+
+                                                }
+                                            }
+                                        });
 
                                     }
 
@@ -404,7 +388,7 @@ public class SignIn extends AppCompatActivity {
 
                             mDialog.dismiss();
                             mAuth.signOut();
-                            Toast.makeText(SignIn.this, "Authentication Failed.", Toast.LENGTH_SHORT).show();
+                            showErrorDialog("Authentication Failed. Mail may already exist through another sign in method. Please confirm and try again.");
 
                         }
 
@@ -412,50 +396,66 @@ public class SignIn extends AppCompatActivity {
                 });
     }
 
-    private void handleFacebookAccessToken(AccessToken token) {
+    private void registerGoogleUser(final FirebaseUser user) {
 
-        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        currentUid = user.getUid();
+
+        final Map<String, Object> newUserMap = new HashMap<>();
+        newUserMap.put("email", user.getEmail());
+        newUserMap.put("firstName", user.getDisplayName());
+        newUserMap.put("lastName", user.getDisplayName());
+        newUserMap.put("profilePicture", "");
+        newUserMap.put("profilePictureThumb", "");
+        newUserMap.put("signUpMode", "Google");
+        newUserMap.put("facebook", "");
+        newUserMap.put("instagram", "");
+        newUserMap.put("twitter", "");
+        newUserMap.put("userType", "User");
+        newUserMap.put("userPackage", "Worker");
+        newUserMap.put("phone", "");
+        newUserMap.put("birthday", "");
+        newUserMap.put("gender", "");
+        newUserMap.put("nationality", "");
+        newUserMap.put("address", "");
+        newUserMap.put("city", "");
+        newUserMap.put("state", "");
+        newUserMap.put("bank", "");
+        newUserMap.put("accountName", "");
+        newUserMap.put("accountNumber", "");
+        newUserMap.put("kinName", "");
+        newUserMap.put("kinEmail", "");
+        newUserMap.put("kinRelationship", "");
+        newUserMap.put("kinPhone", "");
+        newUserMap.put("kinAddress", "");
+        newUserMap.put("linkedIn", "");
+        newUserMap.put("accountManager", "");
+
+        userRef.child(currentUid)
+                .setValue(newUserMap)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
+                    public void onSuccess(Void aVoid) {
 
-                            final FirebaseUser user = mAuth.getCurrentUser();
-
-                            authed.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                    if (dataSnapshot.child(user.getUid()).exists()){
-
-                                        updateUI(user);
-
-                                    } else {
-
-                                        showErrorDialog("This email account does not exist yet, please go to the sign up page and register.");
-                                        mDialog.dismiss();
-                                        mAuth.signOut();
-
-                                    }
-
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-
-                                }
-                            });
-
-                        } else {
-
-                            mDialog.dismiss();
-                            Toast.makeText(SignIn.this, ""+task.getException(), Toast.LENGTH_SHORT).show();
-
-                        }
+                        updateUIRegister(user);
 
                     }
-                });
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+                showErrorDialog("Something Went Wrong. Please Try Again Later.");
+                mDialog.dismiss();
+                if (mAuth.getCurrentUser() != null) {
+
+                    mAuth.getCurrentUser().delete();
+                    authed.child(currentUid).removeValue();
+                    mAuth.signOut();
+
+                }
+
+            }
+        });
+
     }
 
     @Override
@@ -478,17 +478,27 @@ public class SignIn extends AppCompatActivity {
 
             }
 
-        } else {
+        }
+    }
 
-            mCallbackManager.onActivityResult(requestCode, resultCode, data);
+    private void updateUIRegister (FirebaseUser user) {
+
+        if (user != null){
+
+            mDialog.dismiss();
+            Intent finishRegIntent = new Intent(SignIn.this, Registration.class);
+            startActivity(finishRegIntent);
+            finish();
 
         }
+
     }
 
     private void updateUI(FirebaseUser user) {
 
         if (user != null){
 
+            mDialog.dismiss();
             String currentUid = user.getUid();
 
             Paper.book().write(Common.USER_ID, currentUid);

@@ -114,10 +114,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/LoginBackground" />
         <activity
-            android:name=".HomeActivities.Home"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".DashboardMenu.SponsoredFarms"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
@@ -217,10 +213,6 @@
             android:name=".AdminDetails.StudentRequestDetails"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".NewsDetail"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

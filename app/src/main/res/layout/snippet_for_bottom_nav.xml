@@ -15,37 +15,7 @@
         android:orientation="horizontal"
         android:animateLayoutChanges="true"
         android:gravity="center"
-        android:weightSum="8">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_weight="2"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:animateLayoutChanges="true"
-            android:background="@drawable/white_backround"
-            android:orientation="vertical"
-            android:id="@+id/homeLayout">
-
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_menorah_home_green"
-                android:adjustViewBounds="true"
-                android:padding="6dp"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="Home"
-                android:textSize="13sp"
-                android:textColor="@color/black"
-                android:textStyle="bold"
-                android:layout_margin="2dp"
-                android:id="@+id/homeText"/>
-
-        </LinearLayout>
+        android:weightSum="6">
 
         <LinearLayout
             android:layout_width="0dp"

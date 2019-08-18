@@ -16,7 +16,6 @@ import android.widget.Toast;
 
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.HomeActivities.Dashboard;
-import com.blackviking.menorahfarms.HomeActivities.Home;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.facebook.login.LoginManager;

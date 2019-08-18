@@ -8,7 +8,6 @@ import android.text.TextUtils;
 
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.HomeActivities.Dashboard;
-import com.blackviking.menorahfarms.HomeActivities.Home;
 
 import io.paperdb.Paper;
 

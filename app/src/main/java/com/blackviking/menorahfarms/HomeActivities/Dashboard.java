@@ -37,8 +37,8 @@ import io.paperdb.Paper;
 
 public class Dashboard extends AppCompatActivity {
 
-    private LinearLayout homeSwitch, dashboardSwitch, farmstoreSwitch, accountSwitch;
-    private TextView homeText, dashboardText, farmstoreText, accountText;
+    private LinearLayout dashboardSwitch, farmstoreSwitch, accountSwitch;
+    private TextView dashboardText, farmstoreText, accountText;
 
     private TextView welcome, sponsorCycle, totalReturnsText, nextEndOfCycleDate;
     private ImageView cartButton;
@@ -65,11 +65,9 @@ public class Dashboard extends AppCompatActivity {
 
 
         /*---   WIDGETS   ---*/
-        homeSwitch = (LinearLayout)findViewById(R.id.homeLayout);
         dashboardSwitch = (LinearLayout)findViewById(R.id.dashboardLayout);
         farmstoreSwitch = (LinearLayout)findViewById(R.id.farmShopLayout);
         accountSwitch = (LinearLayout)findViewById(R.id.accountLayout);
-        homeText = (TextView)findViewById(R.id.homeText);
         dashboardText = (TextView)findViewById(R.id.dashboardText);
         farmstoreText = (TextView)findViewById(R.id.farmShopText);
         accountText = (TextView)findViewById(R.id.accountText);
@@ -93,22 +91,10 @@ public class Dashboard extends AppCompatActivity {
 
 
         /*---   BOTTOM NAV   ---*/
-        homeText.setTextColor(getResources().getColor(R.color.black));
         dashboardText.setTextColor(getResources().getColor(R.color.colorPrimary));
         farmstoreText.setTextColor(getResources().getColor(R.color.black));
         accountText.setTextColor(getResources().getColor(R.color.black));
 
-        homeSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent homeIntent = new Intent(Dashboard.this, Home.class);
-                startActivity(homeIntent);
-                finish();
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-
-            }
-        });
         farmstoreSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -396,15 +382,5 @@ public class Dashboard extends AppCompatActivity {
             }
         });
 
-        /*about.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent aboutIntent = new Intent(Dashboard.this, About.class);
-                startActivity(aboutIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-
-            }
-        });*/
     }
 }

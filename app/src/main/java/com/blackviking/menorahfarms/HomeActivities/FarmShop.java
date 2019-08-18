@@ -14,8 +14,8 @@ import com.blackviking.menorahfarms.R;
 
 public class FarmShop extends AppCompatActivity {
 
-    private LinearLayout homeSwitch, dashboardSwitch, farmstoreSwitch, accountSwitch;
-    private TextView homeText, dashboardText, farmstoreText, accountText;
+    private LinearLayout dashboardSwitch, farmstoreSwitch, accountSwitch;
+    private TextView dashboardText, farmstoreText, accountText;
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
@@ -27,11 +27,9 @@ public class FarmShop extends AppCompatActivity {
         setContentView(R.layout.activity_farm_shop);
 
         /*---   WIDGETS   ---*/
-        homeSwitch = (LinearLayout)findViewById(R.id.homeLayout);
         dashboardSwitch = (LinearLayout)findViewById(R.id.dashboardLayout);
         farmstoreSwitch = (LinearLayout)findViewById(R.id.farmShopLayout);
         accountSwitch = (LinearLayout)findViewById(R.id.accountLayout);
-        homeText = (TextView)findViewById(R.id.homeText);
         dashboardText = (TextView)findViewById(R.id.dashboardText);
         farmstoreText = (TextView)findViewById(R.id.farmShopText);
         accountText = (TextView)findViewById(R.id.accountText);
@@ -48,22 +46,11 @@ public class FarmShop extends AppCompatActivity {
 
 
         /*---   BOTTOM NAV   ---*/
-        homeText.setTextColor(getResources().getColor(R.color.black));
         dashboardText.setTextColor(getResources().getColor(R.color.black));
         farmstoreText.setTextColor(getResources().getColor(R.color.colorPrimary));
         accountText.setTextColor(getResources().getColor(R.color.black));
 
-        homeSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                Intent homeIntent = new Intent(FarmShop.this, Home.class);
-                startActivity(homeIntent);
-                finish();
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-
-            }
-        });
         dashboardSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

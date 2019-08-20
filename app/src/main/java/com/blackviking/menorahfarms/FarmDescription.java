@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.blackviking.menorahfarms.Common.Common;
+import com.blackviking.menorahfarms.Models.FarmModel;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -63,21 +64,20 @@ public class FarmDescription extends AppCompatActivity {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        String theUnits = dataSnapshot.child("unitsAvailable").getValue().toString();
-                        String theROI = dataSnapshot.child("farmRoi").getValue().toString();
-                        String theDuration = dataSnapshot.child("sponsorDuration").getValue().toString();
-                        String thePrice = dataSnapshot.child("pricePerUnit").getValue().toString();
-                        String theLocation = dataSnapshot.child("farmLocation").getValue().toString();
-                        String theFarmDescription = dataSnapshot.child("farmDescription").getValue().toString();
+                        FarmModel currentFarm = dataSnapshot.getValue(FarmModel.class);
 
-                        farmDescDuration.setText(theDuration + " Months");
-                        farmDescLocation.setText(theLocation);
-                        farmDescROI.setText(theROI + "%");
-                        farmDescUnits.setText(theUnits);
-                        farmDescTerms.setText(theFarmDescription);
+                        if (currentFarm != null){
 
-                        long priceToLong = Long.parseLong(thePrice);
-                        farmDescPrice.setText(Common.convertToPrice(FarmDescription.this, priceToLong));
+                            farmDescDuration.setText(currentFarm.getSponsorDuration() + " Months");
+                            farmDescLocation.setText(currentFarm.getFarmLocation());
+                            farmDescROI.setText(currentFarm.getFarmRoi() + "%");
+                            farmDescUnits.setText(currentFarm.getUnitsAvailable());
+                            farmDescTerms.setText(currentFarm.getFarmDescription());
+
+                            long priceToLong = Long.parseLong(currentFarm.getPricePerUnit());
+                            farmDescPrice.setText(Common.convertToPrice(FarmDescription.this, priceToLong));
+
+                        }
 
                     }
 

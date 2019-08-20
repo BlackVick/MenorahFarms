@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Models.CartModel;
+import com.blackviking.menorahfarms.Models.FarmModel;
 import com.blackviking.menorahfarms.Notification.APIService;
 import com.blackviking.menorahfarms.Notification.DataMessage;
 import com.blackviking.menorahfarms.Notification.MyResponse;
@@ -183,118 +184,125 @@ public class Cart extends AppCompatActivity {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                final String theFarmType = dataSnapshot.child("farmType").getValue().toString();
-                                String theFarmLocation = dataSnapshot.child("farmLocation").getValue().toString();
-                                final String theFarmROI = dataSnapshot.child("farmRoi").getValue().toString();
-                                final String theFarmUnitPrice = dataSnapshot.child("pricePerUnit").getValue().toString();
-                                final String theFarmSponsorDuration = dataSnapshot.child("sponsorDuration").getValue().toString();
-                                final String theFarmImage = dataSnapshot.child("farmImageThumb").getValue().toString();
+                                FarmModel currentFarm = dataSnapshot.getValue(FarmModel.class);
 
-                                long priceToLong = Long.parseLong(theFarmUnitPrice);
+                                if (currentFarm != null){
 
-                                viewHolder.cartItemType.setText(theFarmType);
-                                viewHolder.cartItemLocation.setText(theFarmLocation);
-                                viewHolder.cartItemROI.setText("Return on investment: " + theFarmROI + "%");
-                                viewHolder.cartItemDuration.setText("Duration: " + theFarmSponsorDuration + " Months");
-                                viewHolder.cartItemPrice.setText(Common.convertToPrice(Cart.this, priceToLong));
+                                    final String theFarmType = currentFarm.getFarmType();
+                                    String theFarmLocation = currentFarm.getFarmLocation();
+                                    final String theFarmROI = currentFarm.getFarmRoi();
+                                    final String theFarmUnitPrice = currentFarm.getPricePerUnit();
+                                    final String theFarmSponsorDuration = currentFarm.getSponsorDuration();
+                                    final String theFarmImage = currentFarm.getFarmImageThumb();
 
-                                if (!theFarmImage.equalsIgnoreCase("")){
+                                    long priceToLong = Long.parseLong(theFarmUnitPrice);
 
-                                    Picasso.get()
-                                            .load(theFarmImage)
-                                            .networkPolicy(NetworkPolicy.OFFLINE)
-                                            .placeholder(R.drawable.menorah_placeholder)
-                                            .into(viewHolder.cartItemImage, new Callback() {
-                                                @Override
-                                                public void onSuccess() {
+                                    viewHolder.cartItemType.setText(theFarmType);
+                                    viewHolder.cartItemLocation.setText(theFarmLocation);
+                                    viewHolder.cartItemROI.setText("Return on investment: " + theFarmROI + "%");
+                                    viewHolder.cartItemDuration.setText("Duration: " + theFarmSponsorDuration + " Months");
+                                    viewHolder.cartItemPrice.setText(Common.convertToPrice(Cart.this, priceToLong));
 
-                                                }
+                                    if (!theFarmImage.equalsIgnoreCase("")){
 
-                                                @Override
-                                                public void onError(Exception e) {
-                                                    Picasso.get()
-                                                            .load(theFarmImage)
-                                                            .placeholder(R.drawable.menorah_placeholder)
-                                                            .into(viewHolder.cartItemImage);
-                                                }
+                                        Picasso.get()
+                                                .load(theFarmImage)
+                                                .networkPolicy(NetworkPolicy.OFFLINE)
+                                                .placeholder(R.drawable.menorah_placeholder)
+                                                .into(viewHolder.cartItemImage, new Callback() {
+                                                    @Override
+                                                    public void onSuccess() {
 
-                                            });
+                                                    }
 
-                                } else {
+                                                    @Override
+                                                    public void onError(Exception e) {
+                                                        Picasso.get()
+                                                                .load(theFarmImage)
+                                                                .placeholder(R.drawable.menorah_placeholder)
+                                                                .into(viewHolder.cartItemImage);
+                                                    }
 
-                                    viewHolder.cartItemImage.setImageResource(R.drawable.menorah_placeholder);
+                                                });
+
+                                    } else {
+
+                                        viewHolder.cartItemImage.setImageResource(R.drawable.menorah_placeholder);
+
+                                    }
+
+
+                                    viewHolder.removeFromCart.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            if (Common.isConnectedToInternet(getBaseContext())) {
+                                                openDeleteDialog(adapter.getRef(viewHolder.getAdapterPosition()).getKey());
+                                            } else {
+                                                showErrorDialog("No Internet Access !");
+                                            }
+                                        }
+                                    });
+
+
+                                    viewHolder.checkout.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            if (Common.isConnectedToInternet(getBaseContext())) {
+
+                                                final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(Cart.this).create();
+                                                LayoutInflater inflater = Cart.this.getLayoutInflater();
+                                                View viewOptions = inflater.inflate(R.layout.terms_layout,null);
+
+                                                final TextView termsText = (TextView) viewOptions.findViewById(R.id.termsText);
+                                                final Button cancel = (Button) viewOptions.findViewById(R.id.cancelCheckout);
+                                                final Button proceed = (Button) viewOptions.findViewById(R.id.proceedCheckout);
+
+                                                alertDialog.setView(viewOptions);
+
+                                                alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+                                                alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+                                                termsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                                        String theTerms = dataSnapshot.child("terms").getValue().toString();
+
+                                                        termsText.setText(theTerms);
+
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(DatabaseError databaseError) {
+
+                                                    }
+                                                });
+
+                                                proceed.setOnClickListener(new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View v) {
+                                                        alertDialog.dismiss();
+                                                        checkoutAndPay(adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
+                                                        //testPay(adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
+                                                    }
+                                                });
+
+                                                cancel.setOnClickListener(new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View v) {
+                                                        alertDialog.cancel();
+                                                    }
+                                                });
+
+                                                alertDialog.show();
+
+                                            } else {
+                                                showErrorDialog("No Internet Access !");
+                                            }
+                                        }
+                                    });
 
                                 }
-
-
-                                viewHolder.removeFromCart.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        if (Common.isConnectedToInternet(getBaseContext())) {
-                                            openDeleteDialog(adapter.getRef(viewHolder.getAdapterPosition()).getKey());
-                                        } else {
-                                            showErrorDialog("No Internet Access !");
-                                        }
-                                    }
-                                });
-
-
-                                viewHolder.checkout.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        if (Common.isConnectedToInternet(getBaseContext())) {
-
-                                            final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(Cart.this).create();
-                                            LayoutInflater inflater = Cart.this.getLayoutInflater();
-                                            View viewOptions = inflater.inflate(R.layout.terms_layout,null);
-
-                                            final TextView termsText = (TextView) viewOptions.findViewById(R.id.termsText);
-                                            final Button cancel = (Button) viewOptions.findViewById(R.id.cancelCheckout);
-                                            final Button proceed = (Button) viewOptions.findViewById(R.id.proceedCheckout);
-
-                                            alertDialog.setView(viewOptions);
-
-                                            alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
-                                            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-                                            termsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                                    String theTerms = dataSnapshot.child("terms").getValue().toString();
-
-                                                    termsText.setText(theTerms);
-
-                                                }
-
-                                                @Override
-                                                public void onCancelled(DatabaseError databaseError) {
-
-                                                }
-                                            });
-
-                                            proceed.setOnClickListener(new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    alertDialog.dismiss();
-                                                    checkoutAndPay(adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
-                                                }
-                                            });
-
-                                            cancel.setOnClickListener(new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    alertDialog.cancel();
-                                                }
-                                            });
-
-                                            alertDialog.show();
-
-                                        } else {
-                                            showErrorDialog("No Internet Access !");
-                                        }
-                                    }
-                                });
 
                             }
 
@@ -307,6 +315,50 @@ public class Cart extends AppCompatActivity {
             }
         };
         cartRecycler.setAdapter(adapter);
+
+    }
+
+    private void testPay(String theCartKey, final String theFarmType, String theFarmROI, String theFarmUnitPrice, String theFarmSponsorDuration, long totalPayout, final int units, String farmId) {
+
+        /*---   GLOBAL SET   ---*/
+        currentFarmType = theFarmType;
+        currentFarmRoi = theFarmROI;
+        currentUnitPrice = theFarmUnitPrice;
+        currentDuration = theFarmSponsorDuration;
+        currentFarmId = farmId;
+        currentTotalPayout = totalPayout;
+        currentUnits = units;
+        currentCartKey = theCartKey;
+
+
+        char firstInit = userFirstName.charAt(0);
+        char lastInit = userLastName.charAt(0);
+
+        String initials = String.valueOf(firstInit) + String.valueOf(lastInit);
+
+        paymentReference = initials + "-MF-" + System.currentTimeMillis();
+
+        /*---   PRICE TO PAY   ---*/
+        int thePrice = Integer.parseInt(theFarmUnitPrice);
+        totalPrice = thePrice * units;
+
+
+        /*---   DURATION   ---*/
+        int theDuration = Integer.parseInt(theFarmSponsorDuration);
+        int theDays = 30 * theDuration;
+
+        Date todayDate = Calendar.getInstance().getTime();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+        todayString = formatter.format(todayDate);
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(todayDate);
+        cal.add(Calendar.DATE, theDays);
+        Date futureDate = cal.getTime();
+        SimpleDateFormat formatterFuture = new SimpleDateFormat("dd-MM-yyyy");
+        futureString = formatterFuture.format(futureDate);
+
+        pushToDb();
 
     }
 

@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.blackviking.menorahfarms.Common.Common;
+import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.SignUp;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -101,26 +102,23 @@ public class PersonalDetails extends AppCompatActivity {
 
         /*---   CURRENT USER   ---*/
         userRef.child(currentUid)
-                .addValueEventListener(new ValueEventListener() {
+                .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        String theFirstName = dataSnapshot.child("firstName").getValue().toString();
-                        String theLastName = dataSnapshot.child("lastName").getValue().toString();
-                        String theEmail = dataSnapshot.child("email").getValue().toString();
-                        String theSignUpType = dataSnapshot.child("signUpMode").getValue().toString();
-                        String thePhone = dataSnapshot.child("phone").getValue().toString();
-                        String theBirthday = dataSnapshot.child("birthday").getValue().toString();
-                        String theGender = dataSnapshot.child("gender").getValue().toString();
-                        String theNationality = dataSnapshot.child("nationality").getValue().toString();
+                        UserModel currentUser = dataSnapshot.getValue(UserModel.class);
 
-                        profileName.setText(theFirstName + " " + theLastName);
-                        profileMail.setText(theEmail);
-                        profileType.setText(theSignUpType);
-                        profilePhone.setText(thePhone);
-                        profileBirthday.setText(theBirthday);
-                        profileGender.setText(theGender);
-                        profileNationality.setText(theNationality);
+                        if (currentUser != null){
+
+                            profileName.setText(currentUser.getFirstName() + " " + currentUser.getLastName());
+                            profileMail.setText(currentUser.getEmail());
+                            profileType.setText(currentUser.getSignUpMode());
+                            profilePhone.setText(currentUser.getPhone());
+                            profileBirthday.setText(currentUser.getBirthday());
+                            profileGender.setText(currentUser.getGender());
+                            profileNationality.setText(currentUser.getNationality());
+
+                        }
 
                     }
 

@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.blackviking.menorahfarms.Common.Common;
+import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -63,21 +64,21 @@ public class NextOfKin extends AppCompatActivity {
 
         /*---   CURRENT USER   ---*/
         userRef.child(currentUid)
-                .addValueEventListener(new ValueEventListener() {
+                .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        String theName = dataSnapshot.child("kinName").getValue().toString();
-                        String theEmail= dataSnapshot.child("kinEmail").getValue().toString();
-                        String theRelationship = dataSnapshot.child("kinRelationship").getValue().toString();
-                        String thePhone = dataSnapshot.child("kinPhone").getValue().toString();
-                        String theAddress = dataSnapshot.child("kinAddress").getValue().toString();
+                        UserModel currentUser = dataSnapshot.getValue(UserModel.class);
 
-                        kinAddress.setText(theAddress);
-                        kinName.setText(theName);
-                        kinRelationship.setText(theRelationship);
-                        kinPhone.setText(thePhone);
-                        kinEmail.setText(theEmail);
+                        if (currentUser != null){
+
+                            kinAddress.setText(currentUser.getKinAddress());
+                            kinName.setText(currentUser.getKinName());
+                            kinRelationship.setText(currentUser.getKinRelationship());
+                            kinPhone.setText(currentUser.getKinPhone());
+                            kinEmail.setText(currentUser.getKinEmail());
+
+                        }
 
                     }
 

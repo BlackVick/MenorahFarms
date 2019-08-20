@@ -28,6 +28,7 @@ public class Common {
     public static final String USER_ID = "User";
     public static final String SIGN_UP_CHOICE = "Choice";
     public static final String GOOD_TO_GO = "GoToGo";
+    public static final String PROFILE_WARNING_COUNT = "ProfileWarningCount";
 
 
     /*---   FLUTTERWAVE   ---*/

@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.blackviking.menorahfarms.Common.Common;
+import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -62,19 +63,20 @@ public class SocialMedia extends AppCompatActivity {
 
         /*---   CURRENT USER   ---*/
         userRef.child(currentUid)
-                .addValueEventListener(new ValueEventListener() {
+                .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        String theFacebook = dataSnapshot.child("facebook").getValue().toString();
-                        String theInstagram = dataSnapshot.child("instagram").getValue().toString();
-                        String theTwitter = dataSnapshot.child("twitter").getValue().toString();
-                        String theLinkedIn = dataSnapshot.child("linkedIn").getValue().toString();
+                        UserModel currentUser = dataSnapshot.getValue(UserModel.class);
 
-                        profileFacebook.setText(theFacebook);
-                        profileInstagram.setText(theInstagram);
-                        profileTwitter.setText(theTwitter);
-                        profileLinkedin.setText(theLinkedIn);
+                        if (currentUser != null){
+
+                            profileFacebook.setText(currentUser.getFacebook());
+                            profileInstagram.setText(currentUser.getInstagram());
+                            profileTwitter.setText(currentUser.getTwitter());
+                            profileLinkedin.setText(currentUser.getLinkedIn());
+
+                        }
 
                     }
 

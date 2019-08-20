@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import com.blackviking.menorahfarms.AdminDetails.DueSponsorshipDetail;
 import com.blackviking.menorahfarms.Interface.ItemClickListener;
 import com.blackviking.menorahfarms.Models.DueSponsorshipModel;
+import com.blackviking.menorahfarms.Models.SponsoredFarmModel;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.ViewHolders.AdminViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -83,9 +84,13 @@ public class DueSponsorships extends Fragment {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                String theRef = dataSnapshot.child("sponsorRefNumber").getValue().toString();
+                                SponsoredFarmModel currentSpons = dataSnapshot.getValue(SponsoredFarmModel.class);
 
-                                viewHolder.itemIdentification.setText(theRef);
+                                if (currentSpons != null){
+
+                                    viewHolder.itemIdentification.setText(currentSpons.getSponsorRefNumber());
+
+                                }
 
                             }
 

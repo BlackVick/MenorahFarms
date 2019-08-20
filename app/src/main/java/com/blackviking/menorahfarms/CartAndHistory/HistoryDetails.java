@@ -11,6 +11,7 @@ import com.blackviking.menorahfarms.AdminDetails.DueSponsorshipDetail;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Models.HistoryModel;
 import com.blackviking.menorahfarms.Models.SponsoredFarmModel;
+import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -101,14 +102,15 @@ public class HistoryDetails extends AppCompatActivity {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                String firstName = dataSnapshot.child("firstName").getValue().toString();
-                                String lastName = dataSnapshot.child("lastName").getValue().toString();
-                                String bankName = dataSnapshot.child("bank").getValue().toString();
-                                String accountNumber = dataSnapshot.child("accountNumber").getValue().toString();
+                                UserModel currentUser = dataSnapshot.getValue(UserModel.class);
 
-                                theDueUserName = firstName + " " + lastName;
-                                theDueUserEmail = dataSnapshot.child("email").getValue().toString();
-                                theDueUserBank = bankName + ", " + accountNumber;
+                                if (currentUser != null){
+
+                                    theDueUserName = currentUser.getFirstName() + " " + currentUser.getLastName();
+                                    theDueUserEmail = currentUser.getEmail();
+                                    theDueUserBank = currentUser.getBank() + ", " + currentUser.getAccountNumber();
+
+                                }
 
 
                             }

@@ -29,6 +29,8 @@ import android.widget.Toast;
 import com.blackviking.menorahfarms.BuildConfig;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Common.Permissions;
+import com.blackviking.menorahfarms.Models.StudentModel;
+import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -115,42 +117,50 @@ public class StudentDetails extends AppCompatActivity {
 
         /*---   CURRENT USER   ---*/
         schoolRef.child(currentUid)
-                .addValueEventListener(new ValueEventListener() {
+                .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         
                         if (dataSnapshot.exists()) {
+
+                            final StudentModel currentStudent = dataSnapshot.getValue(StudentModel.class);
+
+                            if (currentStudent != null){
+
+                                schoolName.setText(currentStudent.getSchoolName());
+                                schoolDepartment.setText(currentStudent.getDepartment());
+
+                                if (!currentStudent.getStudentIdThumb().equalsIgnoreCase("")){
+
+                                    Picasso.get()
+                                            .load(currentStudent.getStudentIdThumb())
+                                            .networkPolicy(NetworkPolicy.OFFLINE)
+                                            .placeholder(R.drawable.menorah_placeholder)
+                                            .into(studentId, new Callback() {
+                                                @Override
+                                                public void onSuccess() {
+
+                                                }
+
+                                                @Override
+                                                public void onError(Exception e) {
+                                                    Picasso.get()
+                                                            .load(currentStudent.getStudentIdThumb())
+                                                            .placeholder(R.drawable.menorah_placeholder)
+                                                            .into(studentId);
+                                                }
+                                            });
+
+                                }
+
+                            }
 
                             String theSchoolName = dataSnapshot.child("schoolName").getValue().toString();
                             String theStudentDepartment = dataSnapshot.child("department").getValue().toString();
                             final String theStudentId = dataSnapshot.child("studentIdThumb").getValue().toString();
 
                             
-                            schoolName.setText(theSchoolName);
-                            schoolDepartment.setText(theStudentDepartment);
-                            
-                            if (!theStudentId.equalsIgnoreCase("")){
 
-                                Picasso.get()
-                                        .load(theStudentId)
-                                        .networkPolicy(NetworkPolicy.OFFLINE)
-                                        .placeholder(R.drawable.menorah_placeholder)
-                                        .into(studentId, new Callback() {
-                                            @Override
-                                            public void onSuccess() {
-                                                
-                                            }
-
-                                            @Override
-                                            public void onError(Exception e) {
-                                                Picasso.get()
-                                                        .load(theStudentId)
-                                                        .placeholder(R.drawable.menorah_placeholder)
-                                                        .into(studentId);
-                                            }
-                                        });
-                                
-                            }
 
                         }
 

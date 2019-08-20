@@ -14,6 +14,7 @@ import com.blackviking.menorahfarms.AdminDetails.DueSponsorshipDetail;
 import com.blackviking.menorahfarms.AdminDetails.StudentRequestDetails;
 import com.blackviking.menorahfarms.Interface.ItemClickListener;
 import com.blackviking.menorahfarms.Models.StudentModel;
+import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.ViewHolders.AdminViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -86,7 +87,13 @@ public class StudentRequest extends Fragment {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                viewHolder.itemIdentification.setText(dataSnapshot.child("email").getValue().toString());
+                                UserModel currentUser = dataSnapshot.getValue(UserModel.class);
+
+                                if (currentUser != null){
+
+                                    viewHolder.itemIdentification.setText(currentUser.getEmail());
+
+                                }
 
                             }
 

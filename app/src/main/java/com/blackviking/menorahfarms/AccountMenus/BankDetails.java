@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Models.BankModel;
+import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -75,17 +76,19 @@ public class BankDetails extends AppCompatActivity {
 
         /*---   CURRENT USER   ---*/
         userRef.child(currentUid)
-                .addValueEventListener(new ValueEventListener() {
+                .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        String theBank = dataSnapshot.child("bank").getValue().toString();
-                        String theAccountName = dataSnapshot.child("accountName").getValue().toString();
-                        String theAccountNumber = dataSnapshot.child("accountNumber").getValue().toString();
+                        UserModel currentUser = dataSnapshot.getValue(UserModel.class);
 
-                        profileAccountName.setText(theAccountName);
-                        profileAccountNumber.setText(theAccountNumber);
-                        profileBankName.setText(theBank);
+                        if (currentUser != null){
+
+                            profileAccountName.setText(currentUser.getAccountName());
+                            profileAccountNumber.setText(currentUser.getAccountNumber());
+                            profileBankName.setText(currentUser.getBank());
+
+                        }
 
                     }
 
@@ -100,7 +103,11 @@ public class BankDetails extends AppCompatActivity {
         final List<String> bankList = new ArrayList<>();
         bankList.add(0, "Bank");
 
-        bankRef.addValueEventListener(new ValueEventListener() {
+        final ArrayAdapter<String> dataAdapterGender;
+        dataAdapterGender = new ArrayAdapter(this, android.R.layout.simple_spinner_item, bankList);
+        dataAdapterGender.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        bankRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -111,6 +118,9 @@ public class BankDetails extends AppCompatActivity {
 
                 }
 
+                profileBank.setAdapter(dataAdapterGender);
+                dataAdapterGender.notifyDataSetChanged();
+
             }
 
             @Override
@@ -119,10 +129,7 @@ public class BankDetails extends AppCompatActivity {
             }
         });
 
-        ArrayAdapter<String> dataAdapterGender;
-        dataAdapterGender = new ArrayAdapter(this, android.R.layout.simple_spinner_item, bankList);
-        dataAdapterGender.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        profileBank.setAdapter(dataAdapterGender);
+
         profileBank.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

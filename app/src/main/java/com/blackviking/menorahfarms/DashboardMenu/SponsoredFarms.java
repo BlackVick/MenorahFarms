@@ -14,6 +14,7 @@ import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Common.GetTimeAgo;
 import com.blackviking.menorahfarms.HomeActivities.FarmShop;
 import com.blackviking.menorahfarms.Interface.ItemClickListener;
+import com.blackviking.menorahfarms.Models.FarmModel;
 import com.blackviking.menorahfarms.Models.SponsoredFarmModel;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.Sponsorship.SponsorshipDetails;
@@ -144,32 +145,36 @@ public class SponsoredFarms extends AppCompatActivity {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                        final String farmImage = dataSnapshot.child("farmImageThumb").getValue().toString();
+                                        final FarmModel currentFarm = dataSnapshot.getValue(FarmModel.class);
 
-                                        if (!farmImage.equalsIgnoreCase("")){
+                                        if (currentFarm != null){
 
-                                            Picasso.get()
-                                                    .load(farmImage)
-                                                    .networkPolicy(NetworkPolicy.OFFLINE)
-                                                    .placeholder(R.drawable.menorah_placeholder)
-                                                    .into(viewHolder.sponsoredFarmImage, new Callback() {
-                                                        @Override
-                                                        public void onSuccess() {
+                                            if (!currentFarm.getFarmImageThumb().equalsIgnoreCase("")){
 
-                                                        }
+                                                Picasso.get()
+                                                        .load(currentFarm.getFarmImageThumb())
+                                                        .networkPolicy(NetworkPolicy.OFFLINE)
+                                                        .placeholder(R.drawable.menorah_placeholder)
+                                                        .into(viewHolder.sponsoredFarmImage, new Callback() {
+                                                            @Override
+                                                            public void onSuccess() {
 
-                                                        @Override
-                                                        public void onError(Exception e) {
-                                                            Picasso.get()
-                                                                    .load(farmImage)
-                                                                    .placeholder(R.drawable.menorah_placeholder)
-                                                                    .into(viewHolder.sponsoredFarmImage);
-                                                        }
-                                                    });
+                                                            }
 
-                                        } else {
+                                                            @Override
+                                                            public void onError(Exception e) {
+                                                                Picasso.get()
+                                                                        .load(currentFarm.getFarmImageThumb())
+                                                                        .placeholder(R.drawable.menorah_placeholder)
+                                                                        .into(viewHolder.sponsoredFarmImage);
+                                                            }
+                                                        });
 
-                                            viewHolder.sponsoredFarmImage.setImageResource(R.drawable.menorah_placeholder);
+                                            } else {
+
+                                                viewHolder.sponsoredFarmImage.setImageResource(R.drawable.menorah_placeholder);
+
+                                            }
 
                                         }
 

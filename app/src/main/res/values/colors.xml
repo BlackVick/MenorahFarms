@@ -2,11 +2,13 @@
 <resources>
     <color name="colorPrimary">#12AA58</color>
     <color name="colorPrimaryDark">#0E753F</color>
+    <color name="fadeGreen">#DD0E753F</color>
     <color name="colorAccent">#03512A</color>
     <color name="bottomNavIconColor">#12AA58</color>
     <color name="buttonBackgroundStart">#45c781</color>
     <color name="buttonBackgroundMid">#3CBC4B</color>
     <color name="buttonBackgroundEnd">#B834B115</color>
+    <color name="transparentGreen">#230CCB6B</color>
     <color name="backgroundColor">#D6F6BC</color>
     <color name="black">#ff000000</color>
     <color name="offBlack">#212121</color>

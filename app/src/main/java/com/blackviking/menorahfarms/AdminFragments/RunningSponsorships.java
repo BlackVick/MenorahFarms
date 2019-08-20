@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Models.RunningCycleModel;
+import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.ViewHolders.RunningCycleViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -81,10 +82,13 @@ public class RunningSponsorships extends Fragment {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                        String firstName = dataSnapshot.child("firstName").getValue().toString();
-                                        String lastName = dataSnapshot.child("lastName").getValue().toString();
+                                        UserModel currentUser = dataSnapshot.getValue(UserModel.class);
 
-                                        viewHolder.cycleUserName.setText(firstName + " " + lastName);
+                                        if (currentUser != null){
+
+                                            viewHolder.cycleUserName.setText(currentUser.getFirstName() + " " + currentUser.getLastName());
+
+                                        }
 
                                     }
 

@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.blackviking.menorahfarms.Common.Common;
+import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -62,17 +63,19 @@ public class ContactDetails extends AppCompatActivity {
 
         /*---   CURRENT USER   ---*/
         userRef.child(currentUid)
-                .addValueEventListener(new ValueEventListener() {
+                .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        String theAddress = dataSnapshot.child("address").getValue().toString();
-                        String theCity = dataSnapshot.child("city").getValue().toString();
-                        String theState = dataSnapshot.child("state").getValue().toString();
+                        UserModel currentUser = dataSnapshot.getValue(UserModel.class);
 
-                        profileAddress.setText(theAddress);
-                        profileCity.setText(theCity);
-                        profileState.setText(theState);
+                        if (currentUser != null){
+
+                            profileAddress.setText(currentUser.getAddress());
+                            profileCity.setText(currentUser.getCity());
+                            profileState.setText(currentUser.getState());
+
+                        }
 
                     }
 

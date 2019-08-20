@@ -118,6 +118,8 @@ public class Account extends AppCompatActivity {
 
     private String theUserMail, theFirstName, theLastName, theProfilePicture;
 
+    private boolean isWarned;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -327,16 +329,6 @@ public class Account extends AppCompatActivity {
             }
         });
 
-        /*---   PERMISSIONS HANDLER   ---*/
-        if (checkPermissionsArray(Permissions.PERMISSIONS)){
-
-
-        } else {
-
-            verifyPermissions(Permissions.PERMISSIONS);
-
-        }
-
 
         /*---   CURRENT USER   ---*/
         setCurrentUser();
@@ -461,7 +453,17 @@ public class Account extends AppCompatActivity {
                             userAvatar.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    showUploadDialog();
+
+                                    /*---   PERMISSIONS HANDLER   ---*/
+                                    if (checkPermissionsArray(Permissions.PERMISSIONS)){
+
+                                        showUploadDialog();
+
+                                    } else {
+
+                                        verifyPermissions(Permissions.PERMISSIONS);
+
+                                    }
                                 }
                             });
 
@@ -796,7 +798,7 @@ public class Account extends AppCompatActivity {
         if (Common.isConnectedToInternet(getBaseContext())) {
 
             userRef.child(currentUid)
-                    .addValueEventListener(new ValueEventListener() {
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -856,9 +858,24 @@ public class Account extends AppCompatActivity {
                             profileProgress.setProgressDrawable(draw);
                             profileProgress.setProgress(calcResult);
 
-                            if (calcResult < 70) {
+                            if (Paper.book().read(Common.PROFILE_WARNING_COUNT) != null) {
 
-                                showErrorDialog("We advise that users complete their profile by providing all required details, so we can serve you better. \n\nThank you");
+                                isWarned = Paper.book().read(Common.PROFILE_WARNING_COUNT);
+
+                                if (!isWarned) {
+
+                                    if (calcResult < 70) {
+
+                                        showErrorDialog("We advise that users complete their profile by providing all required details, so we can serve you better. \n\nThank you");
+                                        Paper.book().write(Common.PROFILE_WARNING_COUNT, true);
+
+                                    }
+
+                                }
+
+                            } else {
+
+                                Paper.book().write(Common.PROFILE_WARNING_COUNT, false);
 
                             }
 

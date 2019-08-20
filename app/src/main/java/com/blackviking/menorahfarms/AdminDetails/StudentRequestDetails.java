@@ -12,6 +12,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blackviking.menorahfarms.Common.Common;
+import com.blackviking.menorahfarms.Models.StudentModel;
+import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.Notification.APIService;
 import com.blackviking.menorahfarms.Notification.DataMessage;
 import com.blackviking.menorahfarms.Notification.MyResponse;
@@ -96,12 +98,14 @@ public class StudentRequestDetails extends AppCompatActivity {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                String firstName = dataSnapshot.child("firstName").getValue().toString();
-                                String lastName = dataSnapshot.child("lastName").getValue().toString();
-                                String email = dataSnapshot.child("email").getValue().toString();
+                                UserModel currentUser = dataSnapshot.getValue(UserModel.class);
 
-                                studentName.setText(firstName + " " + lastName);
-                                studentEmail.setText(email);
+                                if (currentUser != null){
+
+                                    studentName.setText(currentUser.getFirstName() + " " + currentUser.getLastName());
+                                    studentEmail.setText(currentUser.getEmail());
+
+                                }
 
                             }
 
@@ -119,35 +123,35 @@ public class StudentRequestDetails extends AppCompatActivity {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                String theSchool = dataSnapshot.child("schoolName").getValue().toString();
-                                String theDepartment = dataSnapshot.child("department").getValue().toString();
-                                final String theSchoolId = dataSnapshot.child("studentId").getValue().toString();
-                                String theSchoolIdThumb = dataSnapshot.child("studentIdThumb").getValue().toString();
+                                final StudentModel currentStudent = dataSnapshot.getValue(StudentModel.class);
+
+                                if (currentStudent != null){
+
+                                    studentSchool.setText(currentStudent.getSchoolName());
+                                    studentDepartment.setText(currentStudent.getDepartment());
 
 
-                                studentSchool.setText(theSchool);
-                                studentDepartment.setText(theDepartment);
+                                    if (!currentStudent.getStudentIdThumb().equalsIgnoreCase("")){
 
+                                        Picasso.get()
+                                                .load(currentStudent.getStudentIdThumb())
+                                                .into(studentId);
 
-                                if (!theSchoolIdThumb.equalsIgnoreCase("")){
+                                        studentId.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
 
-                                    Picasso.get()
-                                            .load(theSchoolIdThumb)
-                                            .into(studentId);
+                                                Uri uri =  Uri.parse(currentStudent.getStudentIdThumb());
 
-                                    studentId.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
+                                                Intent intent = new Intent();
+                                                intent.setAction(Intent.ACTION_VIEW);
+                                                intent.setDataAndType(uri, "image/*");
+                                                startActivity(intent);
 
-                                            Uri uri =  Uri.parse(theSchoolId);
+                                            }
+                                        });
 
-                                            Intent intent = new Intent();
-                                            intent.setAction(Intent.ACTION_VIEW);
-                                            intent.setDataAndType(uri, "image/*");
-                                            startActivity(intent);
-
-                                        }
-                                    });
+                                    }
 
                                 }
 

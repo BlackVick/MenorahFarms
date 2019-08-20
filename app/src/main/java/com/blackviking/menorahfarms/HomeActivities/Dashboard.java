@@ -9,7 +9,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.blackviking.menorahfarms.About;
 import com.blackviking.menorahfarms.AdminDash;
 import com.blackviking.menorahfarms.CartAndHistory.Cart;
 import com.blackviking.menorahfarms.Common.Common;
@@ -19,9 +18,9 @@ import com.blackviking.menorahfarms.DashboardMenu.FarmUpdates;
 import com.blackviking.menorahfarms.DashboardMenu.FollowedFarms;
 import com.blackviking.menorahfarms.DashboardMenu.Notifications;
 import com.blackviking.menorahfarms.DashboardMenu.SponsoredFarms;
+import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.Services.CheckForSponsorship;
-import com.blackviking.menorahfarms.Services.SponsorshipMonitor;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -125,56 +124,58 @@ public class Dashboard extends AppCompatActivity {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        String userFirstName = dataSnapshot.child("firstName").getValue().toString();
-                        final String profilePicture = dataSnapshot.child("profilePictureThumb").getValue().toString();
-                        final String profileType = dataSnapshot.child("userType").getValue().toString();
+                        final UserModel currentUser = dataSnapshot.getValue(UserModel.class);
 
-                        welcome.setText("Hi, "+userFirstName);
+                        if (currentUser != null){
 
-                        if (!profilePicture.equalsIgnoreCase("")){
+                            welcome.setText("Hi, "+currentUser.getFirstName());
 
-                            Picasso.get()
-                                    .load(profilePicture)
-                                    .networkPolicy(NetworkPolicy.OFFLINE)
-                                    .placeholder(R.drawable.profile)
-                                    .into(userAvatar, new Callback() {
-                                        @Override
-                                        public void onSuccess() {
+                            if (!currentUser.getProfilePictureThumb().equalsIgnoreCase("")){
 
-                                        }
+                                Picasso.get()
+                                        .load(currentUser.getProfilePictureThumb())
+                                        .networkPolicy(NetworkPolicy.OFFLINE)
+                                        .placeholder(R.drawable.profile)
+                                        .into(userAvatar, new Callback() {
+                                            @Override
+                                            public void onSuccess() {
 
-                                        @Override
-                                        public void onError(Exception e) {
-                                            Picasso.get()
-                                                    .load(profilePicture)
-                                                    .placeholder(R.drawable.profile)
-                                                    .into(userAvatar);
-                                        }
-                                    });
+                                            }
 
-                        } else {
+                                            @Override
+                                            public void onError(Exception e) {
+                                                Picasso.get()
+                                                        .load(currentUser.getProfilePictureThumb())
+                                                        .placeholder(R.drawable.profile)
+                                                        .into(userAvatar);
+                                            }
+                                        });
 
-                            userAvatar.setImageResource(R.drawable.profile);
+                            } else {
 
-                        }
+                                userAvatar.setImageResource(R.drawable.profile);
+
+                            }
 
 
-                        if (profileType.equalsIgnoreCase("Admin")){
+                            if (currentUser.getUserType().equalsIgnoreCase("Admin")){
 
-                            adminLayout.setVisibility(View.VISIBLE);
-                            adminLayout.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    Intent adminIntent = new Intent(Dashboard.this, AdminDash.class);
-                                    startActivity(adminIntent);
-                                    overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-                                }
-                            });
+                                adminLayout.setVisibility(View.VISIBLE);
+                                adminLayout.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Intent adminIntent = new Intent(Dashboard.this, AdminDash.class);
+                                        startActivity(adminIntent);
+                                        overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+                                    }
+                                });
 
-                        } else {
+                            } else {
 
-                            adminLayout.setVisibility(View.INVISIBLE);
-                            adminLayout.setEnabled(false);
+                                adminLayout.setVisibility(View.INVISIBLE);
+                                adminLayout.setEnabled(false);
+
+                            }
 
                         }
 
@@ -244,7 +245,7 @@ public class Dashboard extends AppCompatActivity {
         /*---   NEXT END OF CYCLE   ---*/
         sponsoredRef.child(currentUid)
                 .limitToFirst(1)
-                .addListenerForSingleValueEvent(
+                .addValueEventListener(
                         new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {

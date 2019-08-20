@@ -3,6 +3,7 @@ package com.blackviking.menorahfarms.ViewHolders;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.blackviking.menorahfarms.Interface.ItemClickListener;
@@ -11,16 +12,19 @@ import com.blackviking.menorahfarms.R;
 public class HistoryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     private ItemClickListener itemClickListener;
-    public TextView historyFarmType, historyRefNumber, historyFarmReturn, historyStartDate, historyEndDate;
+    public ImageView historyProjectImage;
+    public TextView historyProjectDets, historyProjectNickName, historyProjectLocation, historyProjectUnits, historyProjectPrice, historyProjectReturn;
 
     public HistoryViewHolder(@NonNull View itemView) {
         super(itemView);
 
-        historyFarmType = (TextView)itemView.findViewById(R.id.historyFarmType);
-        historyRefNumber = (TextView)itemView.findViewById(R.id.historyRefNumber);
-        historyFarmReturn = (TextView)itemView.findViewById(R.id.historyFarmReturn);
-        historyStartDate = (TextView)itemView.findViewById(R.id.historyStartDate);
-        historyEndDate = (TextView)itemView.findViewById(R.id.historyEndDate);
+        historyProjectImage = (ImageView)itemView.findViewById(R.id.historyProjectImage);
+        historyProjectDets = (TextView)itemView.findViewById(R.id.historyProjectDets);
+        historyProjectNickName = (TextView)itemView.findViewById(R.id.historyProjectNickName);
+        historyProjectLocation = (TextView)itemView.findViewById(R.id.historyProjectLocation);
+        historyProjectUnits = (TextView)itemView.findViewById(R.id.historyProjectUnits);
+        historyProjectPrice = (TextView)itemView.findViewById(R.id.historyProjectPrice);
+        historyProjectReturn = (TextView)itemView.findViewById(R.id.historyProjectReturn);
 
         itemView.setOnClickListener(this);
     }

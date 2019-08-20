@@ -48,39 +48,39 @@
 
     </RelativeLayout>
 
-    <android.support.v7.widget.RecyclerView
+    <android.support.design.widget.TabLayout
+        android:id="@+id/historyTabs"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/historyRecycler"
-        android:layout_marginTop="?attr/actionBarSize"/>
+        android:layout_height="?attr/actionBarSize"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:minHeight="?attr/actionBarSize"
+        app:tabMode="fixed"
+        app:tabSelectedTextColor="@color/colorPrimaryDark"
+        app:tabTextColor="@color/grey"
+        app:tabIndicatorHeight="3.2dp">
 
-    <LinearLayout
+        <android.support.design.widget.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SUMMARY" />
+
+        <android.support.design.widget.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="BY PROJECT" />
+
+    </android.support.design.widget.TabLayout>
+
+    <View
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:id="@+id/emptyLayout"
-        android:orientation="vertical"
-        android:layout_margin="35dp"
-        android:visibility="gone">
+        android:layout_height="0.4dp"
+        android:layout_below="@+id/historyTabs"
+        android:background="@color/grey"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Your Have No History"
-            android:gravity="center"
-            android:textColor="@color/colorAccent"
-            android:textSize="25sp"
-            android:textStyle="bold"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="You have not sponsored any farm to completion yet, please visit the farm store to sponsor a farm."
-            android:gravity="center"
-            android:textColor="@color/grey"
-            android:textSize="15sp"
-            android:layout_marginTop="10dp"/>
-
-    </LinearLayout>
+    <android.support.v4.view.ViewPager
+        android:layout_below="@+id/historyTabs"
+        android:id="@+id/historyViewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </RelativeLayout>

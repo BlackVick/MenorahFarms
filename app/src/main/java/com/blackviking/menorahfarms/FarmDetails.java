@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blackviking.menorahfarms.Common.Common;
+import com.blackviking.menorahfarms.Models.FarmModel;
 import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -138,150 +139,155 @@ public class FarmDetails extends AppCompatActivity {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                String theFarmType = dataSnapshot.child("farmType").getValue().toString();
-                                String theFarmLocation = dataSnapshot.child("farmLocation").getValue().toString();
-                                final String theFarmROI = dataSnapshot.child("farmRoi").getValue().toString();
-                                final String theFarmUnitPrice = dataSnapshot.child("pricePerUnit").getValue().toString();
-                                String theFarmSponsorDuration = dataSnapshot.child("sponsorDuration").getValue().toString();
-                                String theFarmUnitsLeft = dataSnapshot.child("unitsAvailable").getValue().toString();
-                                final String theFarmImage = dataSnapshot.child("farmImage").getValue().toString();
-                                final String theFarmState = dataSnapshot.child("farmState").getValue().toString();
-                                farmNotiId = dataSnapshot.child("farmNotiId").getValue().toString();
+                                FarmModel currentFarm = dataSnapshot.getValue(FarmModel.class);
 
-                                if (!theFarmImage.equalsIgnoreCase("")){
+                                if (currentFarm != null){
 
-                                    Picasso.get()
-                                            .load(theFarmImage)
-                                            .networkPolicy(NetworkPolicy.OFFLINE)
-                                            .placeholder(R.drawable.menorah_placeholder)
-                                            .into(farmImage, new Callback() {
-                                                @Override
-                                                public void onSuccess() {
+                                    String theFarmType = currentFarm.getFarmType();
+                                    String theFarmLocation = currentFarm.getFarmLocation();
+                                    final String theFarmROI = currentFarm.getFarmRoi();
+                                    final String theFarmUnitPrice = currentFarm.getPricePerUnit();
+                                    String theFarmSponsorDuration = currentFarm.getSponsorDuration();
+                                    String theFarmUnitsLeft = currentFarm.getUnitsAvailable();
+                                    final String theFarmImage = currentFarm.getFarmImageThumb();
+                                    final String theFarmState = currentFarm.getFarmState();
+                                    farmNotiId = currentFarm.getFarmNotiId();
 
-                                                }
+                                    if (!theFarmImage.equalsIgnoreCase("")){
 
-                                                @Override
-                                                public void onError(Exception e) {
-                                                    Picasso.get()
-                                                            .load(theFarmImage)
-                                                            .placeholder(R.drawable.menorah_placeholder)
-                                                            .into(farmImage);
-                                                }
-                                            });
+                                        Picasso.get()
+                                                .load(theFarmImage)
+                                                .networkPolicy(NetworkPolicy.OFFLINE)
+                                                .placeholder(R.drawable.menorah_placeholder)
+                                                .into(farmImage, new Callback() {
+                                                    @Override
+                                                    public void onSuccess() {
+
+                                                    }
+
+                                                    @Override
+                                                    public void onError(Exception e) {
+                                                        Picasso.get()
+                                                                .load(theFarmImage)
+                                                                .placeholder(R.drawable.menorah_placeholder)
+                                                                .into(farmImage);
+                                                    }
+                                                });
+
+                                    }
+
+
+                                    farmType.setText(theFarmType);
+                                    unitsLeft.setText(theFarmUnitsLeft);
+                                    farmLocation.setText(theFarmLocation);
+                                    farmROI.setText("Returns " + theFarmROI + "% in " + theFarmSponsorDuration + " months.");
+
+                                    long priceToLong = Long.parseLong(theFarmUnitPrice);
+
+                                    unitPrice.setText(Common.convertToPrice(FarmDetails.this, priceToLong));
+
+                                    totalROI.setText("Return on investment (" + theFarmROI + "%) - " + Common.convertToPrice(FarmDetails.this, priceToLong));
+                                    totalDuration.setText("Total payout after " + theFarmSponsorDuration + " months");
+
+                                    /*---   CALCULATION   ---*/
+                                    long theFixedPricePerUnit = Long.parseLong(theFarmUnitPrice);
+                                    int theFixedRoi = Integer.parseInt(theFarmROI);
+
+                                    /*---   CALCULATION   ---*/
+                                    long theCalculatedPrice = theFixedPricePerUnit * unitNumberText;
+                                    long totalCalculation = theCalculatedPrice * theFixedRoi / 100;
+                                    long totalResult = totalCalculation + theCalculatedPrice;
+
+                                    totalPay.setText(Common.convertToPrice(FarmDetails.this, totalResult));
+
+                                    final int unitsAvail = Integer.parseInt(theFarmUnitsLeft);
+
+                                    if (unitsAvail == 0 || !theFarmState.equalsIgnoreCase("Now Selling")){
+
+                                        addToCartBtn.setVisibility(View.GONE);
+                                        farmNumber.setVisibility(View.GONE);
+
+                                    } else {
+
+                                        addToCartBtn.setVisibility(View.VISIBLE);
+                                        farmNumber.setVisibility(View.VISIBLE);
+
+                                    }
+
+                                    /*---   UNIT NUMBERS   ---*/
+                                    increaseUnitNumber.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+
+                                            if (unitNumberText < unitsAvail) {
+                                                unitNumberText++;
+                                                unitNumber.setText(String.valueOf(unitNumberText));
+
+                                                calculateChanges(unitNumberText, theFarmUnitPrice, theFarmROI);
+
+                                            }
+                                        }
+                                    });
+
+                                    decreaseUnitNumber.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+
+                                            if (unitNumberText == 1){
+
+
+
+                                            } else {
+
+                                                unitNumberText --;
+                                                unitNumber.setText(String.valueOf(unitNumberText));
+
+                                                calculateChanges(unitNumberText, theFarmUnitPrice, theFarmROI);
+
+                                            }
+
+                                        }
+                                    });
+
+
+                                    farmDescription.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            Intent farmDescIntent = new Intent(FarmDetails.this, FarmDescription.class);
+                                            farmDescIntent.putExtra("FarmId", farmId);
+                                            startActivity(farmDescIntent);
+                                            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+                                        }
+                                    });
+
+
+                                    followFarmBtn.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+
+                                            followFarm();
+
+                                        }
+                                    });
+
+                                    addToCartBtn.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+
+                                            if (Common.isConnectedToInternet(getBaseContext())) {
+
+                                                addToCart(unitNumberText, theFarmUnitPrice, theFarmROI);
+
+                                            } else {
+
+                                                showErrorDialog("No Internet Access");
+
+                                            }
+
+                                        }
+                                    });
 
                                 }
-
-
-                                farmType.setText(theFarmType);
-                                unitsLeft.setText(theFarmUnitsLeft);
-                                farmLocation.setText(theFarmLocation);
-                                farmROI.setText("Returns " + theFarmROI + "% in " + theFarmSponsorDuration + " months.");
-
-                                long priceToLong = Long.parseLong(theFarmUnitPrice);
-
-                                unitPrice.setText(Common.convertToPrice(FarmDetails.this, priceToLong));
-
-                                totalROI.setText("Return on investment (" + theFarmROI + "%) - " + Common.convertToPrice(FarmDetails.this, priceToLong));
-                                totalDuration.setText("Total payout after " + theFarmSponsorDuration + " months");
-
-                                /*---   CALCULATION   ---*/
-                                long theFixedPricePerUnit = Long.parseLong(theFarmUnitPrice);
-                                int theFixedRoi = Integer.parseInt(theFarmROI);
-
-                                /*---   CALCULATION   ---*/
-                                long theCalculatedPrice = theFixedPricePerUnit * unitNumberText;
-                                long totalCalculation = theCalculatedPrice * theFixedRoi / 100;
-                                long totalResult = totalCalculation + theCalculatedPrice;
-
-                                totalPay.setText(Common.convertToPrice(FarmDetails.this, totalResult));
-
-                                final int unitsAvail = Integer.parseInt(theFarmUnitsLeft);
-
-                                if (unitsAvail == 0 || !theFarmState.equalsIgnoreCase("Now Selling")){
-
-                                    addToCartBtn.setVisibility(View.GONE);
-                                    farmNumber.setVisibility(View.GONE);
-
-                                } else {
-
-                                    addToCartBtn.setVisibility(View.VISIBLE);
-                                    farmNumber.setVisibility(View.VISIBLE);
-
-                                }
-
-                                /*---   UNIT NUMBERS   ---*/
-                                increaseUnitNumber.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-
-                                        if (unitNumberText < unitsAvail) {
-                                            unitNumberText++;
-                                            unitNumber.setText(String.valueOf(unitNumberText));
-
-                                            calculateChanges(unitNumberText, theFarmUnitPrice, theFarmROI);
-
-                                        }
-                                    }
-                                });
-
-                                decreaseUnitNumber.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-
-                                        if (unitNumberText == 1){
-
-
-
-                                        } else {
-
-                                            unitNumberText --;
-                                            unitNumber.setText(String.valueOf(unitNumberText));
-
-                                            calculateChanges(unitNumberText, theFarmUnitPrice, theFarmROI);
-
-                                        }
-
-                                    }
-                                });
-
-
-                                farmDescription.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        Intent farmDescIntent = new Intent(FarmDetails.this, FarmDescription.class);
-                                        farmDescIntent.putExtra("FarmId", farmId);
-                                        startActivity(farmDescIntent);
-                                        overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-                                    }
-                                });
-
-
-                                followFarmBtn.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-
-                                        followFarm();
-
-                                    }
-                                });
-
-                                addToCartBtn.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-
-                                        if (Common.isConnectedToInternet(getBaseContext())) {
-
-                                            addToCart(unitNumberText, theFarmUnitPrice, theFarmROI);
-
-                                        } else {
-
-                                            showErrorDialog("No Internet Access");
-
-                                        }
-
-                                    }
-                                });
-
 
                             }
 
@@ -325,7 +331,7 @@ public class FarmDetails extends AppCompatActivity {
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            showAffirmDialog();
+                                            Toast.makeText(FarmDetails.this, "Added to cart", Toast.LENGTH_SHORT).show();
                                         }
                                     }).addOnFailureListener(new OnFailureListener() {
                                 @Override

@@ -21,6 +21,7 @@ import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.FarmDetails;
 import com.blackviking.menorahfarms.Interface.ItemClickListener;
 import com.blackviking.menorahfarms.Models.CartModel;
+import com.blackviking.menorahfarms.Models.FarmModel;
 import com.blackviking.menorahfarms.Models.FollowedFarmModel;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.ViewHolders.CartViewHolder;
@@ -130,65 +131,64 @@ public class FollowedFarms extends AppCompatActivity {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                String theFarmType = dataSnapshot.child("farmType").getValue().toString();
-                                final String theFarmROI = dataSnapshot.child("farmRoi").getValue().toString();
-                                final String theFarmUnitPrice = dataSnapshot.child("pricePerUnit").getValue().toString();
-                                String theFarmSponsorDuration = dataSnapshot.child("sponsorDuration").getValue().toString();
-                                final String theFarmImage = dataSnapshot.child("farmImageThumb").getValue().toString();
-                                final String theFarmState = dataSnapshot.child("farmState").getValue().toString();
+                                final FarmModel currentFarm = dataSnapshot.getValue(FarmModel.class);
 
-                                long priceToLong = Long.parseLong(theFarmUnitPrice);
+                                if (currentFarm != null){
 
-                                viewHolder.followedFarmType.setText(theFarmType);
-                                viewHolder.followedFarmROI.setText(theFarmROI + "% returns in " + theFarmSponsorDuration + " months");
-                                viewHolder.followedFarmState.setText(theFarmState);
-                                viewHolder.followedFarmPrice.setText(Common.convertToPrice(FollowedFarms.this, priceToLong));
+                                    long priceToLong = Long.parseLong(currentFarm.getPricePerUnit());
 
-                                if (!theFarmImage.equalsIgnoreCase("")){
+                                    viewHolder.followedFarmType.setText(currentFarm.getFarmType());
+                                    viewHolder.followedFarmROI.setText(currentFarm.getFarmRoi() + "% returns in " + currentFarm.getSponsorDuration() + " months");
+                                    viewHolder.followedFarmState.setText(currentFarm.getFarmState());
+                                    viewHolder.followedFarmPrice.setText(Common.convertToPrice(FollowedFarms.this, priceToLong));
 
-                                    Picasso.get()
-                                            .load(theFarmImage)
-                                            .networkPolicy(NetworkPolicy.OFFLINE)
-                                            .placeholder(R.drawable.menorah_placeholder)
-                                            .into(viewHolder.followedFarmImage, new Callback() {
-                                                @Override
-                                                public void onSuccess() {
+                                    if (!currentFarm.getFarmImageThumb().equalsIgnoreCase("")){
 
-                                                }
+                                        Picasso.get()
+                                                .load(currentFarm.getFarmImageThumb())
+                                                .networkPolicy(NetworkPolicy.OFFLINE)
+                                                .placeholder(R.drawable.menorah_placeholder)
+                                                .into(viewHolder.followedFarmImage, new Callback() {
+                                                    @Override
+                                                    public void onSuccess() {
 
-                                                @Override
-                                                public void onError(Exception e) {
-                                                    Picasso.get()
-                                                            .load(theFarmImage)
-                                                            .placeholder(R.drawable.menorah_placeholder)
-                                                            .into(viewHolder.followedFarmImage);
-                                                }
-                                            });
+                                                    }
 
-                                } else {
+                                                    @Override
+                                                    public void onError(Exception e) {
+                                                        Picasso.get()
+                                                                .load(currentFarm.getFarmImageThumb())
+                                                                .placeholder(R.drawable.menorah_placeholder)
+                                                                .into(viewHolder.followedFarmImage);
+                                                    }
+                                                });
 
-                                    viewHolder.followedFarmImage.setImageResource(R.drawable.menorah_placeholder);
+                                    } else {
+
+                                        viewHolder.followedFarmImage.setImageResource(R.drawable.menorah_placeholder);
+
+                                    }
+
+
+                                    viewHolder.unfollowButton.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            openConfirmationText(adapter.getRef(viewHolder.getAdapterPosition()).getKey());
+                                        }
+                                    });
+
+
+                                    viewHolder.setItemClickListener(new ItemClickListener() {
+                                        @Override
+                                        public void onClick(View view, int position, boolean isLongClick) {
+                                            Intent farmDetailIntent = new Intent(FollowedFarms.this, FarmDetails.class);
+                                            farmDetailIntent.putExtra("FarmId", adapter.getRef(viewHolder.getAdapterPosition()).getKey());
+                                            startActivity(farmDetailIntent);
+                                            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+                                        }
+                                    });
 
                                 }
-
-
-                                viewHolder.unfollowButton.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        openConfirmationText(adapter.getRef(viewHolder.getAdapterPosition()).getKey());
-                                    }
-                                });
-
-
-                                viewHolder.setItemClickListener(new ItemClickListener() {
-                                    @Override
-                                    public void onClick(View view, int position, boolean isLongClick) {
-                                        Intent farmDetailIntent = new Intent(FollowedFarms.this, FarmDetails.class);
-                                        farmDetailIntent.putExtra("FarmId", adapter.getRef(viewHolder.getAdapterPosition()).getKey());
-                                        startActivity(farmDetailIntent);
-                                        overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-                                    }
-                                });
 
                             }
 

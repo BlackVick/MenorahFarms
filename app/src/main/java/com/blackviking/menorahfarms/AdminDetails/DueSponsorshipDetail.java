@@ -10,7 +10,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blackviking.menorahfarms.Common.Common;
+import com.blackviking.menorahfarms.Models.DueSponsorshipModel;
 import com.blackviking.menorahfarms.Models.SponsoredFarmModel;
+import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.Notification.APIService;
 import com.blackviking.menorahfarms.Notification.DataMessage;
 import com.blackviking.menorahfarms.Notification.MyResponse;
@@ -108,10 +110,13 @@ public class DueSponsorshipDetail extends AppCompatActivity {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        userId = dataSnapshot.child("user").getValue().toString();
-                        sponsorshipId = dataSnapshot.child("sponsorshipId").getValue().toString();
+                        DueSponsorshipModel currentDue = dataSnapshot.getValue(DueSponsorshipModel.class);
 
-                        loadAllDetails(userId, sponsorshipId);
+                        if (currentDue != null){
+
+                            loadAllDetails(currentDue.getUser(), currentDue.getSponsorshipId());
+
+                        }
 
                     }
 
@@ -131,15 +136,15 @@ public class DueSponsorshipDetail extends AppCompatActivity {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                String firstName = dataSnapshot.child("firstName").getValue().toString();
-                                String lastName = dataSnapshot.child("lastName").getValue().toString();
-                                String bankName = dataSnapshot.child("bank").getValue().toString();
-                                String accountNumber = dataSnapshot.child("accountNumber").getValue().toString();
+                                UserModel currentUser = dataSnapshot.getValue(UserModel.class);
 
-                                theDueUserName = firstName + " " + lastName;
-                                theDueUserEmail = dataSnapshot.child("email").getValue().toString();
-                                theDueUserBank = bankName + ", " + accountNumber;
+                                if (currentUser != null){
 
+                                    theDueUserName = currentUser.getFirstName() + " " + currentUser.getLastName();
+                                    theDueUserEmail = currentUser.getEmail();
+                                    theDueUserBank = currentUser.getBank() + ", " + currentUser.getAccountNumber();
+
+                                }
 
                             }
 

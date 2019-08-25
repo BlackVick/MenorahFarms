@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Models.BankModel;
+import com.blackviking.menorahfarms.Models.FarmModel;
 import com.blackviking.menorahfarms.Notification.APIService;
 import com.blackviking.menorahfarms.Notification.DataMessage;
 import com.blackviking.menorahfarms.Notification.MyResponse;
@@ -94,15 +95,28 @@ public class AdminNotify extends Fragment {
         final List<String> bankList = new ArrayList<>();
         bankList.add(0, "Topic");
 
-        farmRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        final ArrayAdapter<String> dataAdapterGender;
+        dataAdapterGender = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, bankList);
+        dataAdapterGender.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        farmRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 for (DataSnapshot child : dataSnapshot.getChildren()){
 
-                    bankList.add(child.child("farmNotiId").getValue().toString());
+                    FarmModel currentFarm = child.getValue(FarmModel.class);
+
+                    if (currentFarm != null){
+
+                        bankList.add(currentFarm.getFarmNotiId());
+
+                    }
 
                 }
+
+                topicSpinner.setAdapter(dataAdapterGender);
+                dataAdapterGender.notifyDataSetChanged();
 
             }
 
@@ -112,10 +126,6 @@ public class AdminNotify extends Fragment {
             }
         });
 
-        ArrayAdapter<String> dataAdapterGender;
-        dataAdapterGender = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, bankList);
-        dataAdapterGender.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        topicSpinner.setAdapter(dataAdapterGender);
         topicSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

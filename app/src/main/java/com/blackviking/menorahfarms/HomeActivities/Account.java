@@ -41,6 +41,7 @@ import com.blackviking.menorahfarms.CartAndHistory.Cart;
 import com.blackviking.menorahfarms.CartAndHistory.SponsorshipHistory;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Common.Permissions;
+import com.blackviking.menorahfarms.Models.FarmModel;
 import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.SignIn;
@@ -282,9 +283,15 @@ public class Account extends AppCompatActivity {
 
                         for (DataSnapshot child : dataSnapshot.getChildren()){
 
-                            String farmNotiId = child.child("farmNotiId").getValue().toString();
+                            FarmModel currentFarm = child.getValue(FarmModel.class);
 
-                            FirebaseMessaging.getInstance().unsubscribeFromTopic(farmNotiId);
+                            if (currentFarm != null){
+
+                                String farmNotiId = currentFarm.getFarmNotiId();
+
+                                FirebaseMessaging.getInstance().unsubscribeFromTopic(farmNotiId);
+
+                            }
 
                         }
 

@@ -18,15 +18,19 @@ import com.blackviking.menorahfarms.DashboardMenu.FarmUpdates;
 import com.blackviking.menorahfarms.DashboardMenu.FollowedFarms;
 import com.blackviking.menorahfarms.DashboardMenu.Notifications;
 import com.blackviking.menorahfarms.DashboardMenu.SponsoredFarms;
+import com.blackviking.menorahfarms.Models.FarmModel;
 import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.Services.CheckForSponsorship;
+import com.blackviking.menorahfarms.SignIn;
+import com.facebook.login.LoginManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -46,8 +50,8 @@ public class Dashboard extends AppCompatActivity {
     private RelativeLayout sponsoredFarmsLayout, farmsToWatchLayout, farmUpdatesLayout, allFarmsLayout, projectManagerLayout, notificationLayout, faqLayout, adminLayout;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference userRef, sponsoredRef;
-    private String currentUid;
+    private DatabaseReference userRef, sponsoredRef, farmRef;
+    private String currentUid, loginType;
     private boolean isMonitorRunning;
 
     @Override
@@ -59,6 +63,7 @@ public class Dashboard extends AppCompatActivity {
         /*---   FIREBASE   ---*/
         userRef = db.getReference("Users");
         sponsoredRef = db.getReference("SponsoredFarms");
+        farmRef = db.getReference("Farms");
         if (mAuth.getCurrentUser() != null)
             currentUid = mAuth.getCurrentUser().getUid();
 
@@ -120,13 +125,15 @@ public class Dashboard extends AppCompatActivity {
 
         /*---   CURRENT USER   ---*/
         userRef.child(currentUid)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+                .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
                         final UserModel currentUser = dataSnapshot.getValue(UserModel.class);
 
                         if (currentUser != null){
+
+                            loginType = currentUser.getSignUpMode();
 
                             welcome.setText("Hi, "+currentUser.getFirstName());
 
@@ -167,6 +174,63 @@ public class Dashboard extends AppCompatActivity {
                                         Intent adminIntent = new Intent(Dashboard.this, AdminDash.class);
                                         startActivity(adminIntent);
                                         overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+                                    }
+                                });
+
+                            } else if (currentUser.getUserType().equalsIgnoreCase("Banned")) {
+
+                                farmRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                        for (DataSnapshot child : dataSnapshot.getChildren()){
+
+                                            FarmModel currentFarm = child.getValue(FarmModel.class);
+
+                                            if (currentFarm != null){
+
+                                                String farmNotiId = currentFarm.getFarmNotiId();
+
+                                                FirebaseMessaging.getInstance().unsubscribeFromTopic(farmNotiId);
+
+                                            }
+
+                                        }
+
+                                        if (loginType.equalsIgnoreCase("Facebook")){
+
+                                            Paper.book().destroy();
+
+                                            mAuth.signOut();
+                                            LoginManager.getInstance().logOut();
+
+                                            FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
+                                            FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.GENERAL_NOTIFY);
+                                            Intent signoutIntent = new Intent(Dashboard.this, SignIn.class);
+                                            signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            startActivity(signoutIntent);
+                                            finish();
+
+                                        } else {
+
+                                            Paper.book().destroy();
+
+                                            mAuth.signOut();
+
+                                            FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
+                                            FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.GENERAL_NOTIFY);
+                                            Intent signoutIntent = new Intent(Dashboard.this, SignIn.class);
+                                            signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            startActivity(signoutIntent);
+                                            finish();
+
+                                        }
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
                                     }
                                 });
 

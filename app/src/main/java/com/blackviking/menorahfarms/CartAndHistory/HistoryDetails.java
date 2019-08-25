@@ -80,9 +80,15 @@ public class HistoryDetails extends AppCompatActivity {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        userId = dataSnapshot.child("sponsorshipUser").getValue().toString();
+                        HistoryModel currentHistory = dataSnapshot.getValue(HistoryModel.class);
 
-                        loadAllDetails(userId);
+                        if (currentHistory != null){
+
+                            userId = currentHistory.getSponsorshipUser();
+
+                            loadAllDetails(userId);
+
+                        }
 
                     }
 

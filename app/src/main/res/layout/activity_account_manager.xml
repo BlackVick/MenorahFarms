@@ -5,7 +5,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DashboardMenu.AccountManager">
+    android:animateLayoutChanges="true"
+    tools:context=".DashboardMenu.AccountManager"
+    android:background="@drawable/menorah_background">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -48,104 +50,149 @@
 
     </RelativeLayout>
 
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="140dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:background="@color/white"
+        app:cardElevation="10dp"
+        app:cardCornerRadius="10dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:weightSum="10">
+
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/customer_agent"
+                android:id="@+id/customerCenter"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/customerCenter"
+                android:layout_gravity="center_vertical"
+                android:text="Need Help?"
+                android:paddingStart="20dp"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:textColor="@color/black"
+                android:layout_centerVertical="true"/>
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:id="@+id/notEmptyLayout"
-        android:visibility="gone">
+        android:layout_marginTop="190dp"
+        android:background="@drawable/login_back_from_bottom"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/notEmptyLayout"
+            android:animateLayoutChanges="true"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_centerInParent="true"
+                android:padding="20dp">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:layout_width="110dp"
+                    android:layout_height="110dp"
+                    android:layout_gravity="center"
+                    app:civ_circle_background_color="@color/white"
+                    app:civ_border_color="@color/white"
+                    app:civ_border_width="0.5dp"
+                    android:src="@drawable/profile"
+                    android:id="@+id/accountManagerAvatar"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:text=""
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:textStyle="bold"
+                    android:textSize="22sp"
+                    android:textColor="@color/black"
+                    android:id="@+id/accountManagerName"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:text="Let's chat on telegram."
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/green_button"
+                    android:text="Telegram"
+                    android:textColor="@color/white"
+                    android:textSize="15sp"
+                    android:layout_marginTop="10dp"
+                    android:drawableStart="@drawable/ic_telegram_shit"
+                    android:drawablePadding="10dp"
+                    android:padding="15dp"
+                    android:id="@+id/whatsappManagerButton"
+                    android:layout_gravity="center"/>
+
+            </LinearLayout>
+
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_centerInParent="true"
-            android:padding="20dp">
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:layout_gravity="center"
-                app:civ_circle_background_color="@color/white"
-                app:civ_border_color="@color/white"
-                app:civ_border_width="0.5dp"
-                android:src="@drawable/profile"
-                android:id="@+id/accountManagerAvatar"
-                android:elevation="10dp"/>
+            android:id="@+id/emptyLayout"
+            android:orientation="vertical"
+            android:layout_margin="35dp"
+            android:visibility="gone">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:text=""
-                android:layout_gravity="center"
-                android:textStyle="bold"
-                android:textSize="23sp"
-                android:textColor="@color/black"
-                android:drawableStart="@drawable/ic_user_account"
-                android:drawablePadding="25dp"
-                android:id="@+id/accountManagerName"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:text="Chat with your project manager via Telegram using the link below"
+                android:text="Not Available"
                 android:gravity="center"
-                android:layout_gravity="center"
-                android:textSize="16sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/colorAccent"
+                android:textSize="25sp"
+                android:textStyle="bold"/>
 
-            <Button
-                android:layout_width="wrap_content"
+            <TextView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/green_button"
-                android:text="Telegram"
-                android:textColor="@color/white"
+                android:text="You have not been assigned an account manager yet. Please update your profile or contact us if you are facing any difficulties."
+                android:gravity="center"
+                android:textColor="@color/grey"
                 android:textSize="15sp"
-                android:layout_marginTop="25dp"
-                android:drawableStart="@drawable/ic_telegram_shit"
-                android:drawablePadding="20dp"
-                android:padding="15dp"
-                android:id="@+id/whatsappManagerButton"
-                android:layout_marginStart="10dp"
-                android:layout_gravity="center"/>
+                android:layout_marginTop="10dp"/>
 
         </LinearLayout>
 
     </RelativeLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:id="@+id/emptyLayout"
-        android:orientation="vertical"
-        android:layout_margin="35dp"
-        android:visibility="gone">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Not Available"
-            android:gravity="center"
-            android:textColor="@color/colorAccent"
-            android:textSize="25sp"
-            android:textStyle="bold"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="You have not been assigned an account manager yet. Please update your profile or contact us if you are facing any difficulties."
-            android:gravity="center"
-            android:textColor="@color/grey"
-            android:textSize="15sp"
-            android:layout_marginTop="10dp"/>
-
-    </LinearLayout>
 
 </RelativeLayout>

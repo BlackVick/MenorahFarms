@@ -14,6 +14,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blackviking.menorahfarms.Models.ProjectManagerModel;
 import com.blackviking.menorahfarms.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -112,45 +113,51 @@ public class AccountManager extends AppCompatActivity {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        final String theName = dataSnapshot.child("name").getValue().toString();
-                        final String theProfilePic = dataSnapshot.child("profilePicture").getValue().toString();
-                        final String theWhatsapp = dataSnapshot.child("whatsapp").getValue().toString();
+                        ProjectManagerModel currentManager = dataSnapshot.getValue(ProjectManagerModel.class);
 
-                        accountManagerName.setText(theName);
+                        if (currentManager != null){
 
-                        if (!theProfilePic.equalsIgnoreCase("")){
+                            final String theName = currentManager.getName();
+                            final String theProfilePic = currentManager.getProfilePicture();
+                            final String theWhatsapp = currentManager.getWhatsapp();
 
-                            Picasso.get()
-                                    .load(theProfilePic)
-                                    .networkPolicy(NetworkPolicy.OFFLINE)
-                                    .placeholder(R.drawable.profile)
-                                    .into(accountManagerAvatar, new Callback() {
-                                        @Override
-                                        public void onSuccess() {
+                            accountManagerName.setText("Hi there, my name is " + theName + " and I would be your Project Manager.");
 
-                                        }
+                            if (!theProfilePic.equalsIgnoreCase("")){
 
-                                        @Override
-                                        public void onError(Exception e) {
-                                            Picasso.get()
-                                                    .load(theProfilePic)
-                                                    .placeholder(R.drawable.profile)
-                                                    .into(accountManagerAvatar);
-                                        }
-                                    });
+                                Picasso.get()
+                                        .load(theProfilePic)
+                                        .networkPolicy(NetworkPolicy.OFFLINE)
+                                        .placeholder(R.drawable.profile)
+                                        .into(accountManagerAvatar, new Callback() {
+                                            @Override
+                                            public void onSuccess() {
 
-                        }
+                                            }
 
-                        whatsappManagerButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-
-                                Intent i = new Intent(Intent.ACTION_VIEW);
-                                i.setData(Uri.parse(theWhatsapp));
-                                startActivity(i);
+                                            @Override
+                                            public void onError(Exception e) {
+                                                Picasso.get()
+                                                        .load(theProfilePic)
+                                                        .placeholder(R.drawable.profile)
+                                                        .into(accountManagerAvatar);
+                                            }
+                                        });
 
                             }
-                        });
+
+                            whatsappManagerButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+
+                                    Intent i = new Intent(Intent.ACTION_VIEW);
+                                    i.setData(Uri.parse(theWhatsapp));
+                                    startActivity(i);
+
+                                }
+                            });
+
+                        }
 
                     }
 

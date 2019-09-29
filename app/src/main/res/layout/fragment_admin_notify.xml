@@ -54,7 +54,7 @@
                 android:layout_marginEnd="10dp"
                 android:text=""
                 android:textColor="@color/black"
-                android:textSize="19sp"
+                android:textSize="15sp"
                 android:padding="15dp"
                 android:background="@drawable/edittext_ring"
                 android:drawableStart="@drawable/ic_user_email"
@@ -84,7 +84,7 @@
                 android:layout_marginEnd="10dp"
                 android:text=""
                 android:textColor="@color/black"
-                android:textSize="19sp"
+                android:textSize="15sp"
                 android:padding="15dp"
                 android:background="@drawable/edittext_ring"
                 android:drawableStart="@drawable/ic_notifications"
@@ -106,11 +106,10 @@
                 android:background="@drawable/edittext_ring"
                 android:drawableStart="@drawable/ic_notifications"
                 android:drawablePadding="6dp"
-                android:maxLength="35"
                 android:hint="Message"
                 android:textColorHint="@color/grey"
                 android:id="@+id/notificationMessage"
-                android:minLines="5"/>
+                android:minLines="4"/>
 
             <Button
                 android:layout_width="match_parent"

@@ -22,7 +22,7 @@ public class Faq extends AppCompatActivity {
 
     private WebView webView;
     private ImageView backButton;
-    private String faqLink = "https://menorahfarms.com/faqs/";
+    private String faqLink = "http://menorahfarms.com/faq.html";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

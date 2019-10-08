@@ -1,16 +1,27 @@
 package com.blackviking.menorahfarms.HomeActivities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.blackviking.menorahfarms.AdminDash;
 import com.blackviking.menorahfarms.CartAndHistory.Cart;
+import com.blackviking.menorahfarms.Common.ApplicationClass;
+import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.DashboardMenu.AccountManager;
 import com.blackviking.menorahfarms.DashboardMenu.Faq;
@@ -35,6 +46,9 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.paperdb.Paper;
 
@@ -51,13 +65,84 @@ public class Dashboard extends AppCompatActivity {
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference userRef, sponsoredRef, farmRef;
-    private String currentUid, loginType;
-    private boolean isMonitorRunning;
+    private String currentUid;
+    private boolean isMonitorRunning, isInternetAvail;
+    private UserModel singletonUser, paperUser;
+    private android.app.AlertDialog alertDialog, alertDialogError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
+
+        //execute and get result from async task
+        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
+            @Override
+            public void processFinish(Integer output) {
+
+                //check all cases
+                if (singletonUser == null){
+
+                    if (output == 1){
+
+                        userRef.child(currentUid)
+                                .addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                        UserModel theUser = dataSnapshot.getValue(UserModel.class);
+                                        ((ApplicationClass)(getApplicationContext())).setUser(theUser);
+
+                                        paperUser = Paper.book().read(Common.PAPER_USER);
+                                        setUser(paperUser);
+                                        setOtherDetails();
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+
+                    } else
+
+                    if (output == 0){
+
+                        if (paperUser != null) {
+
+                            setUser(paperUser);
+                            Toast.makeText(Dashboard.this, "No internet", Toast.LENGTH_SHORT).show();
+
+                        } else {
+
+                            alertDialog.dismiss();
+                            showErrorDialog("Details could not be retrieved, please try again later.");
+
+                        }
+
+                    } else
+
+                    if (output == 2){
+
+                        if (paperUser != null) {
+
+                            setUser(paperUser);
+                            Toast.makeText(Dashboard.this, "Please connect to a network", Toast.LENGTH_SHORT).show();
+
+                        } else {
+
+                            alertDialog.dismiss();
+                            showErrorDialog("Details could not be retrieved, please try again later.");
+
+                        }
+
+                    }
+
+                }
+
+            }
+        }).execute();
 
 
         /*---   FIREBASE   ---*/
@@ -124,223 +209,18 @@ public class Dashboard extends AppCompatActivity {
 
 
         /*---   CURRENT USER   ---*/
-        userRef.child(currentUid)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+        singletonUser = ((ApplicationClass)(getApplicationContext())).getUser();
+        paperUser = Paper.book().read(Common.PAPER_USER);
 
-                        final UserModel currentUser = dataSnapshot.getValue(UserModel.class);
-
-                        if (currentUser != null){
-
-                            loginType = currentUser.getSignUpMode();
-
-                            welcome.setText("Hi, "+currentUser.getFirstName());
-
-                            if (!currentUser.getProfilePictureThumb().equalsIgnoreCase("")){
-
-                                Picasso.get()
-                                        .load(currentUser.getProfilePictureThumb())
-                                        .networkPolicy(NetworkPolicy.OFFLINE)
-                                        .placeholder(R.drawable.profile)
-                                        .into(userAvatar, new Callback() {
-                                            @Override
-                                            public void onSuccess() {
-
-                                            }
-
-                                            @Override
-                                            public void onError(Exception e) {
-                                                Picasso.get()
-                                                        .load(currentUser.getProfilePictureThumb())
-                                                        .placeholder(R.drawable.profile)
-                                                        .into(userAvatar);
-                                            }
-                                        });
-
-                            } else {
-
-                                userAvatar.setImageResource(R.drawable.profile);
-
-                            }
+        //show loading dialog
+        showLoadingDialog("Fetching details . . .");
 
 
-                            if (currentUser.getUserType().equalsIgnoreCase("Admin")){
-
-                                adminLayout.setVisibility(View.VISIBLE);
-                                adminLayout.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        Intent adminIntent = new Intent(Dashboard.this, AdminDash.class);
-                                        startActivity(adminIntent);
-                                        overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-                                    }
-                                });
-
-                            } else if (currentUser.getUserType().equalsIgnoreCase("Banned")) {
-
-                                farmRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                        for (DataSnapshot child : dataSnapshot.getChildren()){
-
-                                            FarmModel currentFarm = child.getValue(FarmModel.class);
-
-                                            if (currentFarm != null){
-
-                                                String farmNotiId = currentFarm.getFarmNotiId();
-
-                                                FirebaseMessaging.getInstance().unsubscribeFromTopic(farmNotiId);
-
-                                            }
-
-                                        }
-
-                                        if (loginType.equalsIgnoreCase("Facebook")){
-
-                                            Paper.book().destroy();
-
-                                            mAuth.signOut();
-                                            LoginManager.getInstance().logOut();
-
-                                            FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
-                                            FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.GENERAL_NOTIFY);
-                                            Intent signoutIntent = new Intent(Dashboard.this, SignIn.class);
-                                            signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                            startActivity(signoutIntent);
-                                            finish();
-
-                                        } else {
-
-                                            Paper.book().destroy();
-
-                                            mAuth.signOut();
-
-                                            FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
-                                            FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.GENERAL_NOTIFY);
-                                            Intent signoutIntent = new Intent(Dashboard.this, SignIn.class);
-                                            signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                            startActivity(signoutIntent);
-                                            finish();
-
-                                        }
-
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-
-                                    }
-                                });
-
-                            } else {
-
-                                adminLayout.setVisibility(View.INVISIBLE);
-                                adminLayout.setEnabled(false);
-
-                            }
-
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
+        //check sponsorship monitor
         if (Paper.book().read(Common.isSponsorshipMonitorRunning) == null)
             Paper.book().write(Common.isSponsorshipMonitorRunning, false);
         isMonitorRunning = Paper.book().read(Common.isSponsorshipMonitorRunning);
 
-
-        /*---   CHECK SERVICE   ---*/
-
-
-        /*---   SPONSORED CYCLE   ---*/
-        sponsoredRef.child(currentUid)
-                .addValueEventListener(
-                        new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                if (dataSnapshot.exists()){
-
-                                    long totalReturn = 0;
-                                    int sponsorCount = (int) dataSnapshot.getChildrenCount();
-                                    sponsorCycle.setText("Running Cycles : " + String.valueOf(sponsorCount));
-
-                                    for (DataSnapshot user : dataSnapshot.getChildren()){
-
-                                        long theReturn = Long.parseLong(user.child("sponsorReturn").getValue().toString());
-                                        totalReturn = totalReturn + theReturn;
-
-                                    }
-
-                                    totalReturnsText.setText(Common.convertToPrice(Dashboard.this, totalReturn));
-
-
-
-                                    if (!isMonitorRunning) {
-
-                                        Intent checkSponsorship = new Intent(Dashboard.this, CheckForSponsorship.class);
-                                        startService(checkSponsorship);
-
-                                    }
-
-                                } else {
-
-                                    sponsorCycle.setText("Running Cycles : 0");
-                                    totalReturnsText.setText("₦ 0.00");
-
-                                }
-
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        }
-                );
-
-        /*---   NEXT END OF CYCLE   ---*/
-        sponsoredRef.child(currentUid)
-                .limitToFirst(1)
-                .addValueEventListener(
-                        new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                for (DataSnapshot snap : dataSnapshot.getChildren()){
-
-                                    String theKey = snap.getKey();
-
-                                    if (dataSnapshot.exists()) {
-
-                                        String date = dataSnapshot.child(theKey).child("cycleEndDate").getValue().toString();
-                                        nextEndOfCycleDate.setText(date);
-
-                                    } else {
-
-                                        nextEndOfCycleDate.setText("Not Available");
-
-                                    }
-
-                                }
-
-
-
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        }
-                );
 
 
         /*---   CART   ---*/
@@ -446,6 +326,249 @@ public class Dashboard extends AppCompatActivity {
 
             }
         });
+
+    }
+
+    private void setOtherDetails() {
+
+        /*---   SPONSORED CYCLE   ---*/
+        sponsoredRef.child(currentUid)
+                .addValueEventListener(
+                        new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                if (dataSnapshot.exists()){
+
+                                    long totalReturn = 0;
+                                    int sponsorCount = (int) dataSnapshot.getChildrenCount();
+                                    sponsorCycle.setText("Running Cycles : " + String.valueOf(sponsorCount));
+
+                                    for (DataSnapshot user : dataSnapshot.getChildren()){
+
+                                        long theReturn = Long.parseLong(user.child("sponsorReturn").getValue().toString());
+                                        totalReturn = totalReturn + theReturn;
+
+                                    }
+
+                                    totalReturnsText.setText(Common.convertToPrice(Dashboard.this, totalReturn));
+
+
+
+                                    if (!isMonitorRunning) {
+
+                                        Intent checkSponsorship = new Intent(Dashboard.this, CheckForSponsorship.class);
+                                        startService(checkSponsorship);
+
+                                    }
+
+                                } else {
+
+                                    sponsorCycle.setText("Running Cycles : 0");
+                                    totalReturnsText.setText("₦ 0.00");
+
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        }
+                );
+
+        /*---   NEXT END OF CYCLE   ---*/
+        sponsoredRef.child(currentUid)
+                .limitToFirst(1)
+                .addValueEventListener(
+                        new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                for (DataSnapshot snap : dataSnapshot.getChildren()){
+
+                                    String theKey = snap.getKey();
+
+                                    if (dataSnapshot.exists()) {
+
+                                        String date = dataSnapshot.child(theKey).child("cycleEndDate").getValue().toString();
+                                        nextEndOfCycleDate.setText(date);
+
+                                    } else {
+
+                                        nextEndOfCycleDate.setText("Not Available");
+
+                                    }
+
+                                }
+
+
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        }
+                );
+
+    }
+
+    private void setUser(final UserModel paperUser) {
+
+        //close loading dialog
+        alertDialog.dismiss();
+
+        //welcome message
+        welcome.setText("Hi, " + paperUser.getFirstName());
+
+        //user profile pic
+        if (!paperUser.getProfilePictureThumb().equalsIgnoreCase("")){
+
+            Picasso.get()
+                    .load(paperUser.getProfilePictureThumb())
+                    .networkPolicy(NetworkPolicy.OFFLINE)
+                    .placeholder(R.drawable.profile)
+                    .into(userAvatar, new Callback() {
+                        @Override
+                        public void onSuccess() {
+
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            Picasso.get()
+                                    .load(paperUser.getProfilePictureThumb())
+                                    .placeholder(R.drawable.profile)
+                                    .into(userAvatar);
+                        }
+                    });
+
+        } else {
+
+            userAvatar.setImageResource(R.drawable.profile);
+
+        }
+
+        //user type
+        if (paperUser.getUserType().equalsIgnoreCase("Admin")){
+
+            adminLayout.setVisibility(View.VISIBLE);
+            adminLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent adminIntent = new Intent(Dashboard.this, AdminDash.class);
+                    startActivity(adminIntent);
+                    overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+                }
+            });
+
+        } else if (paperUser.getUserType().equalsIgnoreCase("Banned")) {
+
+            farmRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    for (DataSnapshot child : dataSnapshot.getChildren()){
+
+                        FarmModel currentFarm = child.getValue(FarmModel.class);
+
+                        if (currentFarm != null){
+
+                            String farmNotiId = currentFarm.getFarmNotiId();
+
+                            FirebaseMessaging.getInstance().unsubscribeFromTopic(farmNotiId);
+
+                        }
+
+                    }
+
+                    Paper.book().destroy();
+
+                    mAuth.signOut();
+                    ((ApplicationClass)(getApplicationContext())).resetUser();
+
+                    FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
+                    FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.GENERAL_NOTIFY);
+                    Intent signoutIntent = new Intent(Dashboard.this, SignIn.class);
+                    signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(signoutIntent);
+                    finish();
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+        } else {
+
+            adminLayout.setVisibility(View.INVISIBLE);
+            adminLayout.setEnabled(false);
+
+        }
+
+    }
+
+    /*---   LOADING DIALOG   ---*/
+    public void showLoadingDialog(String theMessage){
+
+        alertDialog = new android.app.AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.loading_dialog,null);
+
+        final TextView loadingText = viewOptions.findViewById(R.id.loadingText);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        loadingText.setText(theMessage);
+
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                finish();
+            }
+        });
+
+        alertDialog.show();
+
+    }
+
+    /*---   WARNING DIALOG   ---*/
+    public void showErrorDialog(String theWarning){
+
+        alertDialogError = new android.app.AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.dialog_layout,null);
+
+        final TextView message = (TextView) viewOptions.findViewById(R.id.dialogMessage);
+        final Button okButton = (Button) viewOptions.findViewById(R.id.dialogButton);
+
+        alertDialogError.setView(viewOptions);
+
+        alertDialogError.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialogError.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        message.setText(theWarning);
+
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialogError.dismiss();
+            }
+        });
+
+        alertDialogError.show();
 
     }
 }

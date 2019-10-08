@@ -15,12 +15,16 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.blackviking.menorahfarms.AccountMenus.StudentDetails;
+import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.Notification.APIService;
 import com.blackviking.menorahfarms.Notification.RetrofitClient;
 import com.blackviking.menorahfarms.R;
 
+import java.net.InetAddress;
 import java.text.NumberFormat;
 import java.util.Locale;
+
+import io.paperdb.Paper;
 
 public class Common {
 
@@ -29,6 +33,7 @@ public class Common {
     public static final String SIGN_UP_CHOICE = "Choice";
     public static final String GOOD_TO_GO = "GoToGo";
     public static final String PROFILE_WARNING_COUNT = "ProfileWarningCount";
+    public static final String PAPER_USER = "PAPER_USER";
 
 
     /*---   FLUTTERWAVE   ---*/
@@ -80,7 +85,7 @@ public class Common {
     }
 
 
-    /*---   CHECK FOR INTERNET   ---*/
+    /*---   CHECK FOR NETWORK CONNECTIVITY   ---*/
     public static boolean isConnectedToInternet(Context context)    {
         ConnectivityManager connectivityManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -100,4 +105,54 @@ public class Common {
     }
 
 
+    /*---   CHECK KYC    ---*/
+    public static String checkKYC (Context context){
+
+        String result = "";
+
+        UserModel currentUser = Paper.book().read(Common.PAPER_USER);
+
+        if (currentUser != null){
+
+            if (currentUser.getPhone().equals("") || currentUser.getNationality().equals("")
+                    || currentUser.getGender().equals("") || currentUser.getBirthday().equals("")){
+
+                result = "Personal details incomplete!";
+
+            } else
+
+            if (currentUser.getAddress().equals("") || currentUser.getCity().equals("")
+                    || currentUser.getState().equals("")){
+
+                result = "Contact details incomplete!";
+
+            } else
+
+            if (currentUser.getBank().equals("") || currentUser.getAccountName().equals("")
+                    || currentUser.getAccountNumber().equals("")){
+
+                result = "Bank details incomplete!";
+
+            } else
+
+            if (currentUser.getKinName().equals("") || currentUser.getKinEmail().equals("")
+                    || currentUser.getKinAddress().equals("") || currentUser.getKinRelationship().equals("")
+                    || currentUser.getKinPhone().equals("")){
+
+                result = "Next of Kin details incomplete!";
+
+            } else {
+
+                result = "Profile Complete";
+
+            }
+
+        } else {
+
+             result = "Null User";
+
+        }
+
+        return result;
+    }
 }

@@ -14,8 +14,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blackviking.menorahfarms.Common.ApplicationClass;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.HomeActivities.Dashboard;
+import com.blackviking.menorahfarms.Models.UserModel;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.facebook.login.LoginManager;
@@ -178,6 +180,23 @@ public class Registration extends AppCompatActivity {
     }
 
     private void goToHome(String currentUid) {
+
+        userRef.child(currentUid)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        UserModel user = dataSnapshot.getValue(UserModel.class);
+
+                        ((ApplicationClass)(getApplicationContext())).setUser(user);
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
 
         mDialog.dismiss();
 

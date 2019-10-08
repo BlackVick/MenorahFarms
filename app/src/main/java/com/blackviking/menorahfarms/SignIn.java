@@ -16,8 +16,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blackviking.menorahfarms.Common.ApplicationClass;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.HomeActivities.Dashboard;
+import com.blackviking.menorahfarms.Models.UserModel;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.google.android.gms.auth.api.Auth;
@@ -489,8 +491,27 @@ public class SignIn extends AppCompatActivity {
 
         if (user != null){
 
-            mDialog.dismiss();
+
             String currentUid = user.getUid();
+
+            userRef.child(currentUid)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            UserModel theUser = dataSnapshot.getValue(UserModel.class);
+
+                            ((ApplicationClass)(getApplicationContext())).setUser(theUser);
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+            mDialog.dismiss();
 
             Paper.book().write(Common.USER_ID, currentUid);
 

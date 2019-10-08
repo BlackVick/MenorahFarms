@@ -475,7 +475,6 @@ public class Cart extends AppCompatActivity {
 
     private void pushToDb() {
 
-
         farmRef.child(currentFarmId)
                 .addListenerForSingleValueEvent(
                         new ValueEventListener() {

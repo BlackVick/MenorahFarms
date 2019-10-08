@@ -4,19 +4,15 @@ import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.media.AudioAttributes;
-import android.net.Uri;
 import android.os.Build;
 
+import com.blackviking.menorahfarms.Models.UserModel;
 import com.crashlytics.android.Crashlytics;
-import com.facebook.FacebookSdk;
-import com.facebook.appevents.AppEventsLogger;
+import com.firebase.ui.auth.User;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
 
-import net.danlew.android.joda.JodaTimeAndroid;
-
-import co.paystack.android.PaystackSdk;
 import io.fabric.sdk.android.Fabric;
 import io.paperdb.Paper;
 
@@ -25,6 +21,23 @@ import io.paperdb.Paper;
  */
 
 public class ApplicationClass extends Application {
+
+    private UserModel user = null;
+
+    public UserModel getUser(){
+        return user;
+    }
+
+    public void setUser(UserModel user){
+        this.user = user;
+        Paper.book().write(Common.PAPER_USER, user);
+    }
+
+    public void resetUser(){
+
+        user = null;
+
+    }
 
     public static final String CHANNEL_1_ID = "FeedChannel";
     public static final String CHANNEL_2_ID = "AdminChannel";
@@ -37,18 +50,11 @@ public class ApplicationClass extends Application {
         /*---   PAPER   ---*/
         Paper.init(getApplicationContext());
 
-        /*---   FACEBOOK   ---*/
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        AppEventsLogger.activateApp(this);
-
-        /*---   PAYSTACK   ---*/
-        PaystackSdk.initialize(getApplicationContext());
-
         /*---   CRASHLYTICS   ---*/
         Fabric.with(this, new Crashlytics());
 
         /*---   FIREBASE OFFLINE   ---*/
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        FirebaseDatabase.getInstance().setPersistenceEnabled(false);
 
         /*-------PICASSO--------*/
         Picasso.Builder builder = new Picasso.Builder(this);

@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
@@ -106,20 +107,45 @@ public class SignUp extends AppCompatActivity {
         signupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Common.isConnectedToInternet(getBaseContext())) {
 
-                    mDialog = new SpotsDialog(SignUp.this, "Processing . . .");
-                    mDialog.setCancelable(false);
-                    mDialog.setCanceledOnTouchOutside(false);
-                    mDialog.show();
-                    signUpUserWithEmail();
-                    registerPassword.onEditorAction(EditorInfo.IME_ACTION_DONE);
+                //show dialog
+                mDialog = new SpotsDialog(SignUp.this, "Processing . . .");
+                mDialog.setCancelable(false);
+                mDialog.setCanceledOnTouchOutside(false);
+                mDialog.show();
 
-                } else {
+                //execute network check async task
+                CheckInternet asyncTask = (CheckInternet) new CheckInternet(SignUp.this, new CheckInternet.AsyncResponse(){
+                    @Override
+                    public void processFinish(Integer output) {
 
-                    showErrorDialog("No Internet Access !");
+                        //check all cases
+                        if (output == 1){
 
-                }
+                            signUpUserWithEmail();
+                            registerPassword.onEditorAction(EditorInfo.IME_ACTION_DONE);
+
+                        } else
+
+                        if (output == 0){
+
+                            //no internet
+                            mDialog.dismiss();
+                            showErrorDialog("No internet access");
+
+                        } else
+
+                        if (output == 2){
+
+                            //no internet
+                            mDialog.dismiss();
+                            showErrorDialog("Not connected to any network");
+
+                        }
+
+                    }
+                }).execute();
+
             }
         });
 

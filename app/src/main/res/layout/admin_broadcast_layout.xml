@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="5dp"
+    android:layout_margin="5dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        android:padding="5dp"
+        android:orientation="vertical"
+        android:layout_margin="5dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:text="Broadcast To All"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="17sp"
+            android:gravity="center"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/colorPrimaryDark"
+            android:layout_marginStart="35dp"
+            android:layout_marginEnd="35dp"/>
+
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:text=""
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            android:padding="15dp"
+            android:background="@color/offWhite"
+            android:drawableStart="@drawable/ic_notifications"
+            android:drawablePadding="6dp"
+            android:hint="Title"
+            android:textColorHint="@color/grey"
+            android:id="@+id/broadcastTopic"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:text=""
+            android:textColor="@color/black"
+            android:textSize="13sp"
+            android:padding="15dp"
+            android:background="@color/offWhite"
+            android:drawableStart="@drawable/ic_notifications"
+            android:drawablePadding="6dp"
+            android:hint="Message"
+            android:textColorHint="@color/grey"
+            android:id="@+id/broadcastMessage"
+            android:minLines="4"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/sendBroadcastBtn"
+            android:text="SEND"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:layout_margin="15dp"
+            android:background="@drawable/new_login_button"/>
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

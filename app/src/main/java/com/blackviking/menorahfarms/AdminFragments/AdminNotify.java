@@ -1,10 +1,12 @@
 package com.blackviking.menorahfarms.AdminFragments;
 
 
+import android.app.AlertDialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -14,11 +16,14 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Models.BankModel;
 import com.blackviking.menorahfarms.Models.FarmModel;
@@ -26,12 +31,15 @@ import com.blackviking.menorahfarms.Notification.APIService;
 import com.blackviking.menorahfarms.Notification.DataMessage;
 import com.blackviking.menorahfarms.Notification.MyResponse;
 import com.blackviking.menorahfarms.R;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
@@ -50,17 +58,19 @@ import retrofit2.Response;
  */
 public class AdminNotify extends Fragment {
 
-    private EditText notificationTopic, notificationMessage, userEmail;
-    private Button sendBroadcastBtn;
+    private EditText followedTopic, followedMessage, sponsoredTopic, sponsoredMessage;
+    private Button sendFollowedNotiBtn, sendSponsoredNotiBtn;
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference notificationRef, userRef, farmRef;
+    private DatabaseReference notificationRef, userRef, farmRef, followedFarmNotiRef, sponsoredFarmNotiRef;
     private APIService mService;
 
-    private Spinner topicSpinner;
-    private RadioGroup announcementStyle;
-    private String selectedTopic = "";
+    private Spinner followedSpinner, sponsoredSpinner;
+    private RadioGroup notificationStyle;
+    private String selectedFollowedGroup = "", selectedSponsoredGroup = "";
 
+    private FloatingActionButton broadcastToAllFab;
+    private RelativeLayout directionLayout, followedFarmLayout, sponsoredFarmLayout;
 
     public AdminNotify() {
         // Required empty public constructor
@@ -76,6 +86,8 @@ public class AdminNotify extends Fragment {
         notificationRef = db.getReference("Notifications");
         userRef = db.getReference("Users");
         farmRef = db.getReference("Farms");
+        followedFarmNotiRef = db.getReference("FollowedFarmsNotification");
+        sponsoredFarmNotiRef = db.getReference("SponsoredFarmsNotification");
 
 
         /*---   FCM   ---*/
@@ -83,56 +95,108 @@ public class AdminNotify extends Fragment {
 
 
         /*---   WIDGET   ---*/
-        notificationTopic = (EditText)v.findViewById(R.id.notificationTopic);
-        notificationMessage = (EditText)v.findViewById(R.id.notificationMessage);
-        userEmail = (EditText)v.findViewById(R.id.userEmail);
-        sendBroadcastBtn = (Button)v.findViewById(R.id.sendNotificationBtn);
-        topicSpinner = (Spinner)v.findViewById(R.id.topicSpinner);
-        announcementStyle = (RadioGroup)v.findViewById(R.id.announcementStyle);
+        followedTopic = v.findViewById(R.id.followedTopic);
+        followedMessage = v.findViewById(R.id.followedMessage);
+        sponsoredTopic = v.findViewById(R.id.sponsoredTopic);
+        sponsoredMessage = v.findViewById(R.id.sponsoredMessage);
+        sendFollowedNotiBtn = v.findViewById(R.id.sendFollowedNotiBtn);
+        sendSponsoredNotiBtn = v.findViewById(R.id.sendSponsoredNotiBtn);
+        followedSpinner = v.findViewById(R.id.followedSpinner);
+        sponsoredSpinner = v.findViewById(R.id.sponsoredSpinner);
+        notificationStyle = v.findViewById(R.id.notificationStyle);
+        broadcastToAllFab = v.findViewById(R.id.broadcastToAllFab);
+        directionLayout = v.findViewById(R.id.directionLayout);
+        followedFarmLayout = v.findViewById(R.id.followedFarmLayout);
+        sponsoredFarmLayout = v.findViewById(R.id.sponsoredFarmLayout);
 
 
-        /*---   BANK SPINNER   ---*/
-        final List<String> bankList = new ArrayList<>();
-        bankList.add(0, "Topic");
-
-        final ArrayAdapter<String> dataAdapterGender;
-        dataAdapterGender = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, bankList);
-        dataAdapterGender.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        farmRef.addValueEventListener(new ValueEventListener() {
+        //notification style
+        notificationStyle.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId){
 
-                for (DataSnapshot child : dataSnapshot.getChildren()){
+                    case R.id.followedFarmsNoti:
+                        loadFollowedFarms();
+                        break;
 
-                    FarmModel currentFarm = child.getValue(FarmModel.class);
-
-                    if (currentFarm != null){
-
-                        bankList.add(currentFarm.getFarmNotiId());
-
-                    }
+                    case R.id.sponsoredFarmsNoti:
+                        loadSponsoredFarms();
+                        break;
 
                 }
-
-                topicSpinner.setAdapter(dataAdapterGender);
-                dataAdapterGender.notifyDataSetChanged();
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
             }
         });
 
-        topicSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+        broadcastToAllFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openBroadcastDialog();
+            }
+        });
+        
+        return v;
+    }
+
+    //FOLLOWED FARMS
+    private void loadFollowedFarms() {
+
+        //set layout
+        directionLayout.setVisibility(View.GONE);
+        followedFarmLayout.setVisibility(View.VISIBLE);
+        sponsoredFarmLayout.setVisibility(View.GONE);
+
+
+        //set followed farm list
+        final List<String> followedFarmList = new ArrayList<>();
+        followedFarmList.add(0, "Followed Farm");
+
+        final ArrayAdapter<String> dataAdapterFollowedFarm;
+        dataAdapterFollowedFarm = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, followedFarmList);
+        dataAdapterFollowedFarm.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        //execute network check async task
+        CheckInternet asyncTask = (CheckInternet) new CheckInternet(getContext(), new CheckInternet.AsyncResponse(){
+            @Override
+            public void processFinish(Integer output) {
+
+                //check all cases
+                if (output == 1){
+
+                    followedFarmNotiRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            for (DataSnapshot child : dataSnapshot.getChildren()){
+
+                                followedFarmList.add(child.getKey());
+
+                            }
+
+                            followedSpinner.setAdapter(dataAdapterFollowedFarm);
+                            dataAdapterFollowedFarm.notifyDataSetChanged();
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                }
+
+            }
+        }).execute();
+
+        followedSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                if (!parent.getItemAtPosition(position).equals("Topic")){
+                if (!parent.getItemAtPosition(position).equals("Followed Farm")){
 
-                    selectedTopic = parent.getItemAtPosition(position).toString();
+                    selectedFollowedGroup = parent.getItemAtPosition(position).toString();
 
                 }
 
@@ -145,123 +209,92 @@ public class AdminNotify extends Fragment {
         });
 
 
-        announcementStyle.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-
-                if (checkedId == R.id.single){
-
-                    topicSpinner.setVisibility(View.GONE);
-                    userEmail.setVisibility(View.VISIBLE);
-                    sendBroadcastBtn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            checkSingleStatus();
-                        }
-                    });
-
-                } else if (checkedId == R.id.all){
-
-                    topicSpinner.setVisibility(View.VISIBLE);
-                    userEmail.setVisibility(View.GONE);
-                    sendBroadcastBtn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            checkTopicStatus();
-                        }
-                    });
-
-                }
-
-            }
-        });
-
-        sendBroadcastBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                checkStatus();
-            }
-        });
-        
-        return v;
+        //validate
+        checkFollowedFarmsNotiParam();
     }
 
-    private void checkTopicStatus() {
+    private void checkFollowedFarmsNotiParam() {
 
-        final String theTopic = notificationTopic.getText().toString().trim();
-        final String theMessage = notificationMessage.getText().toString().trim();
+        final String theTopic = followedTopic.getText().toString().trim();
+        final String theMessage = followedMessage.getText().toString().trim();
 
-        if (Common.isConnectedToInternet(getContext())) {
 
-            if (TextUtils.isEmpty(theTopic)) {
+        //validate fields
+        if (TextUtils.isEmpty(theTopic)) {
 
-                notificationTopic.requestFocus();
-                notificationTopic.setError("Topic Can Not Be Empty !");
+            followedTopic.requestFocus();
+            followedTopic.setError("Field required !");
 
-            } else if (TextUtils.isEmpty(theMessage)) {
+        } else if (TextUtils.isEmpty(theMessage)) {
 
-                notificationMessage.requestFocus();
-                notificationMessage.setError("Message Can Not Be Empty !");
+            followedMessage.requestFocus();
+            followedMessage.setError("Field required !");
 
-            } else if (TextUtils.isEmpty(selectedTopic)) {
+        } else if (TextUtils.isEmpty(selectedFollowedGroup)) {
 
-                showErrorDialog("Select A Topic");
-
-            } else {
-
-                userRef.addListenerForSingleValueEvent(
-                                new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                        for (DataSnapshot snap : dataSnapshot.getChildren()){
-
-                                            String theKey = snap.getKey();
-                                            sendTopicBroadcast(theTopic, theMessage, theKey);
-
-                                        }
-
-                                        Map<String, String> dataSend = new HashMap<>();
-                                        dataSend.put("title", "Menorah Farms");
-                                        dataSend.put("message", theMessage);
-                                        DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(selectedTopic).toString(), dataSend);
-
-                                        mService.sendNotification(dataMessage)
-                                                .enqueue(new retrofit2.Callback<MyResponse>() {
-                                                    @Override
-                                                    public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
-
-                                                    }
-
-                                                    @Override
-                                                    public void onFailure(Call<MyResponse> call, Throwable t) {
-                                                    }
-                                                });
-
-                                        Toast.makeText(getContext(), "Done", Toast.LENGTH_SHORT).show();
-                                        notificationTopic.setText("");
-                                        notificationMessage.setText("");
-
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-
-                                    }
-                                }
-                        );
-
-            }
+            showErrorDialog("Select A Farm");
 
         } else {
 
-            showErrorDialog("No Internet Access !");
+            //execute network check async task
+            CheckInternet asyncTask = (CheckInternet) new CheckInternet(getContext(), new CheckInternet.AsyncResponse(){
+                @Override
+                public void processFinish(Integer output) {
+
+                    //check all cases
+                    if (output == 1){
+
+                        followedFarmNotiRef
+                                .child(selectedFollowedGroup)
+                                .addListenerForSingleValueEvent(
+                                        new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                                for (DataSnapshot snap : dataSnapshot.getChildren()){
+
+                                                    String theKey = snap.getKey();
+                                                    sendFollowedFarmNoti(theTopic, theMessage, theKey);
+
+                                                }
+
+                                                Toast.makeText(getContext(), "Message Sent Successfully", Toast.LENGTH_SHORT).show();
+                                                followedTopic.setText("");
+                                                followedMessage.setText("");
+
+                                            }
+
+                                            @Override
+                                            public void onCancelled(DatabaseError databaseError) {
+
+                                            }
+                                        }
+                                );
+
+                    } else
+
+                    if (output == 0){
+
+                        //set layout
+                        showErrorDialog("Failed due to lack of internet access");
+
+                    } else
+
+                    if (output == 2){
+
+                        //set layout
+                        showErrorDialog("Failed due to lack of network connection");
+
+                    }
+
+                }
+            }).execute();
 
         }
 
     }
 
-    private void sendTopicBroadcast(String theTopic, String theMessage, String theKey) {
+    private void sendFollowedFarmNoti(String theTopic, final String theMessage, final String theKey) {
 
         final Date todayDate = Calendar.getInstance().getTime();
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy  hh:mm");
@@ -275,90 +308,190 @@ public class AdminNotify extends Fragment {
         notificationRef.child(theKey)
                 .push()
                 .setValue(notificationMap)
-                .addOnSuccessListener(
-                        new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                        if (task.isSuccessful()){
+
+                            Map<String, String> dataSend = new HashMap<>();
+                            dataSend.put("title", "Followed Farms");
+                            dataSend.put("message", theMessage);
+                            DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(theKey).toString(), dataSend);
+
+                            mService.sendNotification(dataMessage)
+                                    .enqueue(new retrofit2.Callback<MyResponse>() {
+                                        @Override
+                                        public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<MyResponse> call, Throwable t) {
+                                        }
+                                    });
+
+                        }
+
+                    }
+                });
+
+    }
 
 
+    //SPONSORED FARMS
+    private void loadSponsoredFarms() {
+
+        directionLayout.setVisibility(View.GONE);
+        followedFarmLayout.setVisibility(View.GONE);
+        sponsoredFarmLayout.setVisibility(View.VISIBLE);
+
+        //set followed farm list
+        final List<String> sponsoredFarmList = new ArrayList<>();
+        sponsoredFarmList.add(0, "Sponsored Farm");
+
+        final ArrayAdapter<String> dataAdapterSponsoredFarm;
+        dataAdapterSponsoredFarm = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, sponsoredFarmList);
+        dataAdapterSponsoredFarm.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        //execute network check async task
+        CheckInternet asyncTask = (CheckInternet) new CheckInternet(getContext(), new CheckInternet.AsyncResponse(){
+            @Override
+            public void processFinish(Integer output) {
+
+                //check all cases
+                if (output == 1){
+
+                    sponsoredFarmNotiRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            for (DataSnapshot child : dataSnapshot.getChildren()){
+
+                                sponsoredFarmList.add(child.getKey());
 
                             }
+
+                            sponsoredSpinner.setAdapter(dataAdapterSponsoredFarm);
+                            dataAdapterSponsoredFarm.notifyDataSetChanged();
+
                         }
-                ).addOnFailureListener(new OnFailureListener() {
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                }
+
+            }
+        }).execute();
+
+        sponsoredSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onFailure(@NonNull Exception e) {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if (!parent.getItemAtPosition(position).equals("Sponsored Farm")){
+
+                    selectedSponsoredGroup = parent.getItemAtPosition(position).toString();
+
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
 
             }
         });
 
+        //validate
+        checkSponsoredFarmsNotiParam();
     }
 
-    private void checkSingleStatus() {
+    private void checkSponsoredFarmsNotiParam() {
 
-        final String theEmail = userEmail.getText().toString().trim().toLowerCase();
-        final String theTopic = notificationTopic.getText().toString().trim();
-        final String theMessage = notificationMessage.getText().toString().trim();
+        final String theTopic = sponsoredTopic.getText().toString().trim();
+        final String theMessage = sponsoredMessage.getText().toString().trim();
 
-        if (Common.isConnectedToInternet(getContext())) {
 
-            if (TextUtils.isEmpty(theTopic)) {
+        //validate fields
+        if (TextUtils.isEmpty(theTopic)) {
 
-                notificationTopic.requestFocus();
-                notificationTopic.setError("Topic Can Not Be Empty !");
+            sponsoredTopic.requestFocus();
+            sponsoredTopic.setError("Field required !");
 
-            } else if (TextUtils.isEmpty(theMessage)) {
+        } else if (TextUtils.isEmpty(theMessage)) {
 
-                notificationMessage.requestFocus();
-                notificationMessage.setError("Message Can Not Be Empty !");
+            sponsoredMessage.requestFocus();
+            sponsoredMessage.setError("Field required !");
 
-            } else if (TextUtils.isEmpty(theEmail)) {
+        } else if (TextUtils.isEmpty(selectedSponsoredGroup)) {
 
-                userEmail.requestFocus();
-                userEmail.setError("Who ?");
-
-            } else {
-
-                userRef.orderByChild("email")
-                        .equalTo(theEmail)
-                        .addListenerForSingleValueEvent(
-                                new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                        if (dataSnapshot.exists()) {
-
-                                            for (DataSnapshot snap : dataSnapshot.getChildren()) {
-
-                                                String userKey = snap.getKey();
-                                                sendSingleBroadcast(theTopic, theMessage, theEmail, userKey);
-                                            }
-
-                                        } else {
-
-                                            Toast.makeText(getContext(), "No such user", Toast.LENGTH_SHORT).show();
-
-                                        }
-
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-
-                                    }
-                                }
-                        );
-
-            }
+            showErrorDialog("Select A Farm");
 
         } else {
 
-            showErrorDialog("No Internet Access !");
+            //execute network check async task
+            CheckInternet asyncTask = (CheckInternet) new CheckInternet(getContext(), new CheckInternet.AsyncResponse(){
+                @Override
+                public void processFinish(Integer output) {
+
+                    //check all cases
+                    if (output == 1){
+
+                        sponsoredFarmNotiRef
+                                .child(selectedSponsoredGroup)
+                                .addListenerForSingleValueEvent(
+                                        new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                                for (DataSnapshot snap : dataSnapshot.getChildren()){
+
+                                                    String theKey = snap.getKey();
+                                                    sendSponsoredFarmNoti(theTopic, theMessage, theKey);
+
+                                                }
+
+                                                Toast.makeText(getContext(), "Message Sent Successfully", Toast.LENGTH_SHORT).show();
+                                                sponsoredTopic.setText("");
+                                                sponsoredMessage.setText("");
+
+                                            }
+
+                                            @Override
+                                            public void onCancelled(DatabaseError databaseError) {
+
+                                            }
+                                        }
+                                );
+
+                    } else
+
+                    if (output == 0){
+
+                        //set layout
+                        showErrorDialog("Failed due to lack of internet access");
+
+                    } else
+
+                    if (output == 2){
+
+                        //set layout
+                        showErrorDialog("Failed due to lack of network connection");
+
+                    }
+
+                }
+            }).execute();
 
         }
 
     }
 
-    private void sendSingleBroadcast(String theTopic, final String theMessage, String theEmail, final String userKey) {
+    private void sendSponsoredFarmNoti(String theTopic, final String theMessage, final String theKey) {
 
         final Date todayDate = Calendar.getInstance().getTime();
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy  hh:mm");
@@ -369,79 +502,143 @@ public class AdminNotify extends Fragment {
         notificationMap.put("message", theMessage);
         notificationMap.put("time", todayString);
 
-        notificationRef.child(userKey)
+        notificationRef.child(theKey)
                 .push()
                 .setValue(notificationMap)
-                .addOnSuccessListener(
-                        new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
 
-                                Map<String, String> dataSend = new HashMap<>();
-                                dataSend.put("title", "Menorah Farms");
-                                dataSend.put("message", theMessage);
-                                DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(userKey).toString(), dataSend);
+                        if (task.isSuccessful()){
 
-                                mService.sendNotification(dataMessage)
-                                        .enqueue(new retrofit2.Callback<MyResponse>() {
-                                            @Override
-                                            public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                            Map<String, String> dataSend = new HashMap<>();
+                            dataSend.put("title", "Sponsored Farms");
+                            dataSend.put("message", theMessage);
+                            DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(theKey).toString(), dataSend);
 
-                                            }
+                            mService.sendNotification(dataMessage)
+                                    .enqueue(new retrofit2.Callback<MyResponse>() {
+                                        @Override
+                                        public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
 
-                                            @Override
-                                            public void onFailure(Call<MyResponse> call, Throwable t) {
-                                            }
-                                        });
+                                        }
 
-                                notificationTopic.setText("");
-                                notificationMessage.setText("");
-                                userEmail.setText("");
-                                Toast.makeText(getContext(), "Done", Toast.LENGTH_SHORT).show();
+                                        @Override
+                                        public void onFailure(Call<MyResponse> call, Throwable t) {
+                                        }
+                                    });
 
-                            }
                         }
-                ).addOnFailureListener(new OnFailureListener() {
+
+                    }
+                });
+
+    }
+
+
+    //BROADCAST TO ALL
+    private void openBroadcastDialog() {
+        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(getContext()).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.admin_broadcast_layout,null);
+
+        final EditText broadcastTopic = viewOptions.findViewById(R.id.broadcastTopic);
+        final EditText broadcastMessage = viewOptions.findViewById(R.id.broadcastMessage);
+        final Button sendBroadcastBtn = viewOptions.findViewById(R.id.sendBroadcastBtn);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        sendBroadcastBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onFailure(@NonNull Exception e) {
+            public void onClick(View v) {
+
+                checkBroadcastNotiParam(alertDialog, broadcastTopic, broadcastMessage);
 
             }
         });
 
+
+        alertDialog.show();
     }
 
-    private void checkStatus() {
+    private void checkBroadcastNotiParam(final AlertDialog alertDialog, EditText broadcastTopic, EditText broadcastMessage) {
 
-        String theTopic = notificationTopic.getText().toString().trim();
-        String theMessage = notificationMessage.getText().toString().trim();
+        final String theTopic = broadcastTopic.getText().toString().trim();
+        final String theMessage = broadcastMessage.getText().toString().trim();
 
-        if (Common.isConnectedToInternet(getContext())) {
 
-            if (TextUtils.isEmpty(theTopic)){
+        //validate fields
+        if (TextUtils.isEmpty(theTopic)) {
 
-                notificationTopic.requestFocus();
-                notificationTopic.setError("Topic Can Not Be Empty !");
+            broadcastTopic.requestFocus();
+            broadcastTopic.setError("Field required !");
 
-            } else if (TextUtils.isEmpty(theMessage)){
+        } else if (TextUtils.isEmpty(theMessage)) {
 
-                notificationMessage.requestFocus();
-                notificationMessage.setError("Message Can Not Be Empty !");
-
-            } else {
-
-                sendBroadcast(theTopic, theMessage);
-
-            }
+            broadcastMessage.requestFocus();
+            broadcastMessage.setError("Field required !");
 
         } else {
 
-            showErrorDialog("No Internet Access !");
+            //execute network check async task
+            CheckInternet asyncTask = (CheckInternet) new CheckInternet(getContext(), new CheckInternet.AsyncResponse(){
+                @Override
+                public void processFinish(Integer output) {
+
+                    //check all cases
+                    if (output == 1){
+
+                        userRef.addListenerForSingleValueEvent(
+                                        new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                                for (DataSnapshot snap : dataSnapshot.getChildren()){
+
+                                                    String theKey = snap.getKey();
+                                                    sendBroadcastNoti(theTopic, theMessage, theKey);
+
+                                                }
+
+                                                Toast.makeText(getContext(), "Message Sent Successfully", Toast.LENGTH_SHORT).show();
+                                                alertDialog.dismiss();
+
+                                            }
+
+                                            @Override
+                                            public void onCancelled(DatabaseError databaseError) {
+
+                                            }
+                                        }
+                                );
+
+                    } else
+
+                    if (output == 0){
+
+                        //set layout
+                        showErrorDialog("Failed due to lack of internet access");
+
+                    } else
+
+                    if (output == 2){
+
+                        //set layout
+                        showErrorDialog("Failed due to lack of network connection");
+
+                    }
+
+                }
+            }).execute();
 
         }
 
     }
 
-    private void sendBroadcast(String theTopic, final String theMessage) {
+    private void sendBroadcastNoti(String theTopic, final String theMessage, final String theKey) {
 
         final Date todayDate = Calendar.getInstance().getTime();
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy  hh:mm");
@@ -452,68 +649,39 @@ public class AdminNotify extends Fragment {
         notificationMap.put("message", theMessage);
         notificationMap.put("time", todayString);
 
-        userRef.addListenerForSingleValueEvent(
-                new ValueEventListener() {
+        notificationRef.child(theKey)
+                .push()
+                .setValue(notificationMap)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+                    public void onComplete(@NonNull Task<Void> task) {
 
-                        DatabaseReference pushRef = notificationRef.push();
-                        String pushId = pushRef.getKey();
+                        if (task.isSuccessful()){
 
-                        for (DataSnapshot snap : dataSnapshot.getChildren()){
+                            Map<String, String> dataSend = new HashMap<>();
+                            dataSend.put("title", "Menorah Farms");
+                            dataSend.put("message", theMessage);
+                            DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(theKey).toString(), dataSend);
 
-                            final String theUserIds = snap.getKey();
-
-                            notificationRef.child(theUserIds)
-                                    .child(pushId)
-                                    .setValue(notificationMap)
-                                    .addOnSuccessListener(
-                                    new OnSuccessListener<Void>() {
+                            mService.sendNotification(dataMessage)
+                                    .enqueue(new retrofit2.Callback<MyResponse>() {
                                         @Override
-                                        public void onSuccess(Void aVoid) {
+                                        public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
 
                                         }
-                                    }
-                            ).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
 
-                                }
-                            });
+                                        @Override
+                                        public void onFailure(Call<MyResponse> call, Throwable t) {
+                                        }
+                                    });
 
                         }
 
-                        Map<String, String> dataSend = new HashMap<>();
-                        dataSend.put("title", "Menorah Farms");
-                        dataSend.put("message", theMessage);
-                        DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(Common.GENERAL_NOTIFY).toString(), dataSend);
-
-                        mService.sendNotification(dataMessage)
-                                .enqueue(new retrofit2.Callback<MyResponse>() {
-                                    @Override
-                                    public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
-
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<MyResponse> call, Throwable t) {
-                                    }
-                                });
-
-                        Toast.makeText(getContext(), "Done", Toast.LENGTH_SHORT).show();
-                        notificationTopic.setText("");
-                        notificationMessage.setText("");
-
                     }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                }
-        );
+                });
 
     }
+
 
     /*---   WARNING DIALOG   ---*/
     public void showErrorDialog(String theWarning){

@@ -1,11 +1,18 @@
 package com.blackviking.menorahfarms.Sponsorship;
 
+import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Models.SponsoredFarmModel;
 import com.blackviking.menorahfarms.R;
@@ -27,6 +34,10 @@ public class SponsorshipDetails extends AppCompatActivity {
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private DatabaseReference farmref, sponsoredFarmRef;
     private String currentUid, sponsorshipId;
+
+    private android.app.AlertDialog alertDialog;
+    private RelativeLayout noInternetLayout;
+    private LinearLayout contentLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +68,8 @@ public class SponsorshipDetails extends AppCompatActivity {
         sponsoredFarmTotalReturn = (TextView)findViewById(R.id.sponsoredFarmTotalReturn);
         sponsoredFarmRefNumber = (TextView)findViewById(R.id.sponsoredFarmRefNumber);
         sponsoredFarmTotalPrice = (TextView)findViewById(R.id.sponsoredFarmTotalPrice);
+        noInternetLayout = findViewById(R.id.noInternetLayout);
+        contentLayout = findViewById(R.id.contentLayout);
 
 
         backButton.setOnClickListener(new View.OnClickListener() {
@@ -67,14 +80,56 @@ public class SponsorshipDetails extends AppCompatActivity {
         });
 
 
-        loadSponsorshipDetails();
+        //show loading dialog
+        showLoadingDialog("Loading sponsorship details . . .");
+
+        //execute network check async task
+        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
+            @Override
+            public void processFinish(Integer output) {
+
+                //check all cases
+                if (output == 1){
+
+                    noInternetLayout.setVisibility(View.GONE);
+                    contentLayout.setVisibility(View.VISIBLE);
+                    loadSponsorshipDetails();
+
+                } else
+
+                if (output == 0){
+
+                    //set layout
+                    alertDialog.dismiss();
+                    noInternetLayout.setVisibility(View.VISIBLE);
+                    contentLayout.setVisibility(View.GONE);
+
+                } else
+
+                if (output == 2){
+
+                    //set layout
+                    alertDialog.dismiss();
+                    noInternetLayout.setVisibility(View.VISIBLE);
+                    contentLayout.setVisibility(View.GONE);
+
+                }
+
+            }
+        }).execute();
+
+
     }
 
     private void loadSponsorshipDetails() {
 
+        //remove dalog
+        alertDialog.dismiss();
+
+
         sponsoredFarmRef.child(currentUid)
                 .child(sponsorshipId)
-                .addListenerForSingleValueEvent(
+                .addValueEventListener(
                         new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -109,6 +164,35 @@ public class SponsorshipDetails extends AppCompatActivity {
                             }
                         }
                 );
+
+    }
+
+    /*---   LOADING DIALOG   ---*/
+    public void showLoadingDialog(String theMessage){
+
+        alertDialog = new android.app.AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.loading_dialog,null);
+
+        final TextView loadingText = viewOptions.findViewById(R.id.loadingText);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        loadingText.setText(theMessage);
+
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                finish();
+            }
+        });
+
+        alertDialog.show();
 
     }
 

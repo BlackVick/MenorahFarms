@@ -1,15 +1,21 @@
 package com.blackviking.menorahfarms.DashboardMenu;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
+import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Common.GetTimeAgo;
 import com.blackviking.menorahfarms.HomeActivities.FarmShop;
@@ -45,6 +51,9 @@ public class SponsoredFarms extends AppCompatActivity {
     private FirebaseRecyclerAdapter<SponsoredFarmModel, SponsoredFarmViewHolder> adapter;
     private LinearLayoutManager layoutManager;
 
+    private android.app.AlertDialog alertDialog;
+    private RelativeLayout noInternetLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +73,46 @@ public class SponsoredFarms extends AppCompatActivity {
         goToFarmstoreButton = (RelativeLayout)findViewById(R.id.goToFarmstoreButton);
         emptyLayout = (LinearLayout)findViewById(R.id.emptyLayout);
         sponsoredFarmsRecycler = (RecyclerView)findViewById(R.id.sponsoredFarmsRecycler);
+        noInternetLayout = findViewById(R.id.noInternetLayout);
+
+
+        //show loading dialog
+        showLoadingDialog("Loading sponsorships . . .");
+
+        //execute network check async task
+        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
+            @Override
+            public void processFinish(Integer output) {
+
+                //check all cases
+                if (output == 1){
+
+                    checkForSponsorship();
+
+                } else
+
+                if (output == 0){
+
+                    //set layout
+                    alertDialog.dismiss();
+                    noInternetLayout.setVisibility(View.VISIBLE);
+                    sponsoredFarmsRecycler.setVisibility(View.GONE);
+                    emptyLayout.setVisibility(View.GONE);
+
+                } else
+
+                if (output == 2){
+
+                    //set layout
+                    alertDialog.dismiss();
+                    noInternetLayout.setVisibility(View.VISIBLE);
+                    sponsoredFarmsRecycler.setVisibility(View.GONE);
+                    emptyLayout.setVisibility(View.GONE);
+
+                }
+
+            }
+        }).execute();
 
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,25 +121,27 @@ public class SponsoredFarms extends AppCompatActivity {
             }
         });
 
-
-        checkForSponsorship();
-
     }
 
     private void checkForSponsorship() {
 
         sponsorshipRef.child(currentUid)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+                .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
                         if (dataSnapshot.exists()){
 
                             loadSponsorships();
+                            noInternetLayout.setVisibility(View.GONE);
+                            sponsoredFarmsRecycler.setVisibility(View.VISIBLE);
                             emptyLayout.setVisibility(View.GONE);
 
                         } else {
 
+                            alertDialog.dismiss();
+                            noInternetLayout.setVisibility(View.GONE);
+                            sponsoredFarmsRecycler.setVisibility(View.GONE);
                             emptyLayout.setVisibility(View.VISIBLE);
                             goToFarmstoreButton.setOnClickListener(new View.OnClickListener() {
                                 @Override
@@ -114,6 +165,10 @@ public class SponsoredFarms extends AppCompatActivity {
     }
 
     private void loadSponsorships() {
+
+        //remove dialog
+        alertDialog.dismiss();
+
 
         sponsoredFarmsRecycler.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
@@ -218,6 +273,35 @@ public class SponsoredFarms extends AppCompatActivity {
             }
         };
         sponsoredFarmsRecycler.setAdapter(adapter);
+
+    }
+
+    /*---   LOADING DIALOG   ---*/
+    public void showLoadingDialog(String theMessage){
+
+        alertDialog = new android.app.AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.loading_dialog,null);
+
+        final TextView loadingText = viewOptions.findViewById(R.id.loadingText);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        loadingText.setText(theMessage);
+
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                finish();
+            }
+        });
+
+        alertDialog.show();
 
     }
 

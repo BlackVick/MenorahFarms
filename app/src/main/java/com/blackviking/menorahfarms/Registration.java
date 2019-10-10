@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blackviking.menorahfarms.Common.ApplicationClass;
+import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.HomeActivities.Dashboard;
 import com.blackviking.menorahfarms.Models.UserModel;
@@ -100,19 +101,43 @@ public class Registration extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if (Common.isConnectedToInternet(getBaseContext())) {
+                //show dialog
+                mDialog = new SpotsDialog(Registration.this, "Writing Changes . . .");
+                mDialog.setCancelable(false);
+                mDialog.setCanceledOnTouchOutside(false);
+                mDialog.show();
 
-                    mDialog = new SpotsDialog(Registration.this, "Writing Changes . . .");
-                    mDialog.setCancelable(false);
-                    mDialog.setCanceledOnTouchOutside(false);
-                    mDialog.show();
-                    saveChanges();
+                //execute network check async task
+                CheckInternet asyncTask = (CheckInternet) new CheckInternet(Registration.this, new CheckInternet.AsyncResponse(){
+                    @Override
+                    public void processFinish(Integer output) {
 
-                } else {
+                        //check all cases
+                        if (output == 1){
 
-                    showErrorDialog("No Internet Access !");
+                            saveChanges();
 
-                }
+                        } else
+
+                        if (output == 0){
+
+                            //no internet
+                            mDialog.dismiss();
+                            showErrorDialog("No internet access");
+
+                        } else
+
+                        if (output == 2){
+
+                            //no internet
+                            mDialog.dismiss();
+                            showErrorDialog("Not connected to any network");
+
+                        }
+
+                    }
+                }).execute();
+
             }
         });
 

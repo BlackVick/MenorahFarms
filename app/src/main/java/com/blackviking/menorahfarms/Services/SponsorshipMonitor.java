@@ -7,6 +7,7 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
 
+import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Notification.APIService;
 import com.blackviking.menorahfarms.Notification.DataMessage;
@@ -77,50 +78,67 @@ public class SponsorshipMonitor extends Service {
 
     private void startMonitor() {
 
-        if (Common.isConnectedToInternet(getApplicationContext())){
+        //execute network check async task
+        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
+            @Override
+            public void processFinish(Integer output) {
 
-            sponsoredFarmRef.child(userId)
-                    .orderByChild("status")
-                    .equalTo("sponsoring")
-                    .addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
+                //check all cases
+                if (output == 1){
 
-                            if (dataSnapshot.exists()) {
+                    sponsoredFarmRef.child(userId)
+                            .orderByChild("status")
+                            .equalTo("sponsoring")
+                            .addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                Paper.book().write(Common.isSponsorshipMonitorRunning, true);
+                                    if (dataSnapshot.exists()) {
 
-                                for (DataSnapshot snap : dataSnapshot.getChildren()) {
+                                        Paper.book().write(Common.isSponsorshipMonitorRunning, true);
 
-                                    endDate = snap.child("cycleEndDate").getValue().toString();
-                                    startDateString = snap.child("cycleStartDate").getValue().toString();
+                                        for (DataSnapshot snap : dataSnapshot.getChildren()) {
 
-                                    calculateDays(endDate, startDateString, snap.getKey());
+                                            endDate = snap.child("cycleEndDate").getValue().toString();
+                                            startDateString = snap.child("cycleStartDate").getValue().toString();
+
+                                            calculateDays(endDate, startDateString, snap.getKey());
+
+                                        }
+
+                                        repeatTomorrow();
+
+                                    } else {
+
+                                        Paper.book().write(Common.isSponsorshipMonitorRunning, false);
+                                        stopSelf();
+
+                                    }
 
                                 }
 
-                                repeatTomorrow();
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
 
-                            } else {
+                                }
+                            });
 
-                                Paper.book().write(Common.isSponsorshipMonitorRunning, false);
-                                stopSelf();
+                } else
 
-                            }
+                if (output == 0){
 
-                        }
+                    retryNetwork();
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
+                } else
 
-                        }
-                    });
+                if (output == 2){
 
-        } else {
+                    retryNetwork();
 
-            retryNetwork();
+                }
 
-        }
+            }
+        }).execute();
 
     }
 

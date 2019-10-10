@@ -66,83 +66,14 @@ public class Dashboard extends AppCompatActivity {
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference userRef, sponsoredRef, farmRef;
     private String currentUid;
-    private boolean isMonitorRunning, isInternetAvail;
-    private UserModel singletonUser, paperUser;
+    private boolean isMonitorRunning;
+    private UserModel paperUser;
     private android.app.AlertDialog alertDialog, alertDialogError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
-
-        //execute and get result from async task
-        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
-            @Override
-            public void processFinish(Integer output) {
-
-                //check all cases
-                if (singletonUser == null){
-
-                    if (output == 1){
-
-                        userRef.child(currentUid)
-                                .addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                        UserModel theUser = dataSnapshot.getValue(UserModel.class);
-                                        ((ApplicationClass)(getApplicationContext())).setUser(theUser);
-
-                                        paperUser = Paper.book().read(Common.PAPER_USER);
-                                        setUser(paperUser);
-                                        setOtherDetails();
-
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-
-                                    }
-                                });
-
-                    } else
-
-                    if (output == 0){
-
-                        if (paperUser != null) {
-
-                            setUser(paperUser);
-                            Toast.makeText(Dashboard.this, "No internet", Toast.LENGTH_SHORT).show();
-
-                        } else {
-
-                            alertDialog.dismiss();
-                            showErrorDialog("Details could not be retrieved, please try again later.");
-
-                        }
-
-                    } else
-
-                    if (output == 2){
-
-                        if (paperUser != null) {
-
-                            setUser(paperUser);
-                            Toast.makeText(Dashboard.this, "Please connect to a network", Toast.LENGTH_SHORT).show();
-
-                        } else {
-
-                            alertDialog.dismiss();
-                            showErrorDialog("Details could not be retrieved, please try again later.");
-
-                        }
-
-                    }
-
-                }
-
-            }
-        }).execute();
 
 
         /*---   FIREBASE   ---*/
@@ -209,11 +140,105 @@ public class Dashboard extends AppCompatActivity {
 
 
         /*---   CURRENT USER   ---*/
-        singletonUser = ((ApplicationClass)(getApplicationContext())).getUser();
+        //singletonUser = ((ApplicationClass)(getApplicationContext())).getUser();
         paperUser = Paper.book().read(Common.PAPER_USER);
 
         //show loading dialog
         showLoadingDialog("Fetching details . . .");
+
+        //execute network check async task
+        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
+            @Override
+            public void processFinish(Integer output) {
+
+                //check all cases
+                if (output == 1){
+
+                    //always update latest from server
+                    userRef.child(currentUid)
+                            .addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                    UserModel theUser = dataSnapshot.getValue(UserModel.class);
+                                    ((ApplicationClass) (getApplicationContext())).setUser(theUser);
+
+                                    paperUser = Paper.book().read(Common.PAPER_USER);
+
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
+
+                    if (paperUser == null) {
+
+                        userRef.child(currentUid)
+                                .addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                        UserModel theUser = dataSnapshot.getValue(UserModel.class);
+                                        ((ApplicationClass) (getApplicationContext())).setUser(theUser);
+
+                                        paperUser = Paper.book().read(Common.PAPER_USER);
+                                        setUser(paperUser);
+                                        setOtherDetails();
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+
+                    } else {
+
+                        setUser(paperUser);
+                        setOtherDetails();
+
+                    }
+
+                } else
+
+                if (output == 0){
+
+                    if (paperUser != null) {
+
+                        setUser(paperUser);
+                        Toast.makeText(Dashboard.this, "No internet", Toast.LENGTH_SHORT).show();
+
+                    } else {
+
+                        alertDialog.dismiss();
+                        showErrorDialog("Details could not be retrieved, please try again later.");
+
+                    }
+
+                } else
+
+                if (output == 2){
+
+                    if (paperUser != null) {
+
+                        setUser(paperUser);
+                        Toast.makeText(Dashboard.this, "Please connect to a network", Toast.LENGTH_SHORT).show();
+
+                    } else {
+
+                        alertDialog.dismiss();
+                        showErrorDialog("Details could not be retrieved, please try again later.");
+
+                    }
+
+                }
+
+            }
+        }).execute();
 
 
         //check sponsorship monitor
@@ -467,43 +492,17 @@ public class Dashboard extends AppCompatActivity {
 
         } else if (paperUser.getUserType().equalsIgnoreCase("Banned")) {
 
-            farmRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
+            Paper.book().destroy();
 
-                    for (DataSnapshot child : dataSnapshot.getChildren()){
+            mAuth.signOut();
+            ((ApplicationClass)(getApplicationContext())).resetUser();
 
-                        FarmModel currentFarm = child.getValue(FarmModel.class);
-
-                        if (currentFarm != null){
-
-                            String farmNotiId = currentFarm.getFarmNotiId();
-
-                            FirebaseMessaging.getInstance().unsubscribeFromTopic(farmNotiId);
-
-                        }
-
-                    }
-
-                    Paper.book().destroy();
-
-                    mAuth.signOut();
-                    ((ApplicationClass)(getApplicationContext())).resetUser();
-
-                    FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
-                    FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.GENERAL_NOTIFY);
-                    Intent signoutIntent = new Intent(Dashboard.this, SignIn.class);
-                    signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(signoutIntent);
-                    finish();
-
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
+            FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
+            FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.GENERAL_NOTIFY);
+            Intent signoutIntent = new Intent(Dashboard.this, SignIn.class);
+            signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(signoutIntent);
+            finish();
 
         } else {
 

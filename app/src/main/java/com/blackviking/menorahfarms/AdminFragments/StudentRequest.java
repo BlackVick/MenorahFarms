@@ -9,9 +9,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.blackviking.menorahfarms.AdminDetails.DueSponsorshipDetail;
 import com.blackviking.menorahfarms.AdminDetails.StudentRequestDetails;
+import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Interface.ItemClickListener;
 import com.blackviking.menorahfarms.Models.StudentModel;
 import com.blackviking.menorahfarms.Models.UserModel;
@@ -37,6 +40,9 @@ public class StudentRequest extends Fragment {
     private LinearLayoutManager layoutManager;
     private FirebaseRecyclerAdapter<StudentModel, AdminViewHolder> adapter;
 
+    private RelativeLayout noInternetLayout;
+    private LinearLayout emptyLayout;
+
     public StudentRequest() {
         // Required empty public constructor
     }
@@ -54,9 +60,69 @@ public class StudentRequest extends Fragment {
 
         /*---   WIDGETS   ---*/
         studentRequestRecycler = (RecyclerView)v.findViewById(R.id.studentRequestRecycler);
+        noInternetLayout = v.findViewById(R.id.noInternetLayout);
+        emptyLayout = v.findViewById(R.id.emptyLayout);
 
 
-        loadStudentRequests();
+        //execute network check async task
+        CheckInternet asyncTask = (CheckInternet) new CheckInternet(getContext(), new CheckInternet.AsyncResponse(){
+            @Override
+            public void processFinish(Integer output) {
+
+                //check all cases
+                if (output == 1){
+
+                    studentRequestRef.orderByChild("approval")
+                            .equalTo("pending")
+                            .addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                    if (dataSnapshot.exists()){
+
+                                        noInternetLayout.setVisibility(View.GONE);
+                                        emptyLayout.setVisibility(View.GONE);
+                                        studentRequestRecycler.setVisibility(View.VISIBLE);
+                                        loadStudentRequests();
+
+                                    } else {
+
+                                        noInternetLayout.setVisibility(View.GONE);
+                                        emptyLayout.setVisibility(View.VISIBLE);
+                                        studentRequestRecycler.setVisibility(View.GONE);
+
+                                    }
+
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
+                } else
+
+                if (output == 0){
+
+                    //set layout
+                    noInternetLayout.setVisibility(View.VISIBLE);
+                    emptyLayout.setVisibility(View.GONE);
+                    studentRequestRecycler.setVisibility(View.GONE);
+
+                } else
+
+                if (output == 2){
+
+                    //set layout
+                    noInternetLayout.setVisibility(View.VISIBLE);
+                    emptyLayout.setVisibility(View.GONE);
+                    studentRequestRecycler.setVisibility(View.GONE);
+
+                }
+
+            }
+        }).execute();
 
         return v;
     }

@@ -11,9 +11,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blackviking.menorahfarms.Common.ApplicationClass;
+import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.FarmshopFragments.TabsPager;
 import com.blackviking.menorahfarms.R;
@@ -27,6 +30,8 @@ public class FarmShop extends AppCompatActivity {
 
     private LinearLayout dashboardSwitch, farmstoreSwitch, accountSwitch;
     private TextView dashboardText, farmstoreText, accountText;
+
+    private RelativeLayout noInternetLayout;
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
@@ -52,6 +57,7 @@ public class FarmShop extends AppCompatActivity {
         dashboardText = (TextView)findViewById(R.id.dashboardText);
         farmstoreText = (TextView)findViewById(R.id.farmShopText);
         accountText = (TextView)findViewById(R.id.accountText);
+        noInternetLayout = findViewById(R.id.noInternetLayout);
 
 
         tabLayout = (TabLayout)findViewById(R.id.farmshopTabs);
@@ -60,7 +66,6 @@ public class FarmShop extends AppCompatActivity {
 
         /*----------    TABS HANDLER   ----------*/
         tabsPager = new TabsPager(getSupportFragmentManager());
-        viewPager.setAdapter(tabsPager);
 
 
 
@@ -70,34 +75,58 @@ public class FarmShop extends AppCompatActivity {
         accountText.setTextColor(getResources().getColor(R.color.black));
 
 
+        //show loading dialog
+        showLoadingDialog("Loading all farms . . .");
+
         //load farms into memory
-        if (Common.isConnectedToInternet(getApplicationContext())) {
+        //execute network check async task
+        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
+            @Override
+            public void processFinish(Integer output) {
 
-            showLoadingDialog("Loading all farms . . .");
+                //check all cases
+                if (output == 1){
 
-            farmRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
+                    farmRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
 
+                            setFarms();
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                            Toast.makeText(FarmShop.this, "cancelled", Toast.LENGTH_SHORT).show();
+
+                        }
+                    });
+
+                } else
+
+                if (output == 0){
+
+                    //set layout
                     alertDialog.dismiss();
-                    tabLayout.setupWithViewPager(viewPager);
+                    noInternetLayout.setVisibility(View.VISIBLE);
+                    tabLayout.setVisibility(View.GONE);
+                    viewPager.setVisibility(View.GONE);
+
+                } else
+
+                if (output == 2){
+
+                    //set layout
+                    alertDialog.dismiss();
+                    noInternetLayout.setVisibility(View.VISIBLE);
+                    tabLayout.setVisibility(View.GONE);
+                    viewPager.setVisibility(View.GONE);
 
                 }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                    Toast.makeText(FarmShop.this, "cancelled", Toast.LENGTH_SHORT).show();
-
-                }
-            });
-
-        } else {
-
-
-
-        }
-
+            }
+        }).execute();
 
 
         dashboardSwitch.setOnClickListener(new View.OnClickListener() {
@@ -123,6 +152,21 @@ public class FarmShop extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void setFarms() {
+
+        //setup fragments with tabs
+        viewPager.setAdapter(tabsPager);
+        tabLayout.setupWithViewPager(viewPager);
+
+        //set layout
+        noInternetLayout.setVisibility(View.GONE);
+        tabLayout.setVisibility(View.VISIBLE);
+        viewPager.setVisibility(View.VISIBLE);
+
+        //dismiss dialog
+        alertDialog.dismiss();
     }
 
     /*---   LOADING DIALOG   ---*/

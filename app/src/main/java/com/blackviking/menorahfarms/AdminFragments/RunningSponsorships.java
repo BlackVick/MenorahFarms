@@ -8,7 +8,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
+import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Models.RunningCycleModel;
 import com.blackviking.menorahfarms.Models.UserModel;
@@ -33,6 +36,9 @@ public class RunningSponsorships extends Fragment {
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference userRef, sponsorshipRef, adminSponsorshipRef;
 
+    private RelativeLayout noInternetLayout;
+    private LinearLayout emptyLayout;
+
     public RunningSponsorships() {
         // Required empty public constructor
     }
@@ -52,9 +58,67 @@ public class RunningSponsorships extends Fragment {
 
         /*---   WIDGETS   ---*/
         runningCycleRecycler = (RecyclerView)v.findViewById(R.id.runningCycleRecycler);
+        noInternetLayout = v.findViewById(R.id.noInternetLayout);
+        emptyLayout = v.findViewById(R.id.emptyLayout);
 
 
-        loadRunningCycles();
+        //execute network check async task
+        CheckInternet asyncTask = (CheckInternet) new CheckInternet(getContext(), new CheckInternet.AsyncResponse(){
+            @Override
+            public void processFinish(Integer output) {
+
+                //check all cases
+                if (output == 1){
+
+                    adminSponsorshipRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            if (dataSnapshot.exists()){
+
+                                noInternetLayout.setVisibility(View.GONE);
+                                emptyLayout.setVisibility(View.GONE);
+                                runningCycleRecycler.setVisibility(View.VISIBLE);
+                                loadRunningCycles();
+
+                            } else {
+
+                                noInternetLayout.setVisibility(View.GONE);
+                                emptyLayout.setVisibility(View.VISIBLE);
+                                runningCycleRecycler.setVisibility(View.GONE);
+
+                            }
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                } else
+
+                if (output == 0){
+
+                    //set layout
+                    noInternetLayout.setVisibility(View.VISIBLE);
+                    emptyLayout.setVisibility(View.GONE);
+                    runningCycleRecycler.setVisibility(View.GONE);
+
+                } else
+
+                if (output == 2){
+
+                    //set layout
+                    noInternetLayout.setVisibility(View.VISIBLE);
+                    emptyLayout.setVisibility(View.GONE);
+                    runningCycleRecycler.setVisibility(View.GONE);
+
+                }
+
+            }
+        }).execute();
 
         return v;
     }

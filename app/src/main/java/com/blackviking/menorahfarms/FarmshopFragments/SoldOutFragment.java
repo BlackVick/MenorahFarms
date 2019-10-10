@@ -21,6 +21,7 @@ import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.FarmDetails;
 import com.blackviking.menorahfarms.Interface.ItemClickListener;
 import com.blackviking.menorahfarms.Models.FarmModel;
+import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.ViewHolders.FarmStoreViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -33,6 +34,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
+
+import io.paperdb.Paper;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -70,22 +73,9 @@ public class SoldOutFragment extends Fragment {
 
 
         /*---   CURRENT USER   ---*/
-        userRef.child(currentUid)
-                .addListenerForSingleValueEvent(
-                        new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
+        UserModel paperUser = Paper.book().read(Common.PAPER_USER);
+        userType = paperUser.getUserPackage();
 
-                                userType = dataSnapshot.child("userPackage").getValue().toString();
-
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        }
-                );
 
         loadSoldOutFarms();
 
@@ -129,15 +119,10 @@ public class SoldOutFragment extends Fragment {
                             public void onClick(View view, int position, boolean isLongClick) {
                                 if (userType.equalsIgnoreCase("Student")){
 
-                                    viewHolder.setItemClickListener(new ItemClickListener() {
-                                        @Override
-                                        public void onClick(View view, int position, boolean isLongClick) {
-                                            Intent farmDetailIntent = new Intent(getContext(), FarmDetails.class);
-                                            farmDetailIntent.putExtra("FarmId", adapter.getRef(viewHolder.getAdapterPosition()).getKey());
-                                            startActivity(farmDetailIntent);
-                                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-                                        }
-                                    });
+                                    Intent farmDetailIntent = new Intent(getContext(), FarmDetails.class);
+                                    farmDetailIntent.putExtra("FarmId", adapter.getRef(viewHolder.getAdapterPosition()).getKey());
+                                    startActivity(farmDetailIntent);
+                                    getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
 
                                 } else {
 

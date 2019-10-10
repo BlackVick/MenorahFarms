@@ -1,13 +1,20 @@
 package com.blackviking.menorahfarms.DashboardMenu;
 
+import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
+import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Models.NotificationModel;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.ViewHolders.NotificationViewHolder;
@@ -33,6 +40,9 @@ public class Notifications extends AppCompatActivity {
     private String currentUid;
 
 
+    private android.app.AlertDialog alertDialog;
+    private RelativeLayout noInternetLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,32 +60,73 @@ public class Notifications extends AppCompatActivity {
         backbutton = (ImageView)findViewById(R.id.backButton);
         emptyLayout = (LinearLayout)findViewById(R.id.emptyLayout);
         notificationRecycler = (RecyclerView)findViewById(R.id.notificationRecycler);
+        noInternetLayout = findViewById(R.id.noInternetLayout);
 
 
-        /*---   CHECK EMPTY   ---*/
-        notificationRef.child(currentUid)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+        //show loading dialog
+        showLoadingDialog("Loading notifications . . .");
 
-                        if (dataSnapshot.exists()){
+        //execute network check async task
+        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
+            @Override
+            public void processFinish(Integer output) {
 
-                            emptyLayout.setVisibility(View.GONE);
-                            loadNotifications();
+                //check all cases
+                if (output == 1){
 
-                        } else {
+                    notificationRef.child(currentUid)
+                            .addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
 
-                            emptyLayout.setVisibility(View.VISIBLE);
+                                    if (dataSnapshot.exists()){
 
-                        }
+                                        emptyLayout.setVisibility(View.GONE);
+                                        noInternetLayout.setVisibility(View.GONE);
+                                        notificationRecycler.setVisibility(View.VISIBLE);
+                                        loadNotifications();
 
-                    }
+                                    } else {
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                                        alertDialog.dismiss();
+                                        emptyLayout.setVisibility(View.VISIBLE);
+                                        noInternetLayout.setVisibility(View.GONE);
+                                        notificationRecycler.setVisibility(View.GONE);
 
-                    }
-                });
+                                    }
+
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
+                } else
+
+                if (output == 0){
+
+                    //set layout
+                    alertDialog.dismiss();
+                    noInternetLayout.setVisibility(View.VISIBLE);
+                    notificationRecycler.setVisibility(View.GONE);
+                    emptyLayout.setVisibility(View.GONE);
+
+                } else
+
+                if (output == 2){
+
+                    //set layout
+                    alertDialog.dismiss();
+                    noInternetLayout.setVisibility(View.VISIBLE);
+                    notificationRecycler.setVisibility(View.GONE);
+                    emptyLayout.setVisibility(View.GONE);
+
+                }
+
+            }
+        }).execute();
 
 
         backbutton.setOnClickListener(new View.OnClickListener() {
@@ -88,6 +139,9 @@ public class Notifications extends AppCompatActivity {
     }
 
     private void loadNotifications() {
+
+        //cancel dialog
+        alertDialog.dismiss();
 
         notificationRecycler.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
@@ -111,6 +165,35 @@ public class Notifications extends AppCompatActivity {
             }
         };
         notificationRecycler.setAdapter(adapter);
+
+    }
+
+    /*---   LOADING DIALOG   ---*/
+    public void showLoadingDialog(String theMessage){
+
+        alertDialog = new android.app.AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.loading_dialog,null);
+
+        final TextView loadingText = viewOptions.findViewById(R.id.loadingText);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        loadingText.setText(theMessage);
+
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                finish();
+            }
+        });
+
+        alertDialog.show();
 
     }
 

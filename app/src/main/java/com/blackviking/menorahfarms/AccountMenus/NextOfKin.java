@@ -11,11 +11,15 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.blackviking.menorahfarms.Common.ApplicationClass;
+import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -28,6 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import dmax.dialog.SpotsDialog;
+import io.paperdb.Paper;
 
 public class NextOfKin extends AppCompatActivity {
 
@@ -39,6 +44,7 @@ public class NextOfKin extends AppCompatActivity {
     private DatabaseReference userRef;
     private String currentUid;
     private android.app.AlertDialog mDialog;
+    private UserModel paperUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +57,9 @@ public class NextOfKin extends AppCompatActivity {
         if (mAuth.getCurrentUser() != null)
             currentUid = mAuth.getCurrentUser().getUid();
 
+        //paper user init
+        paperUser = Paper.book().read(Common.PAPER_USER);
+
 
         /*---   WIDGETS   ---*/
         kinName = (MaterialEditText)findViewById(R.id.kinName);
@@ -62,34 +71,11 @@ public class NextOfKin extends AppCompatActivity {
         updateProfile = (Button)findViewById(R.id.updateProfileButton);
 
 
-        /*---   CURRENT USER   ---*/
-        userRef.child(currentUid)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        UserModel currentUser = dataSnapshot.getValue(UserModel.class);
-
-                        if (currentUser != null){
-
-                            kinAddress.setText(currentUser.getKinAddress());
-                            kinName.setText(currentUser.getKinName());
-                            kinRelationship.setText(currentUser.getKinRelationship());
-                            kinPhone.setText(currentUser.getKinPhone());
-                            kinEmail.setText(currentUser.getKinEmail());
-
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
+        //set current user info
+        setUserInfo(paperUser);
 
 
-
+        //exit
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -98,26 +84,63 @@ public class NextOfKin extends AppCompatActivity {
         });
 
 
-
         /*---   UPDATE   ---*/
         updateProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Common.isConnectedToInternet(getBaseContext())) {
-                    updateChanges();
-                } else {
-                    showErrorDialog("No Internet Access !");
-                }
+                //show loading dialog
+                mDialog = new SpotsDialog(NextOfKin.this, "Updating . . .");
+                mDialog.setCancelable(false);
+                mDialog.setCanceledOnTouchOutside(false);
+                mDialog.show();
+
+                //execute network check async task
+                CheckInternet asyncTask = (CheckInternet) new CheckInternet(NextOfKin.this, new CheckInternet.AsyncResponse(){
+                    @Override
+                    public void processFinish(Integer output) {
+
+                        //check all cases
+                        if (output == 1){
+
+                            updateChanges();
+
+                        } else
+
+                        if (output == 0){
+
+                            //no internet
+                            mDialog.dismiss();
+                            showErrorDialog("No internet access");
+
+                        } else
+
+                        if (output == 2){
+
+                            //no internet
+                            mDialog.dismiss();
+                            showErrorDialog("Not connected to any network");
+
+                        }
+
+                    }
+                }).execute();
             }
         });
     }
 
+    private void setUserInfo(UserModel paperUser) {
+
+        kinAddress.setText(paperUser.getKinAddress());
+        kinName.setText(paperUser.getKinName());
+        kinRelationship.setText(paperUser.getKinRelationship());
+        kinPhone.setText(paperUser.getKinPhone());
+        kinEmail.setText(paperUser.getKinEmail());
+
+    }
+
     private void updateChanges() {
 
-        mDialog = new SpotsDialog(NextOfKin.this, "Updating . . .");
-        mDialog.setCancelable(false);
-        mDialog.setCanceledOnTouchOutside(false);
-        mDialog.show();
+        UserModel thePaperUser = Paper.book().read(Common.PAPER_USER);
 
         String theNewName = kinName.getText().toString().trim();
         String theNewEmail = kinEmail.getText().toString().trim();
@@ -126,30 +149,38 @@ public class NextOfKin extends AppCompatActivity {
         String theNewAddress = kinAddress.getText().toString().trim();
 
 
-        final Map<String, Object> userMap = new HashMap<>();
-        userMap.put("kinName", theNewName);
-        userMap.put("kinEmail", theNewEmail);
-        userMap.put("kinRelationship", theNewRelationship);
-        userMap.put("kinPhone", theNewPhone);
-        userMap.put("kinAddress", theNewAddress);
+        final UserModel updateUser = new UserModel(
+                thePaperUser.getEmail(), thePaperUser.getFirstName(), thePaperUser.getLastName(),
+                thePaperUser.getProfilePicture(), thePaperUser.getProfilePictureThumb(), thePaperUser.getSignUpMode(),
+                thePaperUser.getFacebook(), thePaperUser.getInstagram(), thePaperUser.getTwitter(), thePaperUser.getLinkedIn(),
+                thePaperUser.getUserType(), thePaperUser.getUserPackage(), thePaperUser.getPhone(), thePaperUser.getBirthday(),
+                thePaperUser.getGender(), thePaperUser.getNationality(), thePaperUser.getAddress(), thePaperUser.getCity(),
+                thePaperUser.getState(), thePaperUser.getBank(), thePaperUser.getAccountName(), thePaperUser.getAccountNumber(),
+                theNewName, theNewEmail, theNewRelationship, theNewPhone,
+                theNewAddress, thePaperUser.getAccountManager()
+        );
 
 
         userRef.child(currentUid)
-                .updateChildren(userMap)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                .setValue(updateUser)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
-                    public void onSuccess(Void aVoid) {
+                    public void onComplete(@NonNull Task<Void> task) {
 
-                        mDialog.dismiss();
-                        finish();
+                        if (task.isSuccessful()){
+
+                            ((ApplicationClass)(getApplicationContext())).setUser(updateUser);
+                            mDialog.dismiss();
+                            finish();
+
+                        } else {
+
+                            showErrorDialog("Error occurred, please try again later");
+
+                        }
 
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-
-            }
-        });
+                });
 
     }
 

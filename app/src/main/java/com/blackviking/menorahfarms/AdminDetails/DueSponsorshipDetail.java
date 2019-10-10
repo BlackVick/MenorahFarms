@@ -1,16 +1,23 @@
 package com.blackviking.menorahfarms.AdminDetails;
 
+import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blackviking.menorahfarms.AccountMenus.BankDetails;
+import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Models.DueSponsorshipModel;
+import com.blackviking.menorahfarms.Models.FarmModel;
 import com.blackviking.menorahfarms.Models.SponsoredFarmModel;
 import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.Notification.APIService;
@@ -34,6 +41,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import dmax.dialog.SpotsDialog;
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -48,12 +56,15 @@ public class DueSponsorshipDetail extends AppCompatActivity {
             theDueTotalPaid, theDueDuration, theDueStartDate, theDueEndDate, theDueTotalReturn, theDueRefNumber;
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference userRef, dueSponsorshipRef, notificationRef, adminHistoryRef, historyRef, sponsoredFarmsRef, adminSponsorshipRef;
+    private DatabaseReference userRef, dueSponsorshipRef, notificationRef, adminHistoryRef,
+            historyRef, sponsoredFarmsRef, adminSponsorshipRef, sponsoredFarmNotiRef, farmRef;
     private String userId, sponsorshipId, dueSponsorshipId;
     private SponsoredFarmModel currentSponsorship;
 
 
     private APIService mService;
+    private android.app.AlertDialog alertDialog;
+    private android.app.AlertDialog mDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +88,8 @@ public class DueSponsorshipDetail extends AppCompatActivity {
         historyRef = db.getReference("History");
         sponsoredFarmsRef = db.getReference("SponsoredFarms");
         adminSponsorshipRef = db.getReference("RunningCycles");
+        sponsoredFarmNotiRef = db.getReference("SponsoredFarmsNotification");
+        farmRef = db.getReference("Farms");
 
 
         /*---   WIDGETS   ---*/
@@ -105,33 +118,65 @@ public class DueSponsorshipDetail extends AppCompatActivity {
         });
 
 
-        dueSponsorshipRef.child(dueSponsorshipId)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+        //show loading dialog
+        showLoadingDialog("Loading sponsorship details");
 
-                        DueSponsorshipModel currentDue = dataSnapshot.getValue(DueSponsorshipModel.class);
+        //execute network check async task
+        CheckInternet asyncTask = (CheckInternet) new CheckInternet(DueSponsorshipDetail.this, new CheckInternet.AsyncResponse(){
+            @Override
+            public void processFinish(Integer output) {
 
-                        if (currentDue != null){
+                //check all cases
+                if (output == 1){
 
-                            loadAllDetails(currentDue.getUser(), currentDue.getSponsorshipId());
+                    dueSponsorshipRef.child(dueSponsorshipId)
+                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        }
+                                    DueSponsorshipModel currentDue = dataSnapshot.getValue(DueSponsorshipModel.class);
 
-                    }
+                                    if (currentDue != null){
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                                        loadAllDetails(currentDue.getUser(), currentDue.getSponsorshipId());
 
-                    }
-                });
+                                    }
+
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
+                } else
+
+                if (output == 0){
+
+                    //no internet
+                    alertDialog.dismiss();
+                    Toast.makeText(DueSponsorshipDetail.this, "No internet access", Toast.LENGTH_SHORT).show();
+
+                } else
+
+                if (output == 2){
+
+                    //no internet
+                    alertDialog.dismiss();
+                    Toast.makeText(DueSponsorshipDetail.this, "Not connected to any network", Toast.LENGTH_SHORT).show();
+
+                }
+
+            }
+        }).execute();
 
     }
 
     private void loadAllDetails(String userId, String sponsorshipId) {
 
         userRef.child(userId)
-                .addListenerForSingleValueEvent(
+                .addValueEventListener(
                         new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -157,7 +202,7 @@ public class DueSponsorshipDetail extends AppCompatActivity {
 
         sponsoredFarmsRef.child(userId)
                 .child(sponsorshipId)
-                .addListenerForSingleValueEvent(
+                .addValueEventListener(
                         new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -191,6 +236,9 @@ public class DueSponsorshipDetail extends AppCompatActivity {
 
     private void setAllValues() {
 
+        //cancel loading screen
+        alertDialog.dismiss();
+
         long unitPrice = Long.parseLong(theDueUnitPrice);
         long totalReturn = Long.parseLong(theDueTotalReturn);
 
@@ -212,7 +260,42 @@ public class DueSponsorshipDetail extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                settleSponsorship();
+                //show loading dialog
+                mDialog = new SpotsDialog(DueSponsorshipDetail.this, "Processing");
+                mDialog.setCancelable(false);
+                mDialog.setCanceledOnTouchOutside(false);
+                mDialog.show();
+
+                //execute network check async task
+                CheckInternet asyncTask = (CheckInternet) new CheckInternet(DueSponsorshipDetail.this, new CheckInternet.AsyncResponse(){
+                    @Override
+                    public void processFinish(Integer output) {
+
+                        //check all cases
+                        if (output == 1){
+
+                            settleSponsorship();
+
+                        } else
+
+                        if (output == 0){
+
+                            //no internet
+                            mDialog.dismiss();
+                            Toast.makeText(DueSponsorshipDetail.this, "No internet access", Toast.LENGTH_SHORT).show();
+
+                        } else
+
+                        if (output == 2){
+
+                            //no internet
+                            mDialog.dismiss();
+                            Toast.makeText(DueSponsorshipDetail.this, "Not connected to any network", Toast.LENGTH_SHORT).show();
+
+                        }
+
+                    }
+                }).execute();
 
             }
         });
@@ -247,45 +330,134 @@ public class DueSponsorshipDetail extends AppCompatActivity {
 
         adminHistoryRef.child(pushId)
                 .setValue(historyMap)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
-                    public void onSuccess(Void aVoid) {
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()){
+                            historyRef.child(userId)
+                                    .child(pushId)
+                                    .setValue(historyMap)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
 
-                        historyRef.child(userId)
-                                .child(pushId)
-                                .setValue(historyMap)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
+                                            if (task.isSuccessful()){
 
-                                        adminSponsorshipRef.child(sponsorshipId)
-                                                .removeValue();
+                                                adminSponsorshipRef.child(sponsorshipId)
+                                                        .removeValue();
 
-                                        sponsoredFarmsRef.child(userId)
-                                                .child(sponsorshipId)
-                                                .removeValue()
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        dueSponsorshipRef.child(dueSponsorshipId)
-                                                                .removeValue().addOnCompleteListener(
-                                                                new OnCompleteListener<Void>() {
-                                                                    @Override
-                                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                sponsoredFarmsRef.child(userId)
+                                                        .child(sponsorshipId)
+                                                        .removeValue()
+                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
 
-                                                                        if (task.isComplete())
-                                                                            sendNotification();
+                                                                if (task.isSuccessful()){
 
-                                                                    }
+                                                                    dueSponsorshipRef.child(dueSponsorshipId)
+                                                                            .removeValue()
+                                                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                @Override
+                                                                                public void onComplete(@NonNull Task<Void> task) {
+
+                                                                                    if (task.isSuccessful()){
+
+                                                                                        mDialog.dismiss();
+                                                                                        removeNotification(currentSponsorship.getFarmId());
+                                                                                        sendNotification();
+                                                                                        Toast.makeText(DueSponsorshipDetail.this, "Sponsorship was successfully settled", Toast.LENGTH_LONG).show();
+
+                                                                                    }
+
+                                                                                }
+                                                                            });
+
+                                                                } else {
+
+                                                                    mDialog.dismiss();
+                                                                    Toast.makeText(DueSponsorshipDetail.this, "Error occurred", Toast.LENGTH_SHORT).show();
+
                                                                 }
-                                                        );
-                                                    }
-                                                });
 
-                                    }
-                                });
+                                                            }
+                                                        });
+
+                                            } else {
+
+                                                mDialog.dismiss();
+                                                Toast.makeText(DueSponsorshipDetail.this, "Error occurred", Toast.LENGTH_SHORT).show();
+
+                                            }
+
+                                        }
+                                    });
+
+                        } else {
+
+                            mDialog.dismiss();
+                            Toast.makeText(DueSponsorshipDetail.this, "Error occurred", Toast.LENGTH_SHORT).show();
+
+                        }
                     }
                 });
+
+
+    }
+
+    private void removeNotification(String farmId) {
+
+        farmRef.child(farmId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        FarmModel theFarm = dataSnapshot.getValue(FarmModel.class);
+
+                        if (theFarm != null){
+
+                            sponsoredFarmNotiRef.child(theFarm.getFarmNotiId())
+                                    .child(userId)
+                                    .removeValue();
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+    }
+
+    /*---   LOADING DIALOG   ---*/
+    public void showLoadingDialog(String theMessage){
+
+        alertDialog = new android.app.AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.loading_dialog,null);
+
+        final TextView loadingText = viewOptions.findViewById(R.id.loadingText);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        loadingText.setText(theMessage);
+
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                finish();
+            }
+        });
+
+        alertDialog.show();
 
     }
 

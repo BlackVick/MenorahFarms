@@ -1,5 +1,6 @@
 package com.blackviking.menorahfarms;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -15,6 +16,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Models.FarmModel;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -24,6 +26,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.squareup.picasso.Callback;
@@ -38,7 +41,7 @@ public class FarmDetails extends AppCompatActivity {
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private DatabaseReference userRef, farmRef, followedRef, cartRef;
+    private DatabaseReference userRef, farmRef, followedRef, cartRef, followedFarmNotiRef;
     private String currentUid, userType, farmId, farmNotiId;
 
     private ImageView backButton, farmImage;
@@ -49,6 +52,8 @@ public class FarmDetails extends AppCompatActivity {
     private LinearLayout farmNumber;
 
     private int unitNumberText = 1;
+
+    private android.app.AlertDialog alertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +70,7 @@ public class FarmDetails extends AppCompatActivity {
         farmRef = db.getReference("Farms");
         followedRef = db.getReference("FollowedFarms");
         cartRef = db.getReference("Carts");
+        followedFarmNotiRef = db.getReference("FollowedFarmsNotification");
         if (mAuth.getCurrentUser() != null)
             currentUid = mAuth.getCurrentUser().getUid();
 
@@ -97,9 +103,52 @@ public class FarmDetails extends AppCompatActivity {
             }
         });
 
+
+        //show loading dialog
+        showLoadingDialog("Loading farm details . . .");
+
+        //execute network check async task
+        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
+            @Override
+            public void processFinish(Integer output) {
+
+                //check all cases
+                if (output == 1){
+
+                    loadCurrentFarm();
+
+                } else
+
+                if (output == 0){
+
+                    //set layout
+                    alertDialog.dismiss();
+                    Toast.makeText(FarmDetails.this, "No internet connection", Toast.LENGTH_SHORT).show();
+
+                } else
+
+                if (output == 2){
+
+                    //set layout
+                    alertDialog.dismiss();
+                    Toast.makeText(FarmDetails.this, "No network detected", Toast.LENGTH_SHORT).show();
+
+                }
+
+            }
+        }).execute();
+
+
+    }
+
+    private void checkFollowedFarmFollowed() {
+
+        //remove dialog
+        alertDialog.dismiss();
+
         followedRef.child(currentUid)
                 .child(farmId)
-                .addListenerForSingleValueEvent(
+                .addValueEventListener(
                         new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -124,9 +173,6 @@ public class FarmDetails extends AppCompatActivity {
                             }
                         }
                 );
-
-
-        loadCurrentFarm();
 
     }
 
@@ -201,7 +247,7 @@ public class FarmDetails extends AppCompatActivity {
 
                                     final int unitsAvail = Integer.parseInt(theFarmUnitsLeft);
 
-                                    if (unitsAvail == 0 || !theFarmState.equalsIgnoreCase("Now Selling")){
+                                    if (unitsAvail == 0 || !theFarmState.equalsIgnoreCase("Now Selling") || unitsAvail < 0){
 
                                         addToCartBtn.setVisibility(View.GONE);
                                         farmNumber.setVisibility(View.GONE);
@@ -248,6 +294,9 @@ public class FarmDetails extends AppCompatActivity {
                                         }
                                     });
 
+                                    //follow check
+                                    checkFollowedFarmFollowed();
+
 
                                     farmDescription.setOnClickListener(new View.OnClickListener() {
                                         @Override
@@ -273,15 +322,36 @@ public class FarmDetails extends AppCompatActivity {
                                         @Override
                                         public void onClick(View v) {
 
-                                            if (Common.isConnectedToInternet(getBaseContext())) {
+                                            //execute network check async task
+                                            CheckInternet asyncTask = (CheckInternet) new CheckInternet(FarmDetails.this, new CheckInternet.AsyncResponse(){
+                                                @Override
+                                                public void processFinish(Integer output) {
 
-                                                addToCart(unitNumberText, theFarmUnitPrice, theFarmROI);
+                                                    //check all cases
+                                                    if (output == 1){
 
-                                            } else {
+                                                        addToCart(unitNumberText, theFarmUnitPrice, theFarmROI);
 
-                                                showErrorDialog("No Internet Access");
+                                                    } else
 
-                                            }
+                                                    if (output == 0){
+
+                                                        //set layout
+                                                        alertDialog.dismiss();
+                                                        Toast.makeText(FarmDetails.this, "No internet connection", Toast.LENGTH_SHORT).show();
+
+                                                    } else
+
+                                                    if (output == 2){
+
+                                                        //set layout
+                                                        alertDialog.dismiss();
+                                                        Toast.makeText(FarmDetails.this, "No network detected", Toast.LENGTH_SHORT).show();
+
+                                                    }
+
+                                                }
+                                            }).execute();
 
                                         }
                                     });
@@ -301,57 +371,65 @@ public class FarmDetails extends AppCompatActivity {
 
     private void addToCart(final int unitNumberText, final String theFarmUnitPrice, final String theFarmROI) {
 
-        cartRef.child(currentUid)
-                .orderByChild("farmId")
-                .equalTo(farmId)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+        if (Common.checkKYC(FarmDetails.this).equalsIgnoreCase("Profile Complete")) {
 
-                        if (!dataSnapshot.exists()){
+            cartRef.child(currentUid)
+                    .orderByChild("farmId")
+                    .equalTo(farmId)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
 
-                            long theFixedPricePerUnit = Long.parseLong(theFarmUnitPrice);
-                            int theFixedRoi = Integer.parseInt(theFarmROI);
+                            if (!dataSnapshot.exists()) {
 
-                            /*---   CALCULATION   ---*/
-                            long theCalculatedPrice = theFixedPricePerUnit * unitNumberText;
-                            long totalCalculation = theCalculatedPrice * theFixedRoi / 100;
-                            long totalResult = totalCalculation + theCalculatedPrice;
+                                long theFixedPricePerUnit = Long.parseLong(theFarmUnitPrice);
+                                int theFixedRoi = Integer.parseInt(theFarmROI);
 
-                            Map<String, Object> cartMap = new HashMap<>();
-                            cartMap.put("totalPrice", theCalculatedPrice);
-                            cartMap.put("totalPayout", totalResult);
-                            cartMap.put("farmId", farmId);
-                            cartMap.put("units", unitNumberText);
+                                /*---   CALCULATION   ---*/
+                                long theCalculatedPrice = theFixedPricePerUnit * unitNumberText;
+                                long totalCalculation = theCalculatedPrice * theFixedRoi / 100;
+                                long totalResult = totalCalculation + theCalculatedPrice;
 
-                            cartRef.child(currentUid)
-                                    .push()
-                                    .setValue(cartMap)
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            Toast.makeText(FarmDetails.this, "Added to cart", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
+                                Map<String, Object> cartMap = new HashMap<>();
+                                cartMap.put("totalPrice", theCalculatedPrice);
+                                cartMap.put("totalPayout", totalResult);
+                                cartMap.put("farmId", farmId);
+                                cartMap.put("units", unitNumberText);
 
-                                }
-                            });
+                                cartRef.child(currentUid)
+                                        .push()
+                                        .setValue(cartMap)
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                Toast.makeText(FarmDetails.this, "Added to cart", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
 
-                        } else {
+                                    }
+                                });
 
-                            showErrorDialog("This farm has already been added to your cart.");
+                            } else {
+
+                                showErrorDialog("This farm has already been added to your cart.");
+
+                            }
 
                         }
 
-                    }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
 
-                    }
-                });
+        } else {
+
+            showErrorDialog(Common.checkKYC(FarmDetails.this));
+
+        }
 
     }
 
@@ -400,8 +478,8 @@ public class FarmDetails extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void aVoid) {
 
+                        subscribeToNotification(farmId);
 
-                        FirebaseMessaging.getInstance().subscribeToTopic(farmNotiId);
                         followFarmBtn.setVisibility(View.GONE);
                         followedFarmButton.setVisibility(View.VISIBLE);
 
@@ -412,6 +490,34 @@ public class FarmDetails extends AppCompatActivity {
 
             }
         });
+
+    }
+
+    private void subscribeToNotification(String farmId) {
+
+        farmRef.child(farmId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        FarmModel theFarm = dataSnapshot.getValue(FarmModel.class);
+
+                        if (theFarm != null){
+
+                            followedFarmNotiRef.child(theFarm.getFarmNotiId())
+                                    .child(currentUid)
+                                    .child("timestamp")
+                                    .setValue(ServerValue.TIMESTAMP);
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
 
     }
 
@@ -433,6 +539,35 @@ public class FarmDetails extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         finish();
+    }
+
+    /*---   LOADING DIALOG   ---*/
+    public void showLoadingDialog(String theMessage){
+
+        alertDialog = new android.app.AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.loading_dialog,null);
+
+        final TextView loadingText = viewOptions.findViewById(R.id.loadingText);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        loadingText.setText(theMessage);
+
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                finish();
+            }
+        });
+
+        alertDialog.show();
+
     }
 
     /*---   WARNING DIALOG   ---*/

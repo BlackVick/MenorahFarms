@@ -11,11 +11,15 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.blackviking.menorahfarms.Common.ApplicationClass;
+import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -29,6 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import dmax.dialog.SpotsDialog;
+import io.paperdb.Paper;
 
 public class ContactDetails extends AppCompatActivity {
 
@@ -40,6 +45,7 @@ public class ContactDetails extends AppCompatActivity {
     private DatabaseReference userRef;
     private String currentUid;
     private android.app.AlertDialog mDialog;
+    private UserModel paperUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +58,9 @@ public class ContactDetails extends AppCompatActivity {
         if (mAuth.getCurrentUser() != null)
             currentUid = mAuth.getCurrentUser().getUid();
 
+        //paper user init
+        paperUser = Paper.book().read(Common.PAPER_USER);
+
 
         /*---   WIDGETS   ---*/
         profileAddress = (MaterialEditText)findViewById(R.id.profileAddress);
@@ -60,31 +69,8 @@ public class ContactDetails extends AppCompatActivity {
         backButton = (ImageView)findViewById(R.id.backButton);
         updateProfile = (Button)findViewById(R.id.updateProfileButton);
 
-
-        /*---   CURRENT USER   ---*/
-        userRef.child(currentUid)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        UserModel currentUser = dataSnapshot.getValue(UserModel.class);
-
-                        if (currentUser != null){
-
-                            profileAddress.setText(currentUser.getAddress());
-                            profileCity.setText(currentUser.getCity());
-                            profileState.setText(currentUser.getState());
-
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
+        //set current user info
+        setUserInfo(paperUser);
 
 
         backButton.setOnClickListener(new View.OnClickListener() {
@@ -100,49 +86,95 @@ public class ContactDetails extends AppCompatActivity {
         updateProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Common.isConnectedToInternet(getBaseContext())) {
-                    updateChanges();
-                } else {
-                    showErrorDialog("No Internet Access !");
-                }
+                //show loading dialog
+                mDialog = new SpotsDialog(ContactDetails.this, "Updating . . .");
+                mDialog.setCancelable(false);
+                mDialog.setCanceledOnTouchOutside(false);
+                mDialog.show();
+
+                //execute network check async task
+                CheckInternet asyncTask = (CheckInternet) new CheckInternet(ContactDetails.this, new CheckInternet.AsyncResponse(){
+                    @Override
+                    public void processFinish(Integer output) {
+
+                        //check all cases
+                        if (output == 1){
+
+                            updateChanges();
+
+                        } else
+
+                        if (output == 0){
+
+                            //no internet
+                            mDialog.dismiss();
+                            showErrorDialog("No internet access");
+
+                        } else
+
+                        if (output == 2){
+
+                            //no internet
+                            mDialog.dismiss();
+                            showErrorDialog("Not connected to any network");
+
+                        }
+
+                    }
+                }).execute();
             }
         });
     }
 
+    private void setUserInfo(UserModel paperUser) {
+
+        profileAddress.setText(paperUser.getAddress());
+        profileCity.setText(paperUser.getCity());
+        profileState.setText(paperUser.getState());
+
+    }
+
     private void updateChanges() {
 
-        mDialog = new SpotsDialog(ContactDetails.this, "Updating . . .");
-        mDialog.setCancelable(false);
-        mDialog.setCanceledOnTouchOutside(false);
-        mDialog.show();
+        UserModel thePaperUser = Paper.book().read(Common.PAPER_USER);
 
         String theNewAddress = profileAddress.getText().toString().trim();
         String theNewCity = profileCity.getText().toString().trim();
         String theNewState = profileState.getText().toString().trim();
 
 
-        final Map<String, Object> userMap = new HashMap<>();
-        userMap.put("address", theNewAddress);
-        userMap.put("city", theNewCity);
-        userMap.put("state", theNewState);
+        final UserModel updateUser = new UserModel(
+                thePaperUser.getEmail(), thePaperUser.getFirstName(), thePaperUser.getLastName(),
+                thePaperUser.getProfilePicture(), thePaperUser.getProfilePictureThumb(), thePaperUser.getSignUpMode(),
+                thePaperUser.getFacebook(), thePaperUser.getInstagram(), thePaperUser.getTwitter(), thePaperUser.getLinkedIn(),
+                thePaperUser.getUserType(), thePaperUser.getUserPackage(), thePaperUser.getPhone(), thePaperUser.getBirthday(),
+                thePaperUser.getGender(), thePaperUser.getNationality(), theNewAddress, theNewCity,
+                theNewState, thePaperUser.getBank(), thePaperUser.getAccountName(), thePaperUser.getAccountNumber(),
+                thePaperUser.getKinName(), thePaperUser.getKinEmail(), thePaperUser.getKinRelationship(), thePaperUser.getKinPhone(),
+                thePaperUser.getKinAddress(), thePaperUser.getAccountManager()
+        );
 
 
         userRef.child(currentUid)
-                .updateChildren(userMap)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                .setValue(updateUser)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
-                    public void onSuccess(Void aVoid) {
+                    public void onComplete(@NonNull Task<Void> task) {
 
-                        mDialog.dismiss();
-                        finish();
+                        if (task.isSuccessful()){
+
+                            ((ApplicationClass)(getApplicationContext())).setUser(updateUser);
+                            mDialog.dismiss();
+                            finish();
+
+                        } else {
+
+                            showErrorDialog("Error occurred, please try again later");
+
+                        }
 
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-
-            }
-        });
+                });
 
     }
 

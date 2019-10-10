@@ -1,7 +1,10 @@
 package com.blackviking.menorahfarms.CartAndHistory;
 
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,7 +13,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
+import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Interface.ItemClickListener;
 import com.blackviking.menorahfarms.Models.FarmModel;
@@ -40,7 +46,10 @@ public class HistoryProjects extends Fragment {
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference userRef, farmRef, sponsorshipRef, historyRef;
 
+    private RelativeLayout noInternetLayout;
     private String currentUid;
+
+    private android.app.AlertDialog alertDialog;
 
     public HistoryProjects() {
         // Required empty public constructor
@@ -64,37 +73,77 @@ public class HistoryProjects extends Fragment {
         /*---   WIDGET   ---*/
         emptyLayout = (LinearLayout)v.findViewById(R.id.emptyLayout);
         historyRecycler = (RecyclerView)v.findViewById(R.id.projectRecycler);
+        noInternetLayout = v.findViewById(R.id.noInternetLayout);
 
 
-        /*---   CHECK   ---*/
-        historyRef.child(currentUid)
-                .addListenerForSingleValueEvent(
-                        new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
+        //show loading dialog
+        showLoadingDialog("Loading history by projects . . .");
 
-                                if (dataSnapshot.exists()){
 
-                                    historyRecycler.setVisibility(View.VISIBLE);
-                                    emptyLayout.setVisibility(View.GONE);
-                                    loadHistory();
+        //execute network check async task
+        CheckInternet asyncTask = (CheckInternet) new CheckInternet(getContext(), new CheckInternet.AsyncResponse(){
+            @Override
+            public void processFinish(Integer output) {
 
-                                } else {
+                //check all cases
+                if (output == 1){
 
-                                    historyRecycler.setVisibility(View.GONE);
-                                    emptyLayout.setVisibility(View.VISIBLE);
+                    /*---   CHECK   ---*/
+                    historyRef.child(currentUid)
+                            .addListenerForSingleValueEvent(
+                                    new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                }
+                                            if (dataSnapshot.exists()){
 
-                            }
+                                                noInternetLayout.setVisibility(View.GONE);
+                                                historyRecycler.setVisibility(View.VISIBLE);
+                                                emptyLayout.setVisibility(View.GONE);
+                                                loadHistory();
 
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
+                                            } else {
 
-                            }
-                        }
-                );
+                                                alertDialog.dismiss();
+                                                noInternetLayout.setVisibility(View.GONE);
+                                                historyRecycler.setVisibility(View.GONE);
+                                                emptyLayout.setVisibility(View.VISIBLE);
 
+                                            }
+
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+
+                                        }
+                                    }
+                            );
+
+                } else
+
+                if (output == 0){
+
+                    //set layout
+                    alertDialog.dismiss();
+                    noInternetLayout.setVisibility(View.VISIBLE);
+                    historyRecycler.setVisibility(View.GONE);
+                    emptyLayout.setVisibility(View.GONE);
+
+                } else
+
+                if (output == 2){
+
+                    //set layout
+                    alertDialog.dismiss();
+                    noInternetLayout.setVisibility(View.VISIBLE);
+                    historyRecycler.setVisibility(View.GONE);
+                    emptyLayout.setVisibility(View.GONE);
+
+                }
+
+            }
+        }).execute();
 
         return v;
     }
@@ -115,6 +164,9 @@ public class HistoryProjects extends Fragment {
         ) {
             @Override
             protected void populateViewHolder(final HistoryViewHolder viewHolder, final HistoryModel model, int position) {
+
+                //remove loading
+                alertDialog.dismiss();
 
                 farmRef.child(model.getFarmId())
                         .addListenerForSingleValueEvent(
@@ -179,4 +231,32 @@ public class HistoryProjects extends Fragment {
 
     }
 
+    /*---   LOADING DIALOG   ---*/
+    public void showLoadingDialog(String theMessage){
+
+        alertDialog = new android.app.AlertDialog.Builder(getContext()).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.loading_dialog,null);
+
+        final TextView loadingText = viewOptions.findViewById(R.id.loadingText);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        loadingText.setText(theMessage);
+
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                getActivity().finish();
+            }
+        });
+
+        alertDialog.show();
+
+    }
 }

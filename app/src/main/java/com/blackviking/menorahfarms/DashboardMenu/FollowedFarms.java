@@ -1,5 +1,6 @@
 package com.blackviking.menorahfarms.DashboardMenu;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -13,10 +14,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blackviking.menorahfarms.AccountMenus.StudentDetails;
 import com.blackviking.menorahfarms.CartAndHistory.Cart;
+import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.FarmDetails;
 import com.blackviking.menorahfarms.Interface.ItemClickListener;
@@ -50,8 +54,11 @@ public class FollowedFarms extends AppCompatActivity {
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private DatabaseReference followedFarmRef, userRef, farmRef;
+    private DatabaseReference followedFarmRef, userRef, farmRef, followedFarmNotiRef;
     private String currentuid;
+
+    private android.app.AlertDialog alertDialog;
+    private RelativeLayout noInternetLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +70,7 @@ public class FollowedFarms extends AppCompatActivity {
         followedFarmRef = db.getReference("FollowedFarms");
         userRef = db.getReference("Users");
         farmRef = db.getReference("Farms");
+        followedFarmNotiRef = db.getReference("FollowedFarmsNotification");
         if (mAuth.getCurrentUser() != null)
             currentuid = mAuth.getCurrentUser().getUid();
 
@@ -71,6 +79,7 @@ public class FollowedFarms extends AppCompatActivity {
         backButton = (ImageView)findViewById(R.id.backButton);
         emptyLayout = (LinearLayout)findViewById(R.id.emptyLayout);
         followedFarmRecycler = (RecyclerView)findViewById(R.id.followedFarmsRecycler);
+        noInternetLayout = findViewById(R.id.noInternetLayout);
 
 
         backButton.setOnClickListener(new View.OnClickListener() {
@@ -81,33 +90,78 @@ public class FollowedFarms extends AppCompatActivity {
         });
 
 
-        /*---   CHECK IF USER CART EMPTY   ---*/
-        followedFarmRef.child(currentuid)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+        //show loading dialog
+        showLoadingDialog("Loading followed farms . . .");
 
-                        if (dataSnapshot.exists()){
+        //execute network check async task
+        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
+            @Override
+            public void processFinish(Integer output) {
 
-                            emptyLayout.setVisibility(View.GONE);
-                            loadFollowedFarms();
+                //check all cases
+                if (output == 1){
 
-                        } else {
+                    /*---   CHECK IF USER CART EMPTY   ---*/
+                    followedFarmRef.child(currentuid)
+                            .addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
 
-                            emptyLayout.setVisibility(View.VISIBLE);
+                                    if (dataSnapshot.exists()){
 
-                        }
+                                        emptyLayout.setVisibility(View.GONE);
+                                        noInternetLayout.setVisibility(View.GONE);
+                                        followedFarmRecycler.setVisibility(View.VISIBLE);
+                                        loadFollowedFarms();
 
-                    }
+                                    } else {
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                                        alertDialog.dismiss();
+                                        emptyLayout.setVisibility(View.VISIBLE);
+                                        noInternetLayout.setVisibility(View.GONE);
+                                        followedFarmRecycler.setVisibility(View.GONE);
 
-                    }
-                });
+                                    }
+
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
+                } else
+
+                if (output == 0){
+
+                    //set layout
+                    alertDialog.dismiss();
+                    noInternetLayout.setVisibility(View.VISIBLE);
+                    followedFarmRecycler.setVisibility(View.GONE);
+                    emptyLayout.setVisibility(View.GONE);
+
+                } else
+
+                if (output == 2){
+
+                    //set layout
+                    alertDialog.dismiss();
+                    noInternetLayout.setVisibility(View.VISIBLE);
+                    followedFarmRecycler.setVisibility(View.GONE);
+                    emptyLayout.setVisibility(View.GONE);
+
+                }
+
+            }
+        }).execute();
+
     }
 
     private void loadFollowedFarms() {
+
+        //close dialog
+        alertDialog.dismiss();
 
         followedFarmRecycler.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
@@ -222,38 +276,68 @@ public class FollowedFarms extends AppCompatActivity {
         proceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                followedFarmRef.child(currentuid)
-                        .child(key)
-                        .removeValue()
-                        .addOnCompleteListener(
-                        new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                alertDialog.dismiss();
 
-                                farmRef.child(key)
-                                        .addListenerForSingleValueEvent(
-                                                new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                //execute network check async task
+                CheckInternet asyncTask = (CheckInternet) new CheckInternet(FollowedFarms.this, new CheckInternet.AsyncResponse(){
+                    @Override
+                    public void processFinish(Integer output) {
 
-                                                        String theNotiId = dataSnapshot.child("farmNotiId").getValue().toString();
+                        //check all cases
+                        if (output == 1){
 
-                                                        FirebaseMessaging.getInstance().unsubscribeFromTopic(theNotiId);
-                                                        Toast.makeText(FollowedFarms.this, "Farm un-followed", Toast.LENGTH_SHORT).show();
+                            followedFarmRef.child(currentuid)
+                                    .child(key)
+                                    .removeValue()
+                                    .addOnCompleteListener(
+                                            new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    alertDialog.dismiss();
 
-                                                    }
+                                                    farmRef.child(key)
+                                                            .addListenerForSingleValueEvent(
+                                                                    new ValueEventListener() {
+                                                                        @Override
+                                                                        public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                                    @Override
-                                                    public void onCancelled(DatabaseError databaseError) {
+                                                                            String theNotiId = dataSnapshot.child("farmNotiId").getValue().toString();
 
-                                                    }
+                                                                            //unsubscribe to notification
+                                                                            removeNotification(theNotiId);
+
+                                                                            Toast.makeText(FollowedFarms.this, "Farm un-followed", Toast.LENGTH_SHORT).show();
+
+                                                                        }
+
+                                                                        @Override
+                                                                        public void onCancelled(DatabaseError databaseError) {
+
+                                                                        }
+                                                                    }
+                                                            );
+
                                                 }
-                                        );
+                                            }
+                                    );
 
-                            }
+                        } else
+
+                        if (output == 0){
+
+                            Toast.makeText(FollowedFarms.this, "No internet access", Toast.LENGTH_SHORT).show();
+
+                        } else
+
+                        if (output == 2){
+
+                            Toast.makeText(FollowedFarms.this, "No network detected", Toast.LENGTH_SHORT).show();
+
                         }
-                );
+
+                    }
+                }).execute();
+
+
             }
         });
 
@@ -261,6 +345,43 @@ public class FollowedFarms extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 alertDialog.cancel();
+            }
+        });
+
+        alertDialog.show();
+
+    }
+
+    private void removeNotification(String theNotiId) {
+
+        followedFarmNotiRef.child(theNotiId)
+                .child(currentuid)
+                .removeValue();
+
+    }
+
+    /*---   LOADING DIALOG   ---*/
+    public void showLoadingDialog(String theMessage){
+
+        alertDialog = new android.app.AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.loading_dialog,null);
+
+        final TextView loadingText = viewOptions.findViewById(R.id.loadingText);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        loadingText.setText(theMessage);
+
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                finish();
             }
         });
 

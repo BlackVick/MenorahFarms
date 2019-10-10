@@ -66,19 +66,22 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
 
             Notification notification = new NotificationCompat.Builder(this, CHANNEL_2_ID)
-                    .setSmallIcon(R.drawable.ic_menorah_notification)
+                    .setSmallIcon(R.drawable.ic_student_notification)
                     .setContentTitle(title)
                     .setContentText(message)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setColor(getResources().getColor(R.color.colorPrimaryDark))
                     .setContentIntent(contentIntent)
                     .setAutoCancel(true)
+                    .setOnlyAlertOnce(true)
                     .build();
 
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.notify(3, notification);
 
-        } else if (title.equalsIgnoreCase("Sponsorship")) {
+        } else
+
+            if (title.equalsIgnoreCase("Sponsorship")) {
 
             Intent notificationsIntent = new Intent(this, Dashboard.class);
             PendingIntent contentIntent = PendingIntent.getActivity(this,
@@ -86,7 +89,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
 
             Notification notification = new NotificationCompat.Builder(this, CHANNEL_2_ID)
-                    .setSmallIcon(R.drawable.ic_menorah_notification)
+                    .setSmallIcon(R.drawable.ic_sponsored_notification)
                     .setContentTitle(title)
                     .setContentText(message)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -98,7 +101,9 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.notify(2, notification);
 
-        } else if (title.equalsIgnoreCase("Menorah Farms")) {
+        } else
+
+            if (title.equalsIgnoreCase("Menorah Farms")) {
 
             Intent notificationsIntent = new Intent(this, Notifications.class);
             PendingIntent contentIntent = PendingIntent.getActivity(this,
@@ -126,7 +131,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
 
             Notification notification = new NotificationCompat.Builder(this, CHANNEL_2_ID)
-                    .setSmallIcon(R.drawable.ic_menorah_notification)
+                    .setSmallIcon(R.drawable.ic_sponsored_notification)
                     .setContentTitle(title)
                     .setContentText(message)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -146,7 +151,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
 
             Notification notification = new NotificationCompat.Builder(this, CHANNEL_2_ID)
-                    .setSmallIcon(R.drawable.ic_menorah_notification)
+                    .setSmallIcon(R.drawable.ic_sponsored_notification)
                     .setContentTitle(title)
                     .setContentText(message)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -166,17 +171,58 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
 
             Notification notification = new NotificationCompat.Builder(this, CHANNEL_2_ID)
-                    .setSmallIcon(R.drawable.ic_menorah_notification)
+                    .setSmallIcon(R.drawable.ic_admin_notification)
                     .setContentTitle(title)
                     .setContentText(message)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setColor(getResources().getColor(R.color.colorPrimaryDark))
                     .setContentIntent(contentIntent)
                     .setAutoCancel(true)
+                    .setOnlyAlertOnce(true)
                     .build();
 
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.notify(6, notification);
+
+        } else if (title.equalsIgnoreCase("Followed Farms")) {
+
+                Intent notificationsIntent = new Intent(this, AdminDash.class);
+                PendingIntent contentIntent = PendingIntent.getActivity(this,
+                        0, notificationsIntent, 0);
+
+
+                Notification notification = new NotificationCompat.Builder(this, CHANNEL_2_ID)
+                        .setSmallIcon(R.drawable.ic_followed_notification)
+                        .setContentTitle(title)
+                        .setContentText(message)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setColor(getResources().getColor(R.color.colorPrimaryDark))
+                        .setContentIntent(contentIntent)
+                        .setAutoCancel(true)
+                        .build();
+
+                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.notify(7, notification);
+
+        } else if (title.equalsIgnoreCase("Sponsored Farms")) {
+
+                Intent notificationsIntent = new Intent(this, AdminDash.class);
+                PendingIntent contentIntent = PendingIntent.getActivity(this,
+                        0, notificationsIntent, 0);
+
+
+                Notification notification = new NotificationCompat.Builder(this, CHANNEL_2_ID)
+                        .setSmallIcon(R.drawable.ic_sponsored_notification)
+                        .setContentTitle(title)
+                        .setContentText(message)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setColor(getResources().getColor(R.color.colorPrimaryDark))
+                        .setContentIntent(contentIntent)
+                        .setAutoCancel(true)
+                        .build();
+
+                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.notify(8, notification);
 
         }
 
@@ -187,11 +233,6 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         Map<String, String> data = remoteMessage.getData();
         String title = data.get("title");
         String message = data.get("message");
-        String skitId = data.get("skit_id");
-        String skitOwner = data.get("skit_owner");
-        String feedId = data.get("feed_id");
-        String gameFeedId = data.get("game_feed_id");
-        String userId = data.get("user_id");
 
 
         /*---   MAIN NOTIFICATION LOGIC   ---*/
@@ -201,27 +242,32 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
             PendingIntent contentIntent = PendingIntent.getActivity(this,
                     0, notificationsIntent, 0);
 
+
             Notification notification = new NotificationCompat.Builder(this, CHANNEL_2_ID)
-                    .setSmallIcon(R.drawable.ic_menorah_notification)
+                    .setSmallIcon(R.drawable.ic_student_notification)
                     .setContentTitle(title)
                     .setContentText(message)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setColor(getResources().getColor(R.color.colorPrimaryDark))
                     .setContentIntent(contentIntent)
                     .setAutoCancel(true)
+                    .setOnlyAlertOnce(true)
                     .build();
 
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.notify(3, notification);
 
-        } else if (title.equalsIgnoreCase("Sponsorship")) {
+        } else
 
-            Intent notificationsIntent = new Intent(this, Notifications.class);
+        if (title.equalsIgnoreCase("Sponsorship")) {
+
+            Intent notificationsIntent = new Intent(this, Dashboard.class);
             PendingIntent contentIntent = PendingIntent.getActivity(this,
                     0, notificationsIntent, 0);
 
+
             Notification notification = new NotificationCompat.Builder(this, CHANNEL_2_ID)
-                    .setSmallIcon(R.drawable.ic_menorah_notification)
+                    .setSmallIcon(R.drawable.ic_sponsored_notification)
                     .setContentTitle(title)
                     .setContentText(message)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -233,11 +279,14 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.notify(2, notification);
 
-        } else if (title.equalsIgnoreCase("Menorah Farms")) {
+        } else
+
+        if (title.equalsIgnoreCase("Menorah Farms")) {
 
             Intent notificationsIntent = new Intent(this, Notifications.class);
             PendingIntent contentIntent = PendingIntent.getActivity(this,
                     0, notificationsIntent, 0);
+
 
             Notification notification = new NotificationCompat.Builder(this, CHANNEL_2_ID)
                     .setSmallIcon(R.drawable.ic_menorah_notification)
@@ -258,8 +307,9 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
             PendingIntent contentIntent = PendingIntent.getActivity(this,
                     0, notificationsIntent, 0);
 
+
             Notification notification = new NotificationCompat.Builder(this, CHANNEL_2_ID)
-                    .setSmallIcon(R.drawable.ic_menorah_notification)
+                    .setSmallIcon(R.drawable.ic_sponsored_notification)
                     .setContentTitle(title)
                     .setContentText(message)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -277,8 +327,9 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
             PendingIntent contentIntent = PendingIntent.getActivity(this,
                     0, notificationsIntent, 0);
 
+
             Notification notification = new NotificationCompat.Builder(this, CHANNEL_2_ID)
-                    .setSmallIcon(R.drawable.ic_menorah_notification)
+                    .setSmallIcon(R.drawable.ic_sponsored_notification)
                     .setContentTitle(title)
                     .setContentText(message)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -296,8 +347,30 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
             PendingIntent contentIntent = PendingIntent.getActivity(this,
                     0, notificationsIntent, 0);
 
+
             Notification notification = new NotificationCompat.Builder(this, CHANNEL_2_ID)
-                    .setSmallIcon(R.drawable.ic_menorah_notification)
+                    .setSmallIcon(R.drawable.ic_admin_notification)
+                    .setContentTitle(title)
+                    .setContentText(message)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setColor(getResources().getColor(R.color.colorPrimaryDark))
+                    .setContentIntent(contentIntent)
+                    .setAutoCancel(true)
+                    .setOnlyAlertOnce(true)
+                    .build();
+
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.notify(6, notification);
+
+        } else if (title.equalsIgnoreCase("Followed Farms")) {
+
+            Intent notificationsIntent = new Intent(this, AdminDash.class);
+            PendingIntent contentIntent = PendingIntent.getActivity(this,
+                    0, notificationsIntent, 0);
+
+
+            Notification notification = new NotificationCompat.Builder(this, CHANNEL_2_ID)
+                    .setSmallIcon(R.drawable.ic_followed_notification)
                     .setContentTitle(title)
                     .setContentText(message)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -307,7 +380,27 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
                     .build();
 
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.notify(6, notification);
+            notificationManager.notify(7, notification);
+
+        } else if (title.equalsIgnoreCase("Sponsored Farms")) {
+
+            Intent notificationsIntent = new Intent(this, AdminDash.class);
+            PendingIntent contentIntent = PendingIntent.getActivity(this,
+                    0, notificationsIntent, 0);
+
+
+            Notification notification = new NotificationCompat.Builder(this, CHANNEL_2_ID)
+                    .setSmallIcon(R.drawable.ic_sponsored_notification)
+                    .setContentTitle(title)
+                    .setContentText(message)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setColor(getResources().getColor(R.color.colorPrimaryDark))
+                    .setContentIntent(contentIntent)
+                    .setAutoCancel(true)
+                    .build();
+
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.notify(8, notification);
 
         }
 

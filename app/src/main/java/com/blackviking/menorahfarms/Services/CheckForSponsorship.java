@@ -6,7 +6,9 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.widget.Toast;
 
+import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
+import com.blackviking.menorahfarms.FarmDetails;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -50,40 +52,57 @@ public class CheckForSponsorship extends Service {
     private void startCheck() {
 
         /*---   LOAD   ---*/
-        if (Common.isConnectedToInternet(getApplicationContext())){
+        //execute network check async task
+        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
+            @Override
+            public void processFinish(Integer output) {
 
-            /*---   SUBSCRIPTION LOT   ---*/
-            sponsoredFarmRef.child(userId)
-                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
+                //check all cases
+                if (output == 1){
 
-                    if (dataSnapshot.exists()){
+                    /*---   SUBSCRIPTION LOT   ---*/
+                    sponsoredFarmRef.child(userId)
+                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        Intent intent = new Intent(getApplicationContext(), SponsorshipMonitor.class);
-                        startService(intent);
+                                    if (dataSnapshot.exists()){
 
-                        stopSelf();
+                                        Intent intent = new Intent(getApplicationContext(), SponsorshipMonitor.class);
+                                        startService(intent);
 
-                    } else {
+                                        stopSelf();
 
-                        stopSelf();
+                                    } else {
 
-                    }
+                                        stopSelf();
+
+                                    }
+
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
+                } else
+
+                if (output == 0){
+
+                    retryNetwork();
+
+                } else
+
+                if (output == 2){
+
+                    retryNetwork();
 
                 }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-
-        } else {
-
-            retryNetwork();
-
-        }
+            }
+        }).execute();
 
     }
 

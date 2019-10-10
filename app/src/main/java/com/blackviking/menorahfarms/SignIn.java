@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blackviking.menorahfarms.Common.ApplicationClass;
+import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.HomeActivities.Dashboard;
 import com.blackviking.menorahfarms.Models.UserModel;
@@ -105,19 +106,43 @@ public class SignIn extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if (Common.isConnectedToInternet(getBaseContext())) {
+                //show dialog
+                mDialog = new SpotsDialog(SignIn.this, "Please Wait . . .");
+                mDialog.setCancelable(false);
+                mDialog.setCanceledOnTouchOutside(false);
+                mDialog.show();
 
-                    mDialog = new SpotsDialog(SignIn.this, "Please Wait . . .");
-                    mDialog.setCancelable(false);
-                    mDialog.setCanceledOnTouchOutside(false);
-                    mDialog.show();
-                    signInWithGoogle();
+                //execute network check async task
+                CheckInternet asyncTask = (CheckInternet) new CheckInternet(SignIn.this, new CheckInternet.AsyncResponse(){
+                    @Override
+                    public void processFinish(Integer output) {
 
-                } else {
+                        //check all cases
+                        if (output == 1){
 
-                    showErrorDialog("No Internet Access !");
+                            signInWithGoogle();
 
-                }
+                        } else
+
+                        if (output == 0){
+
+                            //no internet
+                            mDialog.dismiss();
+                            showErrorDialog("No internet access");
+
+                        } else
+
+                        if (output == 2){
+
+                            //no internet
+                            mDialog.dismiss();
+                            showErrorDialog("Not connected to any network");
+
+                        }
+
+                    }
+                }).execute();
+
             }
         });
 
@@ -128,20 +153,45 @@ public class SignIn extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Common.isConnectedToInternet(getBaseContext())) {
 
-                    mDialog = new SpotsDialog(SignIn.this, "Please Wait . . .");
-                    mDialog.setCancelable(false);
-                    mDialog.setCanceledOnTouchOutside(false);
-                    mDialog.show();
-                    signInUserWithEmail();
-                    loginPassword.onEditorAction(EditorInfo.IME_ACTION_DONE);
+                //show dialog
+                mDialog = new SpotsDialog(SignIn.this, "Please Wait . . .");
+                mDialog.setCancelable(false);
+                mDialog.setCanceledOnTouchOutside(false);
+                mDialog.show();
 
-                } else {
+                //execute network check async task
+                CheckInternet asyncTask = (CheckInternet) new CheckInternet(SignIn.this, new CheckInternet.AsyncResponse(){
+                    @Override
+                    public void processFinish(Integer output) {
 
-                    showErrorDialog("No Internet Access !");
+                        //check all cases
+                        if (output == 1){
 
-                }
+                            signInUserWithEmail();
+                            loginPassword.onEditorAction(EditorInfo.IME_ACTION_DONE);
+
+                        } else
+
+                        if (output == 0){
+
+                            //no internet
+                            mDialog.dismiss();
+                            showErrorDialog("No internet access");
+
+                        } else
+
+                        if (output == 2){
+
+                            //no internet
+                            mDialog.dismiss();
+                            showErrorDialog("Not connected to any network");
+
+                        }
+
+                    }
+                }).execute();
+
             }
         });
 
@@ -151,17 +201,44 @@ public class SignIn extends AppCompatActivity {
         recoverPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Common.isConnectedToInternet(getBaseContext())) {
 
-                    mDialog = new SpotsDialog(SignIn.this, "Please Wait . . .");
-                    mDialog.setCancelable(false);
-                    mDialog.setCanceledOnTouchOutside(false);
-                    mDialog.show();
-                    resetThePassword();
+                //show dialog
+                mDialog = new SpotsDialog(SignIn.this, "Please Wait . . .");
+                mDialog.setCancelable(false);
+                mDialog.setCanceledOnTouchOutside(false);
+                mDialog.show();
 
-                } else {
-                    showErrorDialog("No Internet Access !");
-                }
+                //execute network check async task
+                CheckInternet asyncTask = (CheckInternet) new CheckInternet(SignIn.this, new CheckInternet.AsyncResponse(){
+                    @Override
+                    public void processFinish(Integer output) {
+
+                        //check all cases
+                        if (output == 1){
+
+                            resetThePassword();
+
+                        } else
+
+                        if (output == 0){
+
+                            //no internet
+                            mDialog.dismiss();
+                            showErrorDialog("No internet access");
+
+                        } else
+
+                        if (output == 2){
+
+                            //no internet
+                            mDialog.dismiss();
+                            showErrorDialog("Not connected to any network");
+
+                        }
+
+                    }
+                }).execute();
+
             }
         });
 

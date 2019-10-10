@@ -13,8 +13,10 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.R;
 
@@ -23,6 +25,7 @@ public class Faq extends AppCompatActivity {
     private WebView webView;
     private ImageView backButton;
     private String faqLink = "http://menorahfarms.com/faq.html";
+    private RelativeLayout noInternetLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,38 +36,61 @@ public class Faq extends AppCompatActivity {
         /*---   WIDGETS   ---*/
         webView = (WebView) findViewById(R.id.faqWebview);
         backButton = (ImageView)findViewById(R.id.backButton);
+        noInternetLayout = findViewById(R.id.noInternetLayout);
 
 
+        //execute network check async task
+        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
+            @Override
+            public void processFinish(Integer output) {
 
-        /*---   LOAD PAGE   ---*/
-        if (Common.isConnectedToInternet(getBaseContext())) {
+                //check all cases
+                if (output == 1){
 
-            CookieSyncManager.createInstance(this);
-            CookieManager.getInstance().setAcceptCookie(true);
+                    //set layout
+                    noInternetLayout.setVisibility(View.GONE);
+                    webView.setVisibility(View.VISIBLE);
 
-            webView.getSettings().setJavaScriptEnabled(true);
-            webView.setFocusable(true);
-            webView.setFocusableInTouchMode(true);
-            webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
-            webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
-            webView.getSettings().setDomStorageEnabled(true);
-            webView.getSettings().setDatabaseEnabled(true);
-            webView.getSettings().setAppCacheEnabled(true);
-            webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
-            webView.loadUrl(faqLink);
-            webView.setWebViewClient(new WebViewClient() {
-                @Override
-                public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-                    showErrorDialog("Error Communicating With Server !");
+                    CookieSyncManager.createInstance(Faq.this);
+                    CookieManager.getInstance().setAcceptCookie(true);
+
+                    webView.getSettings().setJavaScriptEnabled(true);
+                    webView.setFocusable(true);
+                    webView.setFocusableInTouchMode(true);
+                    webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
+                    webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+                    webView.getSettings().setDomStorageEnabled(true);
+                    webView.getSettings().setDatabaseEnabled(true);
+                    webView.getSettings().setAppCacheEnabled(true);
+                    webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+                    webView.loadUrl(faqLink);
+                    webView.setWebViewClient(new WebViewClient() {
+                        @Override
+                        public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                            showErrorDialog("Error Communicating With Server !");
+                        }
+                    });
+
+                } else
+
+                if (output == 0){
+
+                    //set layout
+                    noInternetLayout.setVisibility(View.VISIBLE);
+                    webView.setVisibility(View.GONE);
+
+                } else
+
+                if (output == 2){
+
+                    //set layout
+                    noInternetLayout.setVisibility(View.VISIBLE);
+                    webView.setVisibility(View.GONE);
+
                 }
-            });
 
-        } else {
-
-            showErrorDialog("No Internet Access !");
-
-        }
-
+            }
+        }).execute();
 
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override

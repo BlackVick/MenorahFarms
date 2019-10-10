@@ -1,17 +1,23 @@
 package com.blackviking.menorahfarms.AdminDetails;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
+import com.blackviking.menorahfarms.Models.DueSponsorshipModel;
 import com.blackviking.menorahfarms.Models.StudentModel;
 import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.Notification.APIService;
@@ -35,6 +41,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import dmax.dialog.SpotsDialog;
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -48,6 +55,9 @@ public class StudentRequestDetails extends AppCompatActivity {
     private DatabaseReference userRef, studentRef, notificationRef;
     private String userId;
     private APIService mService;
+
+    private android.app.AlertDialog alertDialog;
+    private android.app.AlertDialog mDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +79,10 @@ public class StudentRequestDetails extends AppCompatActivity {
         notificationRef = db.getReference("Notifications");
 
 
+        //show dialog
+        showLoadingDialog("Loading student details");
+
+
         /*---   WIDGETS   ---*/
         backButton = (ImageView)findViewById(R.id.backButton);
         studentId = (ImageView)findViewById(R.id.studentId);
@@ -87,7 +101,37 @@ public class StudentRequestDetails extends AppCompatActivity {
         });
 
 
-        loadStudentRequest();
+        //execute network check async task
+        CheckInternet asyncTask = (CheckInternet) new CheckInternet(StudentRequestDetails.this, new CheckInternet.AsyncResponse(){
+            @Override
+            public void processFinish(Integer output) {
+
+                //check all cases
+                if (output == 1){
+
+                    loadStudentRequest();
+
+                } else
+
+                if (output == 0){
+
+                    //no internet
+                    alertDialog.dismiss();
+                    Toast.makeText(StudentRequestDetails.this, "No internet access", Toast.LENGTH_SHORT).show();
+
+                } else
+
+                if (output == 2){
+
+                    //no internet
+                    alertDialog.dismiss();
+                    Toast.makeText(StudentRequestDetails.this, "Not connected to any network", Toast.LENGTH_SHORT).show();
+
+                }
+
+            }
+        }).execute();
+
     }
 
     private void loadStudentRequest() {
@@ -126,6 +170,8 @@ public class StudentRequestDetails extends AppCompatActivity {
                                 final StudentModel currentStudent = dataSnapshot.getValue(StudentModel.class);
 
                                 if (currentStudent != null){
+
+                                    alertDialog.dismiss();
 
                                     studentSchool.setText(currentStudent.getSchoolName());
                                     studentDepartment.setText(currentStudent.getDepartment());
@@ -168,14 +214,86 @@ public class StudentRequestDetails extends AppCompatActivity {
         approveStudent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                approveStudentRequest();
+
+                //show loading dialog
+                mDialog = new SpotsDialog(StudentRequestDetails.this, "Processing");
+                mDialog.setCancelable(false);
+                mDialog.setCanceledOnTouchOutside(false);
+                mDialog.show();
+
+                //execute network check async task
+                CheckInternet asyncTask = (CheckInternet) new CheckInternet(StudentRequestDetails.this, new CheckInternet.AsyncResponse(){
+                    @Override
+                    public void processFinish(Integer output) {
+
+                        //check all cases
+                        if (output == 1){
+
+                            approveStudentRequest();
+
+                        } else
+
+                        if (output == 0){
+
+                            //no internet
+                            alertDialog.dismiss();
+                            Toast.makeText(StudentRequestDetails.this, "No internet access", Toast.LENGTH_SHORT).show();
+
+                        } else
+
+                        if (output == 2){
+
+                            //no internet
+                            alertDialog.dismiss();
+                            Toast.makeText(StudentRequestDetails.this, "Not connected to any network", Toast.LENGTH_SHORT).show();
+
+                        }
+
+                    }
+                }).execute();
             }
         });
 
         denyStudent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                denyStudentRequest();
+
+                //show loading dialog
+                mDialog = new SpotsDialog(StudentRequestDetails.this, "Processing");
+                mDialog.setCancelable(false);
+                mDialog.setCanceledOnTouchOutside(false);
+                mDialog.show();
+
+                //execute network check async task
+                CheckInternet asyncTask = (CheckInternet) new CheckInternet(StudentRequestDetails.this, new CheckInternet.AsyncResponse(){
+                    @Override
+                    public void processFinish(Integer output) {
+
+                        //check all cases
+                        if (output == 1){
+
+                            denyStudentRequest();
+
+                        } else
+
+                        if (output == 0){
+
+                            //no internet
+                            mDialog.dismiss();
+                            Toast.makeText(StudentRequestDetails.this, "No internet access", Toast.LENGTH_SHORT).show();
+
+                        } else
+
+                        if (output == 2){
+
+                            //no internet
+                            mDialog.dismiss();
+                            Toast.makeText(StudentRequestDetails.this, "Not connected to any network", Toast.LENGTH_SHORT).show();
+
+                        }
+
+                    }
+                }).execute();
             }
         });
     }
@@ -185,31 +303,43 @@ public class StudentRequestDetails extends AppCompatActivity {
         studentRef.child(userId)
                 .child("approval")
                 .setValue("approved")
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
-                    public void onSuccess(Void aVoid) {
-                        userRef.child(userId)
-                                .child("userPackage")
-                                .setValue("Student")
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
+                    public void onComplete(@NonNull Task<Void> task) {
 
-                                        sendApprovalNotification();
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
+                        if (task.isSuccessful()){
 
-                            }
-                        });
+                            userRef.child(userId)
+                                    .child("userPackage")
+                                    .setValue("Student")
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+
+                                            if (task.isSuccessful()){
+
+                                                mDialog.dismiss();
+                                                sendApprovalNotification();
+
+                                            } else {
+
+                                                mDialog.dismiss();
+                                                Toast.makeText(StudentRequestDetails.this, "Error occurred", Toast.LENGTH_SHORT).show();
+
+                                            }
+
+                                        }
+                                    });
+
+                        } else {
+
+                            mDialog.dismiss();
+                            Toast.makeText(StudentRequestDetails.this, "Error occurred", Toast.LENGTH_SHORT).show();
+
+                        }
+
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-
-            }
-        });
+                });
 
     }
 
@@ -218,17 +348,24 @@ public class StudentRequestDetails extends AppCompatActivity {
         studentRef.child(userId)
                 .child("approval")
                 .setValue("denied")
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
-                    public void onSuccess(Void aVoid) {
-                        sendDenialNotification();
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
+                    public void onComplete(@NonNull Task<Void> task) {
 
-            }
-        });
+                        if (task.isSuccessful()){
+
+                            mDialog.dismiss();
+                            sendDenialNotification();
+
+                        } else {
+
+                            mDialog.dismiss();
+                            Toast.makeText(StudentRequestDetails.this, "Could not send notification", Toast.LENGTH_LONG).show();
+
+                        }
+
+                    }
+                });
 
     }
 
@@ -311,6 +448,35 @@ public class StudentRequestDetails extends AppCompatActivity {
                 });
 
         finish();
+
+    }
+
+    /*---   LOADING DIALOG   ---*/
+    public void showLoadingDialog(String theMessage){
+
+        alertDialog = new android.app.AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.loading_dialog,null);
+
+        final TextView loadingText = viewOptions.findViewById(R.id.loadingText);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        loadingText.setText(theMessage);
+
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                finish();
+            }
+        });
+
+        alertDialog.show();
 
     }
 

@@ -39,6 +39,8 @@ import com.blackviking.menorahfarms.AccountMenus.StudentDetails;
 import com.blackviking.menorahfarms.BuildConfig;
 import com.blackviking.menorahfarms.CartAndHistory.Cart;
 import com.blackviking.menorahfarms.CartAndHistory.SponsorshipHistory;
+import com.blackviking.menorahfarms.Common.ApplicationClass;
+import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Common.Permissions;
 import com.blackviking.menorahfarms.Models.FarmModel;
@@ -100,7 +102,9 @@ public class Account extends AppCompatActivity {
     private ImageView reloadPage;
     private Button resendActivationBtn;
 
-    private RelativeLayout personalDetailsLayout, contactDetailsLayout, bankDetailsLayout, nextOfKinLayout, socialMediaLayout, studentProfileLayout, historyLayout, logOutLayout;
+    private RelativeLayout personalDetailsLayout, contactDetailsLayout,
+            bankDetailsLayout, nextOfKinLayout, socialMediaLayout,
+            studentProfileLayout, historyLayout, logOutLayout;
 
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
@@ -121,6 +125,10 @@ public class Account extends AppCompatActivity {
 
     private boolean isWarned;
 
+
+    private UserModel paperUser;
+    private android.app.AlertDialog alertDialog, alertDialogError;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,6 +141,10 @@ public class Account extends AppCompatActivity {
         farmRef = db.getReference("Farms");
         if (mAuth.getCurrentUser() != null)
             currentUid = mAuth.getCurrentUser().getUid();
+
+
+        //get paper user
+        paperUser = Paper.book().read(Common.PAPER_USER);
 
 
         /*---   WIDGETS   ---*/
@@ -277,69 +289,22 @@ public class Account extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                farmRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+                Paper.book().destroy();
 
-                        for (DataSnapshot child : dataSnapshot.getChildren()){
+                mAuth.signOut();
+                ((ApplicationClass)(getApplicationContext())).resetUser();
 
-                            FarmModel currentFarm = child.getValue(FarmModel.class);
-
-                            if (currentFarm != null){
-
-                                String farmNotiId = currentFarm.getFarmNotiId();
-
-                                FirebaseMessaging.getInstance().unsubscribeFromTopic(farmNotiId);
-
-                            }
-
-                        }
-
-                        if (loginType.equalsIgnoreCase("Facebook")){
-
-                            Paper.book().destroy();
-
-                            mAuth.signOut();
-                            LoginManager.getInstance().logOut();
-
-                            FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
-                            FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.GENERAL_NOTIFY);
-                            Intent signoutIntent = new Intent(Account.this, SignIn.class);
-                            signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(signoutIntent);
-                            finish();
-
-                        } else {
-
-                            Paper.book().destroy();
-
-                            mAuth.signOut();
-
-                            FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
-                            FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.GENERAL_NOTIFY);
-                            Intent signoutIntent = new Intent(Account.this, SignIn.class);
-                            signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(signoutIntent);
-                            finish();
-
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
+                FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
+                FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.GENERAL_NOTIFY);
+                Intent signoutIntent = new Intent(Account.this, SignIn.class);
+                signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(signoutIntent);
+                finish();
 
             }
         });
 
-
-        /*---   CURRENT USER   ---*/
-        setCurrentUser();
-
+        //check mail verification
         if (mAuth.getCurrentUser().isEmailVerified()) {
 
             verifiedLayout.setVisibility(View.VISIBLE);
@@ -366,138 +331,128 @@ public class Account extends AppCompatActivity {
 
         }
 
+        /*---   CURRENT USER   ---*/
+        setCurrentUser(paperUser);
+
     }
 
     private void reloadThePage() {
 
-        mAuth.getCurrentUser().reload().addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
+        mAuth.getCurrentUser().reload().addOnCompleteListener(
+                new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
 
-                if (mAuth.getCurrentUser().isEmailVerified()){
+                        if (task.isSuccessful()){
 
-                    verifiedLayout.setVisibility(View.VISIBLE);
-                    unverifiedLayout.setVisibility(View.GONE);
+                            if (mAuth.getCurrentUser().isEmailVerified()){
 
-                } else {
+                                verifiedLayout.setVisibility(View.VISIBLE);
+                                unverifiedLayout.setVisibility(View.GONE);
 
-                    verifiedLayout.setVisibility(View.GONE);
-                    unverifiedLayout.setVisibility(View.VISIBLE);
+                            } else {
 
-                    resendActivationBtn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            mAuth.getCurrentUser().sendEmailVerification();
+                                verifiedLayout.setVisibility(View.GONE);
+                                unverifiedLayout.setVisibility(View.VISIBLE);
+
+                                resendActivationBtn.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        mAuth.getCurrentUser().sendEmailVerification();
+                                    }
+                                });
+
+                                reloadPage.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        reloadThePage();
+                                    }
+                                });
+
+                            }
+
+                        } else {
+
+                            Toast.makeText(Account.this, "Error occurred", Toast.LENGTH_SHORT).show();
+
                         }
-                    });
 
-                    reloadPage.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            reloadThePage();
-                        }
-                    });
-
+                    }
                 }
-
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-
-            }
-        });
+        );
 
     }
 
-    private void setCurrentUser() {
+    private void setCurrentUser(UserModel paperUserr) {
 
-        userRef.child(currentUid)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+        theFirstName = paperUserr.getFirstName();
+        theLastName = paperUserr.getLastName();
+        theUserMail = paperUserr.getEmail();
+        theProfilePicture = paperUserr.getProfilePictureThumb();
+        loginType = paperUserr.getSignUpMode();
 
-                        UserModel currentUser = dataSnapshot.getValue(UserModel.class);
+        userName.setText(theFirstName + " " + theLastName);
+        userEmail.setText(theUserMail);
 
-                        if (currentUser != null) {
-                            theFirstName = currentUser.getFirstName();
-                            theLastName = currentUser.getLastName();
-                            theUserMail = currentUser.getEmail();
-                            theProfilePicture = currentUser.getProfilePictureThumb();
-                            loginType = currentUser.getSignUpMode();
+        if (!theProfilePicture.equalsIgnoreCase("")) {
 
-                            userName.setText(theFirstName + " " + theLastName);
-                            userEmail.setText(theUserMail);
-
-                            if (!theProfilePicture.equalsIgnoreCase("")) {
-
-                                Picasso.get()
-                                        .load(theProfilePicture)
-                                        .networkPolicy(NetworkPolicy.OFFLINE)
-                                        .placeholder(R.drawable.profile)
-                                        .into(userAvatar, new Callback() {
-                                            @Override
-                                            public void onSuccess() {
-
-                                            }
-
-                                            @Override
-                                            public void onError(Exception e) {
-                                                Picasso.get()
-                                                        .load(theProfilePicture)
-                                                        .placeholder(R.drawable.profile)
-                                                        .into(userAvatar);
-                                            }
-                                        });
-
-
-                            } else {
-
-                                userAvatar.setImageResource(R.drawable.profile);
-
-                            }
-
-                            userAvatar.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-
-                                    /*---   PERMISSIONS HANDLER   ---*/
-                                    if (checkPermissionsArray(Permissions.PERMISSIONS)){
-
-                                        showUploadDialog();
-
-                                    } else {
-
-                                        verifyPermissions(Permissions.PERMISSIONS);
-
-                                    }
-                                }
-                            });
-
-                            if (loginType.equalsIgnoreCase("Email")) {
-
-                                resetPassword.setVisibility(View.VISIBLE);
-                                resetPassword.setEnabled(true);
-
-                            } else {
-
-                                resetPassword.setVisibility(View.INVISIBLE);
-                                resetPassword.setEnabled(false);
-
-                            }
-
-                            setProfileProgress();
+            Picasso.get()
+                    .load(theProfilePicture)
+                    .networkPolicy(NetworkPolicy.OFFLINE)
+                    .placeholder(R.drawable.profile)
+                    .into(userAvatar, new Callback() {
+                        @Override
+                        public void onSuccess() {
 
                         }
 
-                    }
+                        @Override
+                        public void onError(Exception e) {
+                            Picasso.get()
+                                    .load(theProfilePicture)
+                                    .placeholder(R.drawable.profile)
+                                    .into(userAvatar);
+                        }
+                    });
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
 
-                    }
-                });
+        } else {
 
+            userAvatar.setImageResource(R.drawable.profile);
+
+        }
+
+        userAvatar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                /*---   PERMISSIONS HANDLER   ---*/
+                if (checkPermissionsArray(Permissions.PERMISSIONS)){
+
+                    showUploadDialog();
+
+                } else {
+
+                    verifyPermissions(Permissions.PERMISSIONS);
+
+                }
+            }
+        });
+
+        if (loginType.equalsIgnoreCase("Email")) {
+
+            resetPassword.setVisibility(View.VISIBLE);
+            resetPassword.setEnabled(true);
+
+        } else {
+
+            resetPassword.setVisibility(View.INVISIBLE);
+            resetPassword.setEnabled(false);
+
+        }
+
+        //set profile progress bar
+        setProfileProgress(paperUserr);
 
     }
 
@@ -522,23 +477,16 @@ public class Account extends AppCompatActivity {
         layoutParams.y = 100; // bottom margin
         alertDialog.getWindow().setAttributes(layoutParams);
 
+        //open camera
         cameraPick.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if (Common.isConnectedToInternet(getBaseContext())){
-
-                    openCamera();
-
-                }else {
-
-                    showErrorDialog("No Internet Access !");
-                }
+                openCamera();
                 alertDialog.dismiss();
-
             }
         });
 
+        //open gallery
         galleryPick.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -558,8 +506,6 @@ public class Account extends AppCompatActivity {
     }
 
     private void openCamera() {
-
-        final long date = System.currentTimeMillis();
 
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
@@ -638,115 +584,100 @@ public class Account extends AppCompatActivity {
 
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            final CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
 
-                if (Common.isConnectedToInternet(getBaseContext())) {
+                //show dialog
+                mDialog = new SpotsDialog(Account.this, "Upload In Progress . . .");
+                mDialog.setCancelable(false);
+                mDialog.setCanceledOnTouchOutside(false);
+                mDialog.show();
 
-                    mDialog = new SpotsDialog(this, "Upload In Progress . . .");
-                    mDialog.setCancelable(false);
-                    mDialog.setCanceledOnTouchOutside(false);
-                    mDialog.show();
+                //execute network check async task
+                CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
+                    @Override
+                    public void processFinish(Integer output) {
 
-                    Uri resultUri = result.getUri();
-                    String imgURI = resultUri.toString();
+                        //check all cases
+                        if (output == 1){
 
-                    final long date = System.currentTimeMillis();
-                    final String dateShitFmt = String.valueOf(date);
+                            Uri resultUri = result.getUri();
 
-                    File thumb_filepath = new File(resultUri.getPath());
+                            File thumb_filepath = new File(resultUri.getPath());
 
+                            try {
+                                Bitmap thumb_bitmap = new Compressor(Account.this)
+                                        .setMaxWidth(500)
+                                        .setMaxHeight(500)
+                                        .setQuality(75)
+                                        .compressToBitmap(thumb_filepath);
 
-                    try {
-                        Bitmap thumb_bitmap = new Compressor(this)
-                                .setMaxWidth(450)
-                                .setMaxHeight(450)
-                                .setQuality(70)
-                                .compressToBitmap(thumb_filepath);
+                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                thumb_bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+                                final byte[] thumb_byte = baos.toByteArray();
 
-                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        thumb_bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
-                        final byte[] thumb_byte = baos.toByteArray();
+                                final StorageReference imageThumbRef1 = imageRef.child("Thumbnails").child(currentUid + ".jpg");
 
-                        final StorageReference imageRef1 = imageRef.child("FullImages").child(dateShitFmt + ".jpg");
+                                final UploadTask uploadTask = imageThumbRef1.putBytes(thumb_byte);
 
-                        final StorageReference imageThumbRef1 = imageRef.child("Thumbnails").child(dateShitFmt + ".jpg");
+                                mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                    @Override
+                                    public void onCancel(DialogInterface dialog) {
+                                        imageUri = null;
+                                        uploadTask.cancel();
+                                    }
+                                });
 
-                        final UploadTask originalUpload = imageRef1.putFile(resultUri);
+                                uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumb_task) {
 
-                        mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                            @Override
-                            public void onCancel(DialogInterface dialog) {
-                                imageUri = null;
-                                originalUpload.cancel();
-                            }
-                        });
+                                        thumbDownloadUrl = thumb_task.getResult().getDownloadUrl().toString();
 
-                        originalUpload.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                                if (task.isSuccessful()) {
+                                        if (thumb_task.isSuccessful()) {
 
-                                    originalImageUrl = task.getResult().getDownloadUrl().toString();
-                                    final UploadTask uploadTask = imageThumbRef1.putBytes(thumb_byte);
+                                            mDialog.dismiss();
+                                            updateImage(thumbDownloadUrl, thumbDownloadUrl);
 
-                                    mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                                        @Override
-                                        public void onCancel(DialogInterface dialog) {
+                                        } else {
+                                            Toast.makeText(Account.this, "Upload Failed. Please Try Again", Toast.LENGTH_SHORT).show();
+                                            mDialog.dismiss();
                                             imageUri = null;
-                                            uploadTask.cancel();
+                                            originalImageUrl = null;
+                                            thumbDownloadUrl = null;
                                         }
-                                    });
-
-                                    uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumb_task) {
-
-                                            thumbDownloadUrl = thumb_task.getResult().getDownloadUrl().toString();
-
-                                            if (thumb_task.isSuccessful()) {
-
-                                                mDialog.dismiss();
-                                                updateImage(originalImageUrl, thumbDownloadUrl);
-
-                                            } else {
-                                                Toast.makeText(Account.this, "Upload Failed. Please Try Again", Toast.LENGTH_SHORT).show();
-                                                mDialog.dismiss();
-                                                imageUri = null;
-                                            }
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-
-                                        }
-                                    });
-
-                                } else {
-
-                                    Toast.makeText(Account.this, "Upload Failed. Please Try Again", Toast.LENGTH_SHORT).show();
-                                    mDialog.dismiss();
-                                    imageUri = null;
-
-                                }
+                                    }
+                                });
+                            } catch (IOException e) {
+                                e.printStackTrace();
                             }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
 
-                            }
-                        });
+                        } else
 
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                        if (output == 0){
+
+                            //no internet
+                            mDialog.dismiss();
+                            imageUri = null;
+                            originalImageUrl = null;
+                            thumbDownloadUrl = null;
+                            Toast.makeText(Account.this, "No internet", Toast.LENGTH_SHORT).show();
+
+                        } else
+
+                        if (output == 2){
+
+                            //no network
+                            mDialog.dismiss();
+                            imageUri = null;
+                            originalImageUrl = null;
+                            thumbDownloadUrl = null;
+                            Toast.makeText(Account.this, "Not connected to a network", Toast.LENGTH_SHORT).show();
+
+                        }
+
                     }
-
-                } else {
-
-                    showErrorDialog("No Internet Access ! Please, try again later.");
-
-                }
-
+                }).execute();
 
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
@@ -757,23 +688,39 @@ public class Account extends AppCompatActivity {
 
     private void updateImage(String originalImageUrl, String thumbDownloadUrl) {
 
-        Map<String, Object> profilePicMap = new HashMap<>();
-        profilePicMap.put("profilePicture", originalImageUrl);
-        profilePicMap.put("profilePictureThumb", thumbDownloadUrl);
+        UserModel thePaperUser = Paper.book().read(Common.PAPER_USER);
+
+        final UserModel updateUser = new UserModel(
+                thePaperUser.getEmail(), thePaperUser.getFirstName(), thePaperUser.getLastName(),
+                originalImageUrl, thumbDownloadUrl, thePaperUser.getSignUpMode(),
+                thePaperUser.getFacebook(), thePaperUser.getInstagram(), thePaperUser.getTwitter(), thePaperUser.getLinkedIn(),
+                thePaperUser.getUserType(), thePaperUser.getUserPackage(), thePaperUser.getPhone(), thePaperUser.getBirthday(),
+                thePaperUser.getGender(), thePaperUser.getNationality(), thePaperUser.getAddress(), thePaperUser.getCity(),
+                thePaperUser.getState(), thePaperUser.getBank(), thePaperUser.getAccountName(), thePaperUser.getAccountNumber(),
+                thePaperUser.getKinName(), thePaperUser.getKinEmail(), thePaperUser.getKinRelationship(), thePaperUser.getKinPhone(),
+                thePaperUser.getKinAddress(), thePaperUser.getAccountManager()
+        );
 
         userRef.child(currentUid)
-                .updateChildren(profilePicMap)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                .setValue(updateUser)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
-                    public void onSuccess(Void aVoid) {
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                        if (task.isSuccessful()){
+
+                            ((ApplicationClass)(getApplicationContext())).setUser(updateUser);
+                            paperUser = Paper.book().read(Common.PAPER_USER);
+                            setCurrentUser(paperUser);
+
+                        } else {
+
+                            Toast.makeText(Account.this, "Update failed", Toast.LENGTH_SHORT).show();
+
+                        }
 
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-
-            }
-        });
+                });
     }
 
     private File getOutputMediaFile(int type){
@@ -800,103 +747,82 @@ public class Account extends AppCompatActivity {
         return mediaFile;
     }
 
-    private void setProfileProgress() {
+    private void setProfileProgress(UserModel paperUserr) {
 
-        if (Common.isConnectedToInternet(getBaseContext())) {
-
-            userRef.child(currentUid)
-                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-
-                            String profileFirstName = dataSnapshot.child("firstName").getValue().toString();
-                            String profileLastName = dataSnapshot.child("lastName").getValue().toString();
-                            String profileUserMail = dataSnapshot.child("email").getValue().toString();
-                            String profilePix = dataSnapshot.child("profilePictureThumb").getValue().toString();
-                            String profileFacebook = dataSnapshot.child("facebook").getValue().toString();
-                            String profileInstagram = dataSnapshot.child("instagram").getValue().toString();
-                            String profileTwitter = dataSnapshot.child("twitter").getValue().toString();
-                            String profileLinkedIn = dataSnapshot.child("linkedIn").getValue().toString();
-                            String profilePhone = dataSnapshot.child("phone").getValue().toString();
-                            String profileBirthday = dataSnapshot.child("birthday").getValue().toString();
-                            String profileGender = dataSnapshot.child("gender").getValue().toString();
-                            String profileNatinality = dataSnapshot.child("nationality").getValue().toString();
-                            String profileAddress = dataSnapshot.child("address").getValue().toString();
-                            String profileCity = dataSnapshot.child("city").getValue().toString();
-                            String profileState = dataSnapshot.child("state").getValue().toString();
-                            String profileBank = dataSnapshot.child("bank").getValue().toString();
-                            String profileAccountName = dataSnapshot.child("accountName").getValue().toString();
-                            String profileAccountNumber = dataSnapshot.child("accountNumber").getValue().toString();
-                            String profileKinName = dataSnapshot.child("kinName").getValue().toString();
-                            String profileKinMail = dataSnapshot.child("kinEmail").getValue().toString();
-                            String profileKinRelationship = dataSnapshot.child("kinRelationship").getValue().toString();
-                            String profileKinPhone = dataSnapshot.child("kinPhone").getValue().toString();
-                            String profileKinAddress = dataSnapshot.child("kinAddress").getValue().toString();
+        String profileFirstName = paperUserr.getFirstName();
+        String profileLastName = paperUserr.getLastName();
+        String profileUserMail = paperUserr.getEmail();
+        String profilePix = paperUserr.getProfilePictureThumb();
+        String profileFacebook = paperUserr.getFacebook();
+        String profileInstagram = paperUserr.getInstagram();
+        String profileTwitter = paperUserr.getTwitter();
+        String profileLinkedIn = paperUserr.getLinkedIn();
+        String profilePhone = paperUserr.getPhone();
+        String profileBirthday = paperUserr.getBirthday();
+        String profileGender = paperUserr.getGender();
+        String profileNatinality = paperUserr.getNationality();
+        String profileAddress = paperUserr.getAddress();
+        String profileCity = paperUserr.getCity();
+        String profileState = paperUserr.getState();
+        String profileBank = paperUserr.getBank();
+        String profileAccountName = paperUserr.getAccountName();
+        String profileAccountNumber = paperUserr.getAccountNumber();
+        String profileKinName = paperUserr.getKinName();
+        String profileKinMail = paperUserr.getKinEmail();
+        String profileKinRelationship = paperUserr.getKinRelationship();
+        String profileKinPhone = paperUserr.getKinPhone();
+        String profileKinAddress = paperUserr.getKinAddress();
 
 
-                            String[] theArray = {profileFirstName, profileLastName, profileUserMail, profilePix,
-                                    profileFacebook, profileInstagram, profileTwitter, profileLinkedIn, profilePhone, profileBirthday, profileGender,
-                                    profileNatinality, profileAddress, profileCity, profileState, profileBank, profileAccountName, profileAccountNumber,
-                                    profileKinName, profileKinMail, profileKinRelationship, profileKinPhone, profileKinAddress};
+        String[] theArray = {profileFirstName, profileLastName, profileUserMail, profilePix,
+                profileFacebook, profileInstagram, profileTwitter, profileLinkedIn, profilePhone, profileBirthday, profileGender,
+                profileNatinality, profileAddress, profileCity, profileState, profileBank, profileAccountName, profileAccountNumber,
+                profileKinName, profileKinMail, profileKinRelationship, profileKinPhone, profileKinAddress};
 
 
-                            int profileProgressInt = 0;
-                            ArrayList<String> list = new ArrayList<>();
-                            int totalResult;
+        int profileProgressInt = 0;
+        ArrayList<String> list = new ArrayList<>();
+        int totalResult;
 
-                            int calcResult = 0;
+        int calcResult = 0;
 
-                            for (int i = 0; i < 23; i++) {
+        for (int i = 0; i < 23; i++) {
 
-                                if (!theArray[i].equalsIgnoreCase("")) {
+            if (!theArray[i].equalsIgnoreCase("")) {
 
-                                    list.add(theArray[i]);
+                list.add(theArray[i]);
 
-                                }
+            }
 
-                            }
+        }
 
-                            calcResult = (list.size() * 100) / 23;
+        calcResult = (list.size() * 100) / 23;
 
 
-                            profileProgressText.setText("Your profile is " + String.valueOf(calcResult) + "% complete.");
+        profileProgressText.setText("Your profile is " + calcResult + "% complete.");
 
-                            Drawable draw = getResources().getDrawable(R.drawable.progress_drawable);
-                            profileProgress.setProgressDrawable(draw);
-                            profileProgress.setProgress(calcResult);
+        Drawable draw = getResources().getDrawable(R.drawable.progress_drawable);
+        profileProgress.setProgressDrawable(draw);
+        profileProgress.setProgress(calcResult);
 
-                            if (Paper.book().read(Common.PROFILE_WARNING_COUNT) != null) {
+        if (Paper.book().read(Common.PROFILE_WARNING_COUNT) != null) {
 
-                                isWarned = Paper.book().read(Common.PROFILE_WARNING_COUNT);
+            isWarned = Paper.book().read(Common.PROFILE_WARNING_COUNT);
 
-                                if (!isWarned) {
+            if (!isWarned) {
 
-                                    if (calcResult < 70) {
+                if (calcResult < 75) {
 
-                                        showErrorDialog("We advise that users complete their profile by providing all required details, so we can serve you better. \n\nThank you");
-                                        Paper.book().write(Common.PROFILE_WARNING_COUNT, true);
+                    showErrorDialog("You are advised to complete your profile to enable you participate in farm sponsorships. \n\nThank you");
+                    Paper.book().write(Common.PROFILE_WARNING_COUNT, true);
 
-                                    }
+                }
 
-                                }
-
-                            } else {
-
-                                Paper.book().write(Common.PROFILE_WARNING_COUNT, false);
-
-                            }
-
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
+            }
 
         } else {
 
-            Toast.makeText(this, "Could not get profile progress.", Toast.LENGTH_SHORT).show();
+            Paper.book().write(Common.PROFILE_WARNING_COUNT, false);
 
         }
 

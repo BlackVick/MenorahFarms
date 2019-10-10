@@ -1,10 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AdminFragments.AdminNotify">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".AdminFragments.AdminNotify"
+    android:animateLayoutChanges="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/directionLayout">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Please Select What Category Your Notification Is Directed At \n\nOR\n\nSimply Click On The Floaty Button At The Bottom Right Corner To Broadcast To All"
+                android:textColor="@color/colorAccent"
+                android:textSize="14sp"
+                android:gravity="center"
+                android:layout_margin="30dp"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -14,13 +39,14 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
             android:orientation="vertical">
 
             <RadioGroup
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:id="@+id/announcementStyle"
+                android:id="@+id/notificationStyle"
                 android:weightSum="2"
                 android:layout_marginTop="25dp"
                 android:layout_marginStart="15dp"
@@ -30,102 +56,180 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:text="User"
-                    android:textSize="15sp"
+                    android:text="Followed Farms"
+                    android:textSize="14sp"
                     android:textColor="@color/colorPrimaryDark"
-                    android:id="@+id/single"/>
+                    android:id="@+id/followedFarmsNoti"/>
 
                 <RadioButton
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:text="Farms"
-                    android:textSize="15sp"
+                    android:text="Sponsored Farms"
+                    android:textSize="14sp"
                     android:textColor="@color/colorPrimaryDark"
-                    android:id="@+id/all"/>
+                    android:id="@+id/sponsoredFarmsNoti"/>
 
             </RadioGroup>
 
-            <EditText
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:text=""
-                android:textColor="@color/black"
-                android:textSize="15sp"
-                android:padding="15dp"
-                android:background="@drawable/edittext_ring"
-                android:drawableStart="@drawable/ic_user_email"
-                android:drawablePadding="6dp"
-                android:hint="User Email"
-                android:inputType="textEmailAddress"
-                android:textColorHint="@color/grey"
-                android:id="@+id/userEmail"
-                android:visibility="gone"/>
+                android:id="@+id/followedFarmLayout"
+                android:visibility="gone">
 
-            <Spinner
-                android:id="@+id/topicSpinner"
-                android:layout_width="match_parent"
-                android:layout_marginTop="20dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:textSize="15sp"
-                android:layout_height="50dp"
-                android:background="@drawable/edittext_ring"
-                android:visibility="gone"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-            <EditText
+                    <Spinner
+                        android:id="@+id/followedSpinner"
+                        android:layout_width="match_parent"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:textSize="15sp"
+                        android:layout_height="50dp"
+                        android:background="@color/offWhite"/>
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:text=""
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
+                        android:padding="15dp"
+                        android:background="@color/offWhite"
+                        android:drawableStart="@drawable/ic_notifications"
+                        android:drawablePadding="6dp"
+                        android:hint="Title"
+                        android:textColorHint="@color/grey"
+                        android:id="@+id/followedTopic"/>
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:text=""
+                        android:textColor="@color/black"
+                        android:textSize="13sp"
+                        android:padding="15dp"
+                        android:background="@color/offWhite"
+                        android:drawableStart="@drawable/ic_notifications"
+                        android:drawablePadding="6dp"
+                        android:hint="Message"
+                        android:textColorHint="@color/grey"
+                        android:id="@+id/followedMessage"
+                        android:minLines="4"/>
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="25dp"
+                        android:layout_marginEnd="25dp"
+                        android:layout_marginTop="50dp"
+                        android:background="@drawable/new_login_button"
+                        android:text="SEND BROADCAST"
+                        android:textColor="@color/white"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:id="@+id/sendFollowedNotiBtn"/>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:text=""
-                android:textColor="@color/black"
-                android:textSize="15sp"
-                android:padding="15dp"
-                android:background="@drawable/edittext_ring"
-                android:drawableStart="@drawable/ic_notifications"
-                android:drawablePadding="6dp"
-                android:hint="Notification Topic"
-                android:textColorHint="@color/grey"
-                android:id="@+id/notificationTopic"/>
+                android:id="@+id/sponsoredFarmLayout"
+                android:visibility="gone">
 
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:text=""
-                android:textColor="@color/black"
-                android:textSize="15sp"
-                android:padding="15dp"
-                android:background="@drawable/edittext_ring"
-                android:drawableStart="@drawable/ic_notifications"
-                android:drawablePadding="6dp"
-                android:hint="Message"
-                android:textColorHint="@color/grey"
-                android:id="@+id/notificationMessage"
-                android:minLines="4"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="25dp"
-                android:layout_marginEnd="25dp"
-                android:layout_marginTop="50dp"
-                android:background="@drawable/new_login_button"
-                android:text="SEND BROADCAST"
-                android:textColor="@color/white"
-                android:textSize="17sp"
-                android:textStyle="bold"
-                android:id="@+id/sendNotificationBtn"/>
+                    <Spinner
+                        android:id="@+id/sponsoredSpinner"
+                        android:layout_width="match_parent"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:textSize="15sp"
+                        android:layout_height="50dp"
+                        android:background="@color/offWhite"/>
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:text=""
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
+                        android:padding="15dp"
+                        android:background="@color/offWhite"
+                        android:drawableStart="@drawable/ic_notifications"
+                        android:drawablePadding="6dp"
+                        android:hint="Title"
+                        android:textColorHint="@color/grey"
+                        android:id="@+id/sponsoredTopic"/>
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:text=""
+                        android:textColor="@color/black"
+                        android:textSize="13sp"
+                        android:padding="15dp"
+                        android:background="@color/offWhite"
+                        android:drawableStart="@drawable/ic_notifications"
+                        android:drawablePadding="6dp"
+                        android:hint="Message"
+                        android:textColorHint="@color/grey"
+                        android:id="@+id/sponsoredMessage"
+                        android:minLines="4"/>
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="25dp"
+                        android:layout_marginEnd="25dp"
+                        android:layout_marginTop="50dp"
+                        android:background="@drawable/new_login_button"
+                        android:text="SEND BROADCAST"
+                        android:textColor="@color/white"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:id="@+id/sendSponsoredNotiBtn"/>
+
+                </LinearLayout>
+
+            </RelativeLayout>
 
         </LinearLayout>
 
     </ScrollView>
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="8dp"
+        android:src="@drawable/ic_broadcast_to_all"
+        app:backgroundTint="@color/offWhite"
+        android:id="@+id/broadcastToAllFab"/>
 
 </RelativeLayout>

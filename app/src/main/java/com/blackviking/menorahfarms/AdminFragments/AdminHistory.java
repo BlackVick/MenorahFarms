@@ -9,9 +9,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.blackviking.menorahfarms.CartAndHistory.HistoryDetails;
 import com.blackviking.menorahfarms.CartAndHistory.SponsorshipHistory;
+import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Interface.ItemClickListener;
 import com.blackviking.menorahfarms.Models.HistoryModel;
@@ -19,8 +22,11 @@ import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.ViewHolders.AdminViewHolder;
 import com.blackviking.menorahfarms.ViewHolders.HistoryViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,6 +39,9 @@ public class AdminHistory extends Fragment {
 
     private LinearLayoutManager layoutManager;
     private FirebaseRecyclerAdapter<HistoryModel, AdminViewHolder> adapter;
+
+    private RelativeLayout noInternetLayout;
+    private LinearLayout emptyLayout;
 
     public AdminHistory() {
         // Required empty public constructor
@@ -51,9 +60,68 @@ public class AdminHistory extends Fragment {
 
         /*---   WIDGETS    ---*/
         adminHistoryRecycler = (RecyclerView)v.findViewById(R.id.adminHistoryRecycler);
+        noInternetLayout = v.findViewById(R.id.noInternetLayout);
+        emptyLayout = v.findViewById(R.id.emptyLayout);
 
 
-        loadHistory();
+        //execute network check async task
+        CheckInternet asyncTask = (CheckInternet) new CheckInternet(getContext(), new CheckInternet.AsyncResponse(){
+            @Override
+            public void processFinish(Integer output) {
+
+                //check all cases
+                if (output == 1){
+
+                    adminHistoryRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            if (dataSnapshot.exists()){
+
+                                noInternetLayout.setVisibility(View.GONE);
+                                emptyLayout.setVisibility(View.GONE);
+                                adminHistoryRecycler.setVisibility(View.VISIBLE);
+                                loadHistory();
+
+                            } else {
+
+                                noInternetLayout.setVisibility(View.GONE);
+                                emptyLayout.setVisibility(View.VISIBLE);
+                                adminHistoryRecycler.setVisibility(View.GONE);
+
+                            }
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                } else
+
+                if (output == 0){
+
+                    //set layout
+                    noInternetLayout.setVisibility(View.VISIBLE);
+                    emptyLayout.setVisibility(View.GONE);
+                    adminHistoryRecycler.setVisibility(View.GONE);
+
+                } else
+
+                if (output == 2){
+
+                    //set layout
+                    noInternetLayout.setVisibility(View.VISIBLE);
+                    emptyLayout.setVisibility(View.GONE);
+                    adminHistoryRecycler.setVisibility(View.GONE);
+
+                }
+
+            }
+        }).execute();
+
         return v;
     }
 

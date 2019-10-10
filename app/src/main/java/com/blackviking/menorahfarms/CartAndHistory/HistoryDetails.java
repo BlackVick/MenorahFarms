@@ -19,6 +19,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import io.paperdb.Paper;
+
 public class HistoryDetails extends AppCompatActivity {
 
     private ImageView backButton;
@@ -102,31 +104,11 @@ public class HistoryDetails extends AppCompatActivity {
 
     private void loadAllDetails(String userId) {
 
-        userRef.child(userId)
-                .addListenerForSingleValueEvent(
-                        new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
+        UserModel currentUser = Paper.book().read(Common.PAPER_USER);
 
-                                UserModel currentUser = dataSnapshot.getValue(UserModel.class);
-
-                                if (currentUser != null){
-
-                                    theDueUserName = currentUser.getFirstName() + " " + currentUser.getLastName();
-                                    theDueUserEmail = currentUser.getEmail();
-                                    theDueUserBank = currentUser.getBank() + ", " + currentUser.getAccountNumber();
-
-                                }
-
-
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        }
-                );
+        theDueUserName = currentUser.getFirstName() + " " + currentUser.getLastName();
+        theDueUserEmail = currentUser.getEmail();
+        theDueUserBank = currentUser.getBank() + ", " + currentUser.getAccountNumber();
 
         adminHistoryRef.child(historyId)
                 .addListenerForSingleValueEvent(

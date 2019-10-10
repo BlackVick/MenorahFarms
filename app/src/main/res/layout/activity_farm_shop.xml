@@ -33,6 +33,42 @@
 
     </RelativeLayout>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:layout_above="@+id/navLayout"
+        android:id="@+id/noInternetLayout"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/no_internet_warning"
+                android:layout_gravity="center"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/noInternet"
+                android:textColor="@color/grey"
+                android:textSize="13sp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:layout_marginTop="30dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
     <android.support.design.widget.TabLayout
         android:id="@+id/farmshopTabs"
         android:layout_width="match_parent"
@@ -41,7 +77,8 @@
         android:minHeight="?attr/actionBarSize"
         app:tabMode="fixed"
         app:tabSelectedTextColor="@color/colorPrimaryDark"
-        app:tabTextColor="@color/grey">
+        app:tabTextColor="@color/grey"
+        android:visibility="gone">
 
         <android.support.design.widget.TabItem
             android:layout_width="wrap_content"
@@ -65,7 +102,8 @@
         android:layout_above="@+id/navLayout"
         android:id="@+id/farmshopViewPager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
 
     <include layout="@layout/snippet_for_bottom_nav"/>
 

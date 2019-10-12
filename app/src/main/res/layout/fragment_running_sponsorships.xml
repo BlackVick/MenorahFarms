@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AdminFragments.RunningSponsorships">
+    tools:context=".AdminFragments.RunningSponsorships"
+    android:animateLayoutChanges="true">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -61,10 +62,58 @@
 
     </LinearLayout>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/offWhite"
+        android:id="@+id/controlLayout"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/ic_menorah_back_button_green"
+            android:padding="8dp"
+            android:id="@+id/backButton"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toEndOf="@+id/backButton"
+            android:background="@color/white"
+            android:id="@+id/searchText"
+            android:gravity="center_vertical"
+            android:inputType="textCapCharacters"
+            android:paddingStart="5dp"
+            android:paddingEnd="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:drawableStart="@drawable/ic_search_black_24dp"
+            android:drawablePadding="10dp"
+            android:textSize="14sp"
+            android:singleLine="true"
+            android:ellipsize="start"
+            android:textColor="@color/black"
+            android:hint="Search by Ref"
+            android:textColorHint="@color/grey"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.4dp"
+            android:background="@color/offBlack"
+            android:layout_alignParentBottom="true"/>
+
+    </RelativeLayout>
+
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/runningCycleRecycler"
+        android:layout_below="@+id/controlLayout"
         android:visibility="gone"/>
 
 </RelativeLayout>

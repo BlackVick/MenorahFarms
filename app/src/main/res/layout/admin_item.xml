@@ -13,10 +13,10 @@
         android:layout_marginEnd="10dp"
         android:id="@+id/itemIdentification"
         android:text=""
-        android:textStyle="normal"
-        android:textSize="17sp"
+        android:textStyle="bold"
+        android:textSize="15sp"
         android:padding="3dp"
-        android:textColor="@color/black"
+        android:textColor="@color/colorAccent"
         android:ellipsize="end"
         android:maxLines="1"/>
 

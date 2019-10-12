@@ -343,8 +343,7 @@ public class DueSponsorshipDetail extends AppCompatActivity {
 
                                             if (task.isSuccessful()){
 
-                                                adminSponsorshipRef.child(sponsorshipId)
-                                                        .removeValue();
+                                                removeFromCycle(currentSponsorship.getFarmId(), sponsorshipId);
 
                                                 sponsoredFarmsRef.child(userId)
                                                         .child(sponsorshipId)
@@ -402,6 +401,33 @@ public class DueSponsorshipDetail extends AppCompatActivity {
                     }
                 });
 
+
+    }
+
+    private void removeFromCycle(final String farmId, final String sponsorshipId) {
+
+        farmRef.child(farmId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        FarmModel theFarm = dataSnapshot.getValue(FarmModel.class);
+
+                        if (theFarm != null){
+
+                            adminSponsorshipRef.child(theFarm.getFarmNotiId())
+                                    .child(sponsorshipId)
+                                    .removeValue();
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
 
     }
 

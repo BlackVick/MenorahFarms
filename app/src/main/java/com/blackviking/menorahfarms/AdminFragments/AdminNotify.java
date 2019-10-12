@@ -210,7 +210,13 @@ public class AdminNotify extends Fragment {
 
 
         //validate
-        checkFollowedFarmsNotiParam();
+        sendFollowedNotiBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkFollowedFarmsNotiParam();
+            }
+        });
+
     }
 
     private void checkFollowedFarmsNotiParam() {
@@ -407,7 +413,13 @@ public class AdminNotify extends Fragment {
         });
 
         //validate
-        checkSponsoredFarmsNotiParam();
+        sendSponsoredNotiBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkSponsoredFarmsNotiParam();
+            }
+        });
+
     }
 
     private void checkSponsoredFarmsNotiParam() {

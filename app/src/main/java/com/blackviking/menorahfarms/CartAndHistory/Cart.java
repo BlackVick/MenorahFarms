@@ -707,8 +707,8 @@ public class Cart extends AppCompatActivity {
         //subscribe to notification
         subscribeToNnotification(currentFarmId);
 
-        adminSponsorRef.child(pushId)
-                .setValue(adminSponsorshipMap);
+        //add to running cycle
+        addToRunningCycle(pushId, adminSponsorshipMap, currentFarmId);
 
         sponsorshipRef.child(currentuid)
                 .child(pushId)
@@ -748,6 +748,33 @@ public class Cart extends AppCompatActivity {
                             showErrorDialog("Unknown error occurred, please contact admin immediately");
 
                         }
+
+                    }
+                });
+
+    }
+
+    private void addToRunningCycle(final String pushId, final Map<String, Object> adminSponsorshipMap, String currentFarmId) {
+
+        farmRef.child(currentFarmId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        FarmModel theFarm = dataSnapshot.getValue(FarmModel.class);
+
+                        if (theFarm != null){
+
+                            adminSponsorRef.child(theFarm.getFarmNotiId())
+                                    .child(pushId)
+                                    .setValue(adminSponsorshipMap);
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
                     }
                 });
@@ -794,7 +821,9 @@ public class Cart extends AppCompatActivity {
         notificationMap.put("time", todayString);
 
 
-        final Map<String, Object> adminNotificationMap = new HashMap<>();
+        //notification to admin
+        sendAlertToAdmin();
+        /*final Map<String, Object> adminNotificationMap = new HashMap<>();
         adminNotificationMap.put("topic", "Sponsorship Start");
         adminNotificationMap.put("message", "New Sponsorship Alert.");
         adminNotificationMap.put("time", todayString);
@@ -853,7 +882,7 @@ public class Cart extends AppCompatActivity {
 
                             }
                         }
-                );
+                );*/
 
         notificationRef.child(currentuid)
                 .push()
@@ -888,6 +917,49 @@ public class Cart extends AppCompatActivity {
 
             }
         });
+
+    }
+
+    private void sendAlertToAdmin() {
+
+        userRef.orderByChild("userType")
+                .equalTo("Admin")
+                .addListenerForSingleValueEvent(
+                        new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                for (DataSnapshot snap : dataSnapshot.getChildren()){
+
+                                    final String adminKey = snap.getKey();
+
+                                    Map<String, String> dataSend = new HashMap<>();
+                                    dataSend.put("title", "Sponsorship Start");
+                                    dataSend.put("message", "A new user just sponsored a farm.");
+                                    DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(adminKey).toString(), dataSend);
+
+                                    mService.sendNotification(dataMessage)
+                                            .enqueue(new retrofit2.Callback<MyResponse>() {
+                                                @Override
+                                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+
+                                                }
+
+                                                @Override
+                                                public void onFailure(Call<MyResponse> call, Throwable t) {
+                                                }
+                                            });
+
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        }
+                );
 
     }
 

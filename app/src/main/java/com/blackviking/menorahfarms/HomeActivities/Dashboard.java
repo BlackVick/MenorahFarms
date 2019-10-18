@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -35,6 +36,10 @@ import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.Services.CheckForSponsorship;
 import com.blackviking.menorahfarms.SignIn;
 import com.facebook.login.LoginManager;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -70,6 +75,10 @@ public class Dashboard extends AppCompatActivity {
     private UserModel paperUser;
     private android.app.AlertDialog alertDialog, alertDialogError;
 
+    //google
+    private GoogleApiClient mGoogleApiClient;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,6 +91,7 @@ public class Dashboard extends AppCompatActivity {
         farmRef = db.getReference("Farms");
         if (mAuth.getCurrentUser() != null)
             currentUid = mAuth.getCurrentUser().getUid();
+
 
 
         /*---   WIDGETS   ---*/
@@ -114,6 +124,24 @@ public class Dashboard extends AppCompatActivity {
         dashboardText.setTextColor(getResources().getColor(R.color.colorPrimary));
         farmstoreText.setTextColor(getResources().getColor(R.color.black));
         accountText.setTextColor(getResources().getColor(R.color.black));
+
+
+
+        /*---   GOOGLE INIT   ---*/
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
+                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                        Toast.makeText(Dashboard.this, "Unknown Error Occurred", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
 
         farmstoreSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -492,17 +520,42 @@ public class Dashboard extends AppCompatActivity {
 
         } else if (paperUser.getUserType().equalsIgnoreCase("Banned")) {
 
-            Paper.book().destroy();
 
-            mAuth.signOut();
-            ((ApplicationClass)(getApplicationContext())).resetUser();
+            if (paperUser.getSignUpMode().equalsIgnoreCase("Google")){
 
-            FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
-            FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.GENERAL_NOTIFY);
-            Intent signoutIntent = new Intent(Dashboard.this, SignIn.class);
-            signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(signoutIntent);
-            finish();
+                //revoke access
+                Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient);
+
+                Paper.book().destroy();
+
+                mAuth.signOut();
+                ((ApplicationClass)(getApplicationContext())).resetUser();
+
+                FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
+                FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.GENERAL_NOTIFY);
+                Intent signoutIntent = new Intent(Dashboard.this, SignIn.class);
+                signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(signoutIntent);
+
+                finish();
+
+            } else {
+
+                Paper.book().destroy();
+
+                mAuth.signOut();
+                ((ApplicationClass)(getApplicationContext())).resetUser();
+
+                FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
+                FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.GENERAL_NOTIFY);
+                Intent signoutIntent = new Intent(Dashboard.this, SignIn.class);
+                signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(signoutIntent);
+
+                finish();
+
+            }
+
 
         } else {
 

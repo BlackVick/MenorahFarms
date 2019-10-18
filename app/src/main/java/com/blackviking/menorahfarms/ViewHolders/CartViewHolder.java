@@ -11,15 +11,15 @@ import com.blackviking.menorahfarms.R;
 
 public class CartViewHolder extends RecyclerView.ViewHolder {
 
-    public ImageView cartItemImage, removeFromCart;
-    public TextView cartItemType, cartItemLocation, cartItemROI, cartItemDuration, cartItemPrice, cartItemUnits;
+    public ImageView cartItemImage;
+    public TextView cartItemType, cartItemLocation, cartItemROI, cartItemDuration, cartItemPrice, cartItemUnits, removeFromCart;
     public Button checkout;
 
     public CartViewHolder(@NonNull View itemView) {
         super(itemView);
 
         cartItemImage = (ImageView)itemView.findViewById(R.id.cartItemImage);
-        removeFromCart = (ImageView)itemView.findViewById(R.id.removeFromCart);
+        removeFromCart = (TextView) itemView.findViewById(R.id.removeFromCart);
         cartItemType = (TextView)itemView.findViewById(R.id.cartItemType);
         cartItemLocation = (TextView)itemView.findViewById(R.id.cartItemLocation);
         cartItemROI = (TextView)itemView.findViewById(R.id.cartItemROI);

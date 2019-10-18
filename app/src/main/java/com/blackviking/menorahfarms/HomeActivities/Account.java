@@ -48,6 +48,10 @@ import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.SignIn;
 import com.facebook.login.LoginManager;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -129,6 +133,10 @@ public class Account extends AppCompatActivity {
     private UserModel paperUser;
     private android.app.AlertDialog alertDialog, alertDialogError;
 
+
+    //google
+    private GoogleApiClient mGoogleApiClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -177,6 +185,25 @@ public class Account extends AppCompatActivity {
         unverifiedLayout = (RelativeLayout)findViewById(R.id.unverifiedLayout);
         reloadPage = (ImageView)findViewById(R.id.reloadPage);
         resendActivationBtn = (Button)findViewById(R.id.resendActivationBtn);
+
+
+
+        /*---   GOOGLE INIT   ---*/
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
+                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                        Toast.makeText(Account.this, "Unknown Error Occurred", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
 
 
         /*---   BOTTOM NAV   ---*/
@@ -289,17 +316,40 @@ public class Account extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Paper.book().destroy();
+                if (paperUser.getSignUpMode().equalsIgnoreCase("Google")){
 
-                mAuth.signOut();
-                ((ApplicationClass)(getApplicationContext())).resetUser();
+                    //revoke access
+                    Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient);
 
-                FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
-                FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.GENERAL_NOTIFY);
-                Intent signoutIntent = new Intent(Account.this, SignIn.class);
-                signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(signoutIntent);
-                finish();
+                    Paper.book().destroy();
+
+                    mAuth.signOut();
+                    ((ApplicationClass)(getApplicationContext())).resetUser();
+
+                    FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
+                    FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.GENERAL_NOTIFY);
+                    Intent signoutIntent = new Intent(Account.this, SignIn.class);
+                    signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(signoutIntent);
+
+                    finish();
+
+                } else {
+
+                    Paper.book().destroy();
+
+                    mAuth.signOut();
+                    ((ApplicationClass)(getApplicationContext())).resetUser();
+
+                    FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
+                    FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.GENERAL_NOTIFY);
+                    Intent signoutIntent = new Intent(Account.this, SignIn.class);
+                    signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(signoutIntent);
+
+                    finish();
+
+                }
 
             }
         });

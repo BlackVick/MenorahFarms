@@ -60,7 +60,7 @@ public class CheckInternet extends AsyncTask<String,Void,Integer>{
         try {
             Socket socket=new Socket();
             SocketAddress socketAddress=new InetSocketAddress("8.8.8.8",53);
-            socket.connect(socketAddress,1500);
+            socket.connect(socketAddress,4000);
             socket.close();
             result=1;
         } catch (IOException e) {

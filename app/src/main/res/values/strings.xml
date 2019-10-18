@@ -4,7 +4,8 @@
     <string name="fb_login_protocol_scheme">fb2434484176610800</string>
     <string name="poweredBy">2019 | Menorah Farms &#169;</string>
     <string name="noInternet">We could not communicate with the server. Please check internet connection and try again later.</string>
-
+    <string name="transferNotice">Please make transfer for the total amount of units you are sponsoring to the BANK ACCOUNT BELOW and upload a proof of payment (Screenshot of transaction statement). \n\nYour sponsorship will be activated once confirmed</string>
+    <string name="uploadFinish">UPLOAD</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

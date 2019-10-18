@@ -193,7 +193,6 @@ public class FarmDetails extends AppCompatActivity {
                                     final String theFarmROI = currentFarm.getFarmRoi();
                                     final String theFarmUnitPrice = currentFarm.getPricePerUnit();
                                     String theFarmSponsorDuration = currentFarm.getSponsorDuration();
-                                    String theFarmUnitsLeft = currentFarm.getUnitsAvailable();
                                     final String theFarmImage = currentFarm.getFarmImageThumb();
                                     final String theFarmState = currentFarm.getFarmState();
                                     farmNotiId = currentFarm.getFarmNotiId();
@@ -223,7 +222,7 @@ public class FarmDetails extends AppCompatActivity {
 
 
                                     farmType.setText(theFarmType);
-                                    unitsLeft.setText(theFarmUnitsLeft);
+                                    unitsLeft.setText("2 Hours Left");
                                     farmLocation.setText(theFarmLocation);
                                     farmROI.setText("Returns " + theFarmROI + "% in " + theFarmSponsorDuration + " months.");
 
@@ -245,9 +244,7 @@ public class FarmDetails extends AppCompatActivity {
 
                                     totalPay.setText(Common.convertToPrice(FarmDetails.this, totalResult));
 
-                                    final int unitsAvail = Integer.parseInt(theFarmUnitsLeft);
-
-                                    if (unitsAvail == 0 || !theFarmState.equalsIgnoreCase("Now Selling") || unitsAvail < 0){
+                                    if (!theFarmState.equalsIgnoreCase("Now Selling")){
 
                                         addToCartBtn.setVisibility(View.GONE);
                                         farmNumber.setVisibility(View.GONE);
@@ -264,13 +261,13 @@ public class FarmDetails extends AppCompatActivity {
                                         @Override
                                         public void onClick(View v) {
 
-                                            if (unitNumberText < unitsAvail) {
-                                                unitNumberText++;
-                                                unitNumber.setText(String.valueOf(unitNumberText));
-
-                                                calculateChanges(unitNumberText, theFarmUnitPrice, theFarmROI);
-
-                                            }
+//                                            if (unitNumberText < unitsAvail) {
+//                                                unitNumberText++;
+//                                                unitNumber.setText(String.valueOf(unitNumberText));
+//
+//                                                calculateChanges(unitNumberText, theFarmUnitPrice, theFarmROI);
+//
+//                                            }
                                         }
                                     });
 

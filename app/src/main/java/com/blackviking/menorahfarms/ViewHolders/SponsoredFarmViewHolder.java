@@ -15,7 +15,7 @@ public class SponsoredFarmViewHolder extends RecyclerView.ViewHolder implements 
     private ItemClickListener itemClickListener;
     public ImageView sponsoredFarmImage;
     public TextView sponsoredFarmType, sponsoredFarmPriceUnit, sponsoredFarmDate, sponsoredFarmRefNumber, sponsoredFarmROI;
-    public RelativeLayout processing;
+    public RelativeLayout processing, pending;
 
     public SponsoredFarmViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -27,6 +27,7 @@ public class SponsoredFarmViewHolder extends RecyclerView.ViewHolder implements 
         sponsoredFarmRefNumber = (TextView)itemView.findViewById(R.id.sponsoredFarmRefNumber);
         sponsoredFarmROI = (TextView)itemView.findViewById(R.id.sponsoredFarmROI);
         processing = (RelativeLayout) itemView.findViewById(R.id.processing);
+        pending = (RelativeLayout) itemView.findViewById(R.id.pending);
 
         itemView.setOnClickListener(this);
     }

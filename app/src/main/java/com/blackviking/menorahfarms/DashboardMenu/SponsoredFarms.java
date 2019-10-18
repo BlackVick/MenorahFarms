@@ -254,10 +254,17 @@ public class SponsoredFarms extends AppCompatActivity {
                 if (model.getStatus().equalsIgnoreCase("processing")){
 
                     viewHolder.processing.setVisibility(View.VISIBLE);
+                    viewHolder.pending.setVisibility(View.GONE);
+
+                } else if (model.getStatus().equalsIgnoreCase("pending")){
+
+                    viewHolder.processing.setVisibility(View.GONE);
+                    viewHolder.pending.setVisibility(View.VISIBLE);
 
                 } else {
 
                     viewHolder.processing.setVisibility(View.GONE);
+                    viewHolder.pending.setVisibility(View.GONE);
 
                 }
 

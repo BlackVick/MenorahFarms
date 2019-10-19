@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/farm_item_bacground"
+    android:layout_width="match_parent"
+    android:layout_marginStart="10dp"
+    android:layout_marginEnd="10dp"
+    android:layout_marginTop="13dp"
+    android:layout_marginBottom="13dp"
+    android:layout_height="wrap_content"
+    app:corner_radius="11dp"
+    android:elevation="6dp"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="10">
+
+            <com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout
+                android:layout_width="0dp"
+                android:layout_weight="4"
+                android:layout_height="80dp"
+                app:corner_radius="11dp"
+                android:layout_gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/menorah_placeholder"
+                    android:scaleType="centerCrop"
+                    android:id="@+id/farmManageImage"/>
+
+            </com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="6"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/farmManageType"
+                    android:text=""
+                    android:textColor="@color/black"
+                    android:padding="2dp"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/farmManageStatus"
+                    android:text=""
+                    android:textColor="@color/black"
+                    android:padding="1dp"
+                    android:textSize="14sp"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout>

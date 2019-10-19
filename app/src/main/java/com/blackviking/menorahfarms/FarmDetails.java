@@ -184,7 +184,7 @@ public class FarmDetails extends AppCompatActivity {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                FarmModel currentFarm = dataSnapshot.getValue(FarmModel.class);
+                                final FarmModel currentFarm = dataSnapshot.getValue(FarmModel.class);
 
                                 if (currentFarm != null){
 
@@ -261,13 +261,39 @@ public class FarmDetails extends AppCompatActivity {
                                         @Override
                                         public void onClick(View v) {
 
-//                                            if (unitNumberText < unitsAvail) {
-//                                                unitNumberText++;
-//                                                unitNumber.setText(String.valueOf(unitNumberText));
-//
-//                                                calculateChanges(unitNumberText, theFarmUnitPrice, theFarmROI);
-//
-//                                            }
+                                            if (currentFarm.getPackagedType().equalsIgnoreCase("Student")){
+
+                                                if (unitNumberText < 10) {
+                                                    unitNumberText++;
+                                                    unitNumber.setText(String.valueOf(unitNumberText));
+
+                                                    calculateChanges(unitNumberText, theFarmUnitPrice, theFarmROI);
+
+                                                } else {
+
+                                                    showErrorDialog("You can not exceed sponsorship limit for this package.");
+
+                                                }
+
+                                            }
+
+                                            if (currentFarm.getPackagedType().equalsIgnoreCase("Worker")){
+
+                                                if (unitNumberText < 100) {
+                                                    unitNumberText++;
+                                                    unitNumber.setText(String.valueOf(unitNumberText));
+
+                                                    calculateChanges(unitNumberText, theFarmUnitPrice, theFarmROI);
+
+                                                } else {
+
+                                                    showErrorDialog("You can not exceed sponsorship limit for this package");
+
+                                                }
+
+                                            }
+
+
                                         }
                                     });
 

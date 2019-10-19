@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
+import com.blackviking.menorahfarms.Models.FarmModel;
 import com.blackviking.menorahfarms.Notification.APIService;
 import com.blackviking.menorahfarms.Notification.DataMessage;
 import com.blackviking.menorahfarms.Notification.MyResponse;
@@ -35,7 +36,7 @@ import retrofit2.Response;
 public class SponsorshipMonitor extends Service {
 
     FirebaseDatabase db = FirebaseDatabase.getInstance();
-    DatabaseReference sponsoredFarmRef, dueSponsorRef, notificationRef, userRef;
+    DatabaseReference sponsoredFarmRef, dueSponsorRef, notificationRef, userRef, runningCycleRef, farmRef;
     String userId, startDateString, endDate, todayString;
     APIService mService;
 
@@ -57,6 +58,8 @@ public class SponsorshipMonitor extends Service {
         dueSponsorRef = db.getReference("DueSponsorships");
         notificationRef = db.getReference("Notifications");
         userRef = db.getReference("Users");
+        runningCycleRef = db.getReference("RunningCycles");
+        farmRef = db.getReference("Farms");
 
 
         /*---   FCM   ---*/
@@ -101,8 +104,9 @@ public class SponsorshipMonitor extends Service {
 
                                             endDate = snap.child("cycleEndDate").getValue().toString();
                                             startDateString = snap.child("cycleStartDate").getValue().toString();
+                                            String farmId = snap.child("farmId").getValue().toString();
 
-                                            calculateDays(endDate, startDateString, snap.getKey());
+                                            calculateDays(endDate, startDateString, snap.getKey(), farmId);
 
                                         }
 
@@ -142,7 +146,7 @@ public class SponsorshipMonitor extends Service {
 
     }
 
-    private void calculateDays(String endDate, String startDateString, String key) {
+    private void calculateDays(String endDate, String startDateString, String key, String farmId) {
 
         todayDate = Calendar.getInstance().getTime();
         sdfToday = new SimpleDateFormat("dd-MM-yyyy");
@@ -168,7 +172,7 @@ public class SponsorshipMonitor extends Service {
 
                 if (daysUsed >= totalSponsorshipDays) {
 
-                    endSponsorship(key);
+                    endSponsorship(key, farmId);
 
                 }
 
@@ -182,18 +186,48 @@ public class SponsorshipMonitor extends Service {
 
     }
 
-    private void endSponsorship(String key) {
+    private void endSponsorship(String key, String farmId) {
+
+
+        //remove from running cycle
+        farmRef.child(farmId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        FarmModel theFarm = dataSnapshot.getValue(FarmModel.class);
+
+                        if (theFarm != null){
+
+                            runningCycleRef.child(theFarm.getFarmNotiId())
+                                    .child(userId)
+                                    .removeValue();
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
 
         Map<String, Object> dueSponsorshipMap = new HashMap<>();
         dueSponsorshipMap.put("user", userId);
         dueSponsorshipMap.put("sponsorshipId", key);
         dueSponsorshipMap.put("timeDue", ServerValue.TIMESTAMP);
 
+
+        //switch sponsorship to processing
         sponsoredFarmRef.child(userId)
                 .child(key)
                 .child("status")
                 .setValue("processing");
 
+
+        //add sponsorship to due
         dueSponsorRef.push()
                 .setValue(dueSponsorshipMap)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -271,15 +305,6 @@ public class SponsorshipMonitor extends Service {
                                 for (DataSnapshot snap : dataSnapshot.getChildren()){
 
                                     String theUserIds = snap.getKey();
-
-                                    final Map<String, Object> notificationMap = new HashMap<>();
-                                    notificationMap.put("topic", "Sponsorship End");
-                                    notificationMap.put("message", "A sponsorship cycle just ended.");
-                                    notificationMap.put("time", todayString);
-
-                                    notificationRef.child(theUserIds)
-                                            .push()
-                                            .setValue(notificationMap);
 
                                     Map<String, String> dataSend = new HashMap<>();
                                     dataSend.put("title", "Admin");

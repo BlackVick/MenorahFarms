@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AdminDetails.FarmManagementDetail"
+    android:animateLayoutChanges="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@color/colorAccent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="10">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_weight="1.2"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_menorah_back_button_white"
+                    android:layout_centerInParent="true"
+                    android:id="@+id/backButton"
+                    android:adjustViewBounds="true"/>
+
+            </RelativeLayout>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="8.8"
+                android:layout_height="match_parent"
+                android:text="Farm Manager"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:gravity="center_vertical"
+                android:paddingStart="30dp"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="55.1dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:animateLayoutChanges="true"
+            android:padding="20dp">
+
+            <com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="170dp"
+                app:corner_radius="15dp"
+                android:elevation="6dp">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/farmManageDetailImage"
+                    android:src="@drawable/menorah_placeholder"
+                    android:scaleType="centerCrop"
+                    android:adjustViewBounds="true"/>
+
+            </com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:animateLayoutChanges="true"
+                android:weightSum="10">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="10"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textStyle="bold"
+                    android:textSize="23sp"
+                    android:textColor="@color/black"
+                    android:id="@+id/farmManageDetailsType"
+                    android:gravity="center_vertical"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="@color/grey"
+                android:textSize="13sp"
+                android:id="@+id/farmManageDetailLocation"
+                android:layout_marginTop="10dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:id="@+id/farmManageDetailROI"
+                android:layout_marginTop="10dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:id="@+id/farmManageDetailStatus"
+                android:layout_marginTop="10dp"/>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:background="@drawable/new_login_button"
+                android:id="@+id/activateFarm"
+                android:text="ACTIVATE FARM"
+                android:textColor="@color/white"
+                android:layout_margin="15dp"
+                android:visibility="gone"/>
+
+            <com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout
+                android:background="@drawable/farm_item_bacground"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:corner_radius="7dp"
+                android:elevation="4dp"
+                android:layout_marginTop="10dp"
+                android:padding="10dp"
+                android:id="@+id/activateFarmLayout"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="15dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="How many hours should farm remain activated?"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"/>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_alignParentEnd="true"
+                            android:padding="3dp">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Hour(s)"
+                                android:textSize="16sp"
+                                android:textColor="@color/black"
+                                android:layout_gravity="center"
+                                android:gravity="center"/>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:layout_marginTop="8dp"
+                                android:layout_gravity="start"
+                                android:id="@+id/farmNumber"
+                                android:background="@drawable/number_button_bacground">
+
+                                <RelativeLayout
+                                    android:layout_width="30dp"
+                                    android:layout_height="28dp">
+
+                                    <ImageView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:src="@drawable/ic_subtract_number_unit"
+                                        android:adjustViewBounds="true"
+                                        android:id="@+id/decreaseHourNumber"/>
+
+                                </RelativeLayout>
+
+                                <RelativeLayout
+                                    android:layout_width="40dp"
+                                    android:layout_height="28dp"
+                                    android:background="@color/colorPrimary">
+
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:gravity="center"
+                                        android:text=""
+                                        android:textColor="@color/white"
+                                        android:textSize="16sp"
+                                        android:id="@+id/hourNumber"/>
+
+                                </RelativeLayout>
+
+                                <RelativeLayout
+                                    android:layout_width="30dp"
+                                    android:layout_height="28dp">
+
+                                    <ImageView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:src="@drawable/ic_add_number_unit"
+                                        android:adjustViewBounds="true"
+                                        android:id="@+id/increaseHourNumber"/>
+
+                                </RelativeLayout>
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </RelativeLayout>
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        android:background="@drawable/new_login_button"
+                        android:id="@+id/confirmActivation"
+                        android:text="CONFIRM ACTIVATION"
+                        android:textColor="@color/white"
+                        android:layout_margin="15dp"/>
+
+                </LinearLayout>
+
+            </com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</RelativeLayout>

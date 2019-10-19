@@ -65,7 +65,7 @@ public class PendingSponsorships extends Fragment {
 
         /*---   FIREBASE   ---*/
         userRef = db.getReference("Users");
-        pendingSponsorshipRef = db.getReference("SponsoredFarms");
+        pendingSponsorshipRef = db.getReference("PendingSponsorships");
 
 
         /*---   WIDGETS   ---*/
@@ -188,7 +188,7 @@ public class PendingSponsorships extends Fragment {
 
         adapter = new FirebaseRecyclerAdapter<PendingSponsorshipModel, PendingSponsorshipViewHolder>(
                 PendingSponsorshipModel.class,
-                R.layout.running_cycle_item,
+                R.layout.pending_sponsorship_item,
                 PendingSponsorshipViewHolder.class,
                 pendingSponsorshipRef.child(key)
         ) {

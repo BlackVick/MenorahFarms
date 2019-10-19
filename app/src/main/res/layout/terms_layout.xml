@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:corner_radius="1dp"
-    android:layout_margin="2dp"
-    android:padding="15dp"
+    android:padding="10dp"
     android:background="@color/white">
 
     <ScrollView
@@ -92,4 +90,4 @@
 
     </LinearLayout>
 
-</com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout>
+</RelativeLayout>

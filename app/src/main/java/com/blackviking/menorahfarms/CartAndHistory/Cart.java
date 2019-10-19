@@ -94,7 +94,7 @@ public class Cart extends AppCompatActivity {
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private DatabaseReference cartRef, userRef, farmRef, sponsorshipRef, payHistoryRef, termsRef, menorahBankRef, pendingSponsorshipRef,
-            notificationRef, adminSponsorRef, sponsoredFarmNotiRef;
+            notificationRef;
     private String currentuid;
     private String paymentReference;
 
@@ -142,8 +142,6 @@ public class Cart extends AppCompatActivity {
         payHistoryRef = db.getReference("TransactionHistory");
         termsRef = db.getReference("TermsAndConditions");
         notificationRef = db.getReference("Notifications");
-        adminSponsorRef = db.getReference("RunningCycles");
-        sponsoredFarmNotiRef = db.getReference("SponsoredFarmsNotification");
         menorahBankRef = db.getReference("MenorahBankDetails");
         imageRef = storage.getReference("PaymentProofs");
         pendingSponsorshipRef = db.getReference("PendingSponsorships");
@@ -1002,22 +1000,6 @@ public class Cart extends AppCompatActivity {
         sponsorshipMap.put("farmId", currentFarmId);
         sponsorshipMap.put("status", "pending");
 
-        //admin running cycle map
-        Map<String, Object> adminSponsorshipMap = new HashMap<>();
-        adminSponsorshipMap.put("sponsorReturn", String.valueOf(currentTotalPayout));
-        adminSponsorshipMap.put("cycleEndDate", futureString);
-        adminSponsorshipMap.put("cycleStartDate", todayString);
-        adminSponsorshipMap.put("sponsorRefNumber", paymentReference);
-        adminSponsorshipMap.put("unitPrice", currentUnitPrice);
-        adminSponsorshipMap.put("sponsoredUnits", String.valueOf(currentUnits));
-        adminSponsorshipMap.put("sponsoredFarmType", currentFarmType);
-        adminSponsorshipMap.put("sponsoredFarmRoi", currentFarmRoi);
-        adminSponsorshipMap.put("sponsorshipDuration", currentDuration);
-        adminSponsorshipMap.put("startPoint", ServerValue.TIMESTAMP);
-        adminSponsorshipMap.put("totalAmountPaid", totalPrice);
-        adminSponsorshipMap.put("farmId", currentFarmId);
-        adminSponsorshipMap.put("userId", currentuid);
-
         //pending sponsorship map
         Map<String, Object> adminPendingSponsorshipMap = new HashMap<>();
         adminPendingSponsorshipMap.put("sponsorReturn", String.valueOf(currentTotalPayout));
@@ -1044,14 +1026,11 @@ public class Cart extends AppCompatActivity {
         logMap.put("farmSponsored", currentFarmId);
         logMap.put("paymentProof", originalImageUrl);
 
-        DatabaseReference pushRef = adminSponsorRef.push();
+        DatabaseReference pushRef = sponsorshipRef.push();
         String pushId = pushRef.getKey();
 
-        //subscribe to notification
-        subscribeToNnotification(currentFarmId);
-
-        //add to running cycle
-        addToRunningCycle(pushId, adminSponsorshipMap, currentFarmId, adminPendingSponsorshipMap);
+        //add to pending sponsorships cycle
+        addToPendingSponsorships(pushId, currentFarmId, adminPendingSponsorshipMap);
 
         sponsorshipRef.child(currentuid)
                 .child(pushId)
@@ -1103,7 +1082,7 @@ public class Cart extends AppCompatActivity {
 
     }
 
-    private void addToRunningCycle(final String pushId, final Map<String, Object> adminSponsorshipMap, String currentFarmId, final Map<String, Object> adminPendingSponsorshipMap) {
+    private void addToPendingSponsorships(final String pushId, String currentFarmId, final Map<String, Object> adminPendingSponsorshipMap) {
 
         farmRef.child(currentFarmId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1113,42 +1092,10 @@ public class Cart extends AppCompatActivity {
                         FarmModel theFarm = dataSnapshot.getValue(FarmModel.class);
 
                         if (theFarm != null){
-
-                            adminSponsorRef.child(theFarm.getFarmNotiId())
-                                    .child(pushId)
-                                    .setValue(adminSponsorshipMap);
 
                             pendingSponsorshipRef.child(theFarm.getFarmNotiId())
                                     .child(pushId)
                                     .setValue(adminPendingSponsorshipMap);
-
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
-    }
-
-    private void subscribeToNnotification(String currentFarmId) {
-
-        farmRef.child(currentFarmId)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        FarmModel theFarm = dataSnapshot.getValue(FarmModel.class);
-
-                        if (theFarm != null){
-
-                            sponsoredFarmNotiRef.child(theFarm.getFarmNotiId())
-                                    .child(currentuid)
-                                    .child("timestamp")
-                                    .setValue(ServerValue.TIMESTAMP);
 
                         }
 
@@ -1169,8 +1116,8 @@ public class Cart extends AppCompatActivity {
         String todayString = formatter.format(todayDate);
 
         final Map<String, Object> notificationMap = new HashMap<>();
-        notificationMap.put("topic", "Sponsorship Start");
-        notificationMap.put("message", "Your payment has been received successfully and your sponsorship cycle will start shortly. You can monitor your sponsored farm from the Sponsored Farms page through your dashboard.");
+        notificationMap.put("topic", "Sponsorship Pending");
+        notificationMap.put("message", "Your proof of payment has been received successfully and your sponsorship cycle will start as soon as proof is verified. You will be notified once your sponsorship has been approved.");
         notificationMap.put("time", todayString);
 
 
@@ -1246,8 +1193,8 @@ public class Cart extends AppCompatActivity {
                             public void onSuccess(Void aVoid) {
 
                                 Map<String, String> dataSend = new HashMap<>();
-                                dataSend.put("title", "Sponsorship Start");
-                                dataSend.put("message", "Your payment has been received successfully and your sponsorship cycle will start shortly. You can monitor your sponsored farm from the Sponsored Farms page through your dashboard.");
+                                dataSend.put("title", "Sponsorship");
+                                dataSend.put("message", "Your proof of payment has been received successfully and your sponsorship cycle will start as soon as proof is verified. You will be notified once your sponsorship has been approved.");
                                 DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(currentuid).toString(), dataSend);
 
                                 mService.sendNotification(dataMessage)

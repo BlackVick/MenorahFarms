@@ -19,6 +19,8 @@ import android.widget.Toast;
 import com.blackviking.menorahfarms.AdminFragments.AdminHistory;
 import com.blackviking.menorahfarms.AdminFragments.AdminNotify;
 import com.blackviking.menorahfarms.AdminFragments.DueSponsorships;
+import com.blackviking.menorahfarms.AdminFragments.FarmManagement;
+import com.blackviking.menorahfarms.AdminFragments.PendingSponsorships;
 import com.blackviking.menorahfarms.AdminFragments.RunningSponsorships;
 import com.blackviking.menorahfarms.AdminFragments.StudentRequest;
 import com.blackviking.menorahfarms.Common.CheckInternet;
@@ -33,12 +35,14 @@ public class AdminDash extends AppCompatActivity {
     private ImageView backButton;
     private TextView fragmentName;
 
-    private RelativeLayout dueSponsorshipLayout, studentApplyLayout, adminNotifyLayout, runningSponsorshipLayout, adminHistoryLayout;
-    private ImageView dueSponsorshipImage, studentApplyImage, adminNotifyImage, runningSponsorshipImage, adminHistoryImage;
-    private TextView dueSponsorshipCounter, studentApplyCounter, runningSponsorshipCounter;
+    private RelativeLayout dueSponsorshipLayout, studentApplyLayout, adminNotifyLayout,
+                            runningSponsorshipLayout, adminHistoryLayout, pendingSponsorshipLayout, farmManagementLayout;
+    private ImageView dueSponsorshipImage, studentApplyImage, adminNotifyImage, runningSponsorshipImage,
+                            adminHistoryImage, pendingSponsorshipImage, farmManagementImage;
+    private TextView dueSponsorshipCounter, studentApplyCounter, runningSponsorshipCounter, pendingSponsorshipCounter;
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference studentRef, dueSponsorshipRef, notificationRef, userRef, adminSponsorshipRef;
+    private DatabaseReference studentRef, dueSponsorshipRef, notificationRef, userRef, adminSponsorshipRef, pendingSponsorshipRef;
 
 
     private RelativeLayout noInternetLayout, adminBottomNav;
@@ -60,6 +64,7 @@ public class AdminDash extends AppCompatActivity {
         notificationRef = db.getReference("Notifications");
         userRef = db.getReference("Users");
         adminSponsorshipRef = db.getReference("RunningCycles");
+        pendingSponsorshipRef = db.getReference("PendingSponsorships");
 
 
         /*---   WIDGETS   ---*/
@@ -75,15 +80,21 @@ public class AdminDash extends AppCompatActivity {
         studentApplyImage = (ImageView)findViewById(R.id.studentApplyImage);
         adminNotifyImage = (ImageView)findViewById(R.id.adminNotifyImage);
         runningSponsorshipImage = (ImageView)findViewById(R.id.runningSponsorshipImage);
-        adminHistoryImage = (ImageView)findViewById(R.id.adminHistoryImage);
-        dueSponsorshipCounter = (TextView)findViewById(R.id.dueSponsorshipCounter);
-        studentApplyCounter = (TextView)findViewById(R.id.studentApplyCounter);
-        runningSponsorshipCounter = (TextView)findViewById(R.id.runningSponsorshipCounter);
+        adminHistoryImage = findViewById(R.id.adminHistoryImage);
+        dueSponsorshipCounter = findViewById(R.id.dueSponsorshipCounter);
+        studentApplyCounter = findViewById(R.id.studentApplyCounter);
+        runningSponsorshipCounter = findViewById(R.id.runningSponsorshipCounter);
 
         noInternetLayout = findViewById(R.id.noInternetLayout);
         adminBottomNav = findViewById(R.id.adminBottomNav);
         adminFrame = findViewById(R.id.adminFrame);
         line = findViewById(R.id.line);
+
+        pendingSponsorshipLayout = findViewById(R.id.pendingSponsorshipLayout);
+        farmManagementLayout = findViewById(R.id.farmManagementLayout);
+        pendingSponsorshipImage = findViewById(R.id.pendingSponsorshipImage);
+        farmManagementImage = findViewById(R.id.farmManagementImage);
+        pendingSponsorshipCounter = findViewById(R.id.pendingSponsorshipCounter);
 
 
 
@@ -93,6 +104,8 @@ public class AdminDash extends AppCompatActivity {
         final AdminNotify adminNotify = new AdminNotify();
         final RunningSponsorships runningSponsorships = new RunningSponsorships();
         final AdminHistory adminHistory = new AdminHistory();
+        final PendingSponsorships pendingSponsorships = new PendingSponsorships();
+        final FarmManagement farmManagement = new FarmManagement();
 
 
         //show loading dialog
@@ -166,6 +179,13 @@ public class AdminDash extends AppCompatActivity {
                 adminHistoryLayout.setBackgroundResource(R.color.white);
                 adminHistoryImage.setImageResource(R.drawable.ic_history);
 
+                pendingSponsorshipLayout.setBackgroundResource(R.color.white);
+                pendingSponsorshipImage.setImageResource(R.drawable.ic_pending_sponsorships_green);
+                pendingSponsorshipCounter.setTextColor(getResources().getColor(R.color.red));
+
+                farmManagementLayout.setBackgroundResource(R.color.white);
+                farmManagementImage.setImageResource(R.drawable.ic_farm_management_green);
+
                 setFragment(dueSponsorships);
             }
         });
@@ -193,6 +213,13 @@ public class AdminDash extends AppCompatActivity {
 
                 adminHistoryLayout.setBackgroundResource(R.color.white);
                 adminHistoryImage.setImageResource(R.drawable.ic_history);
+
+                pendingSponsorshipLayout.setBackgroundResource(R.color.white);
+                pendingSponsorshipImage.setImageResource(R.drawable.ic_pending_sponsorships_green);
+                pendingSponsorshipCounter.setTextColor(getResources().getColor(R.color.red));
+
+                farmManagementLayout.setBackgroundResource(R.color.white);
+                farmManagementImage.setImageResource(R.drawable.ic_farm_management_green);
 
                 setFragment(studentRequest);
 
@@ -223,6 +250,13 @@ public class AdminDash extends AppCompatActivity {
                 adminHistoryLayout.setBackgroundResource(R.color.white);
                 adminHistoryImage.setImageResource(R.drawable.ic_history);
 
+                pendingSponsorshipLayout.setBackgroundResource(R.color.white);
+                pendingSponsorshipImage.setImageResource(R.drawable.ic_pending_sponsorships_green);
+                pendingSponsorshipCounter.setTextColor(getResources().getColor(R.color.red));
+
+                farmManagementLayout.setBackgroundResource(R.color.white);
+                farmManagementImage.setImageResource(R.drawable.ic_farm_management_green);
+
                 setFragment(adminNotify);
 
             }
@@ -251,6 +285,13 @@ public class AdminDash extends AppCompatActivity {
 
                 adminHistoryLayout.setBackgroundResource(R.color.white);
                 adminHistoryImage.setImageResource(R.drawable.ic_history);
+
+                pendingSponsorshipLayout.setBackgroundResource(R.color.white);
+                pendingSponsorshipImage.setImageResource(R.drawable.ic_pending_sponsorships_green);
+                pendingSponsorshipCounter.setTextColor(getResources().getColor(R.color.red));
+
+                farmManagementLayout.setBackgroundResource(R.color.white);
+                farmManagementImage.setImageResource(R.drawable.ic_farm_management_green);
 
                 setFragment(runningSponsorships);
 
@@ -281,7 +322,86 @@ public class AdminDash extends AppCompatActivity {
                 adminHistoryLayout.setBackgroundResource(R.color.colorPrimaryDark);
                 adminHistoryImage.setImageResource(R.drawable.ic_history_white);
 
+                pendingSponsorshipLayout.setBackgroundResource(R.color.white);
+                pendingSponsorshipImage.setImageResource(R.drawable.ic_pending_sponsorships_green);
+                pendingSponsorshipCounter.setTextColor(getResources().getColor(R.color.red));
+
+                farmManagementLayout.setBackgroundResource(R.color.white);
+                farmManagementImage.setImageResource(R.drawable.ic_farm_management_green);
+
                 setFragment(adminHistory);
+
+            }
+        });
+
+        pendingSponsorshipLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                fragmentName.setText("Pending Sponsorships");
+
+                dueSponsorshipLayout.setBackgroundResource(R.color.white);
+                dueSponsorshipImage.setImageResource(R.drawable.ic_due_sponsorships);
+                dueSponsorshipCounter.setTextColor(getResources().getColor(R.color.red));
+
+                studentApplyLayout.setBackgroundResource(R.color.white);
+                studentApplyImage.setImageResource(R.drawable.ic_student_request);
+                studentApplyCounter.setTextColor(getResources().getColor(R.color.red));
+
+                adminNotifyLayout.setBackgroundResource(R.color.white);
+                adminNotifyImage.setImageResource(R.drawable.ic_notifications);
+
+                runningSponsorshipLayout.setBackgroundResource(R.color.white);
+                runningSponsorshipImage.setImageResource(R.drawable.ic_current_sponsorships_green);
+                runningSponsorshipCounter.setTextColor(getResources().getColor(R.color.red));
+
+                adminHistoryLayout.setBackgroundResource(R.color.white);
+                adminHistoryImage.setImageResource(R.drawable.ic_history);
+
+                pendingSponsorshipLayout.setBackgroundResource(R.color.colorPrimaryDark);
+                pendingSponsorshipImage.setImageResource(R.drawable.ic_pending_sponsorship_white);
+                pendingSponsorshipCounter.setTextColor(getResources().getColor(R.color.white));
+
+                farmManagementLayout.setBackgroundResource(R.color.white);
+                farmManagementImage.setImageResource(R.drawable.ic_farm_management_green);
+
+                setFragment(pendingSponsorships);
+
+            }
+        });
+
+        farmManagementLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                fragmentName.setText("Farm Management");
+
+                dueSponsorshipLayout.setBackgroundResource(R.color.white);
+                dueSponsorshipImage.setImageResource(R.drawable.ic_due_sponsorships);
+                dueSponsorshipCounter.setTextColor(getResources().getColor(R.color.red));
+
+                studentApplyLayout.setBackgroundResource(R.color.white);
+                studentApplyImage.setImageResource(R.drawable.ic_student_request);
+                studentApplyCounter.setTextColor(getResources().getColor(R.color.red));
+
+                adminNotifyLayout.setBackgroundResource(R.color.white);
+                adminNotifyImage.setImageResource(R.drawable.ic_notifications);
+
+                runningSponsorshipLayout.setBackgroundResource(R.color.white);
+                runningSponsorshipImage.setImageResource(R.drawable.ic_current_sponsorships_green);
+                runningSponsorshipCounter.setTextColor(getResources().getColor(R.color.red));
+
+                adminHistoryLayout.setBackgroundResource(R.color.white);
+                adminHistoryImage.setImageResource(R.drawable.ic_history);
+
+                pendingSponsorshipLayout.setBackgroundResource(R.color.white);
+                pendingSponsorshipImage.setImageResource(R.drawable.ic_pending_sponsorships_green);
+                pendingSponsorshipCounter.setTextColor(getResources().getColor(R.color.red));
+
+                farmManagementLayout.setBackgroundResource(R.color.colorPrimaryDark);
+                farmManagementImage.setImageResource(R.drawable.ic_farm_management_white);
+
+                setFragment(farmManagement);
 
             }
         });
@@ -352,6 +472,21 @@ public class AdminDash extends AppCompatActivity {
 
                     }
                 });
+
+        pendingSponsorshipRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                int pendSponsCount = (int) dataSnapshot.getChildrenCount();
+                pendingSponsorshipCounter.setText(String.valueOf(pendSponsCount));
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
     }
 

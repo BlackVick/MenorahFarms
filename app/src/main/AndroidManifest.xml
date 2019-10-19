@@ -3,15 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.blackviking.menorahfarms">
 
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
-
     <application
         android:name=".Common.ApplicationClass"
         android:allowBackup="true"
@@ -22,27 +13,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <service
-            android:name=".Services.SponsorshipMonitor"
-            android:enabled="true"
-            android:exported="true" />
-
-
-        <service
-            android:name=".Services.CheckForSponsorship"
-            android:enabled="true"
-            android:exported="true" />
-
-        <service
-            android:name=".Notification.MyFirebaseMessaging"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
-
 
         <activity
             android:name=".Splash"
@@ -55,37 +25,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <provider
-            android:name=".Common.GenericFileProvider"
-            android:authorities="${applicationId}.provider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths" />
-        </provider>
-
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:configChanges="orientation"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/Base.Theme.AppCompat" />
-
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="97c5e0bb9711d1cf829d94e2147e8567b6542b37"
-            tools:replace="android:value" />
-        <meta-data
-            android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id"
-            tools:replace="android:value" />
-
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name" />
+
         <activity
             android:name="com.facebook.CustomTabActivity"
             android:exported="true">
@@ -98,16 +48,19 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".SignIn"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:theme="@style/LoginBackground" />
+
         <activity
             android:name=".SignUp"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:theme="@style/LoginBackground" />
+
         <activity
             android:name=".Registration"
             android:configChanges="orientation"
@@ -117,6 +70,7 @@
             android:name=".DashboardMenu.SponsoredFarms"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".DashboardMenu.FollowedFarms"
             android:configChanges="orientation"
@@ -136,7 +90,7 @@
         <activity
             android:name=".DashboardMenu.FarmUpdates"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".DashboardMenu.AccountManager"
             android:configChanges="orientation"
@@ -144,7 +98,7 @@
         <activity
             android:name=".DashboardMenu.Faq"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".CartAndHistory.Cart"
             android:configChanges="orientation"
@@ -160,15 +114,15 @@
         <activity
             android:name=".AccountMenus.ContactDetails"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".AccountMenus.BankDetails"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".AccountMenus.NextOfKin"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".AccountMenus.SocialMedia"
             android:configChanges="orientation"
@@ -176,11 +130,11 @@
         <activity
             android:name=".FarmDetails"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".AccountMenus.StudentDetails"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".FarmDescription"
             android:configChanges="orientation"
@@ -192,7 +146,7 @@
         <activity
             android:name=".Sponsorship.SponsorshipDetails"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".AdminDash"
             android:configChanges="orientation"
@@ -200,7 +154,7 @@
         <activity
             android:name=".DashboardMenu.Notifications"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".AdminDetails.DueSponsorshipDetail"
             android:configChanges="orientation"
@@ -209,6 +163,53 @@
             android:name=".AdminDetails.StudentRequestDetails"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".AdminDetails.PendingSponsorshipDetail"
+            android:theme="@style/ImageViewTheme"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"></activity>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="97c5e0bb9711d1cf829d94e2147e8567b6542b37"
+            tools:replace="android:value" />
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id"
+            tools:replace="android:value" />
+        <provider
+            android:name=".Common.GenericFileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+        <service
+            android:name=".Services.SponsorshipMonitor"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name=".Services.CheckForSponsorship"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name=".Notification.MyFirebaseMessaging"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
     </application>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
 </manifest>

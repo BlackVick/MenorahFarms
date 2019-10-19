@@ -108,137 +108,184 @@
         android:id="@+id/adminBottomNav"
         android:visibility="gone">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <HorizontalScrollView
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:animateLayoutChanges="true"
-            android:weightSum="5">
+            android:layout_centerInParent="true"
+            android:scrollbars="none">
 
-            <RelativeLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:animateLayoutChanges="true"
+            <LinearLayout
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:id="@+id/dueSponsorshipLayout">
+                android:orientation="horizontal"
+                android:animateLayoutChanges="true">
 
-                <ImageView
-                    android:layout_width="wrap_content"
+                <RelativeLayout
+                    android:layout_width="65dp"
+                    android:animateLayoutChanges="true"
                     android:layout_height="match_parent"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/ic_due_sponsorships"
-                    android:adjustViewBounds="true"
-                    android:padding="15dp"
-                    android:id="@+id/dueSponsorshipImage"/>
+                    android:id="@+id/dueSponsorshipLayout">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=""
-                    android:textColor="@color/red"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:layout_alignParentEnd="true"
-                    android:layout_margin="4dp"
-                    android:id="@+id/dueSponsorshipCounter"/>
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/ic_due_sponsorships"
+                        android:adjustViewBounds="true"
+                        android:padding="15dp"
+                        android:id="@+id/dueSponsorshipImage"/>
 
-            </RelativeLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="@color/red"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:layout_alignParentEnd="true"
+                        android:layout_margin="4dp"
+                        android:id="@+id/dueSponsorshipCounter"/>
 
-            <RelativeLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:animateLayoutChanges="true"
-                android:layout_height="match_parent"
-                android:id="@+id/studentApplyLayout">
+                </RelativeLayout>
 
-                <ImageView
-                    android:layout_width="wrap_content"
+                <RelativeLayout
+                    android:layout_width="65dp"
+                    android:animateLayoutChanges="true"
                     android:layout_height="match_parent"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/ic_student_request"
-                    android:adjustViewBounds="true"
-                    android:padding="15dp"
-                    android:id="@+id/studentApplyImage"/>
+                    android:id="@+id/studentApplyLayout">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=""
-                    android:textColor="@color/red"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:layout_alignParentEnd="true"
-                    android:layout_margin="4dp"
-                    android:id="@+id/studentApplyCounter"/>
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/ic_student_request"
+                        android:adjustViewBounds="true"
+                        android:padding="15dp"
+                        android:id="@+id/studentApplyImage"/>
 
-            </RelativeLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="@color/red"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:layout_alignParentEnd="true"
+                        android:layout_margin="4dp"
+                        android:id="@+id/studentApplyCounter"/>
 
-            <RelativeLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:animateLayoutChanges="true"
-                android:layout_height="match_parent"
-                android:id="@+id/adminNotifyLayout">
+                </RelativeLayout>
 
-                <ImageView
-                    android:layout_width="wrap_content"
+                <RelativeLayout
+                    android:layout_width="65dp"
+                    android:animateLayoutChanges="true"
                     android:layout_height="match_parent"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/ic_notifications"
-                    android:adjustViewBounds="true"
-                    android:padding="15dp"
-                    android:id="@+id/adminNotifyImage"/>
+                    android:id="@+id/adminNotifyLayout">
 
-            </RelativeLayout>
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/ic_notifications"
+                        android:adjustViewBounds="true"
+                        android:padding="15dp"
+                        android:id="@+id/adminNotifyImage"/>
 
-            <RelativeLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:animateLayoutChanges="true"
-                android:layout_height="match_parent"
-                android:id="@+id/runningSponsorshipLayout">
+                </RelativeLayout>
 
-                <ImageView
-                    android:layout_width="wrap_content"
+                <RelativeLayout
+                    android:layout_width="65dp"
+                    android:animateLayoutChanges="true"
                     android:layout_height="match_parent"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/ic_current_sponsorships_green"
-                    android:adjustViewBounds="true"
-                    android:padding="17dp"
-                    android:id="@+id/runningSponsorshipImage"/>
+                    android:id="@+id/runningSponsorshipLayout">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=""
-                    android:textColor="@color/red"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:layout_alignParentEnd="true"
-                    android:layout_margin="4dp"
-                    android:id="@+id/runningSponsorshipCounter"/>
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/ic_current_sponsorships_green"
+                        android:adjustViewBounds="true"
+                        android:padding="17dp"
+                        android:id="@+id/runningSponsorshipImage"/>
 
-            </RelativeLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="@color/red"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:layout_alignParentEnd="true"
+                        android:layout_margin="4dp"
+                        android:id="@+id/runningSponsorshipCounter"/>
 
-            <RelativeLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:animateLayoutChanges="true"
-                android:id="@+id/adminHistoryLayout">
+                </RelativeLayout>
 
-                <ImageView
-                    android:layout_width="wrap_content"
+                <RelativeLayout
+                    android:layout_width="65dp"
                     android:layout_height="match_parent"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/ic_history"
-                    android:adjustViewBounds="true"
-                    android:padding="15dp"
-                    android:id="@+id/adminHistoryImage"/>
+                    android:animateLayoutChanges="true"
+                    android:id="@+id/adminHistoryLayout">
 
-            </RelativeLayout>
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/ic_history"
+                        android:adjustViewBounds="true"
+                        android:padding="15dp"
+                        android:id="@+id/adminHistoryImage"/>
 
-        </LinearLayout>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="65dp"
+                    android:animateLayoutChanges="true"
+                    android:layout_height="match_parent"
+                    android:id="@+id/pendingSponsorshipLayout">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/ic_pending_sponsorships_green"
+                        android:adjustViewBounds="true"
+                        android:padding="17dp"
+                        android:id="@+id/pendingSponsorshipImage"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="@color/red"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:layout_alignParentEnd="true"
+                        android:layout_margin="4dp"
+                        android:id="@+id/pendingSponsorshipCounter"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="65dp"
+                    android:animateLayoutChanges="true"
+                    android:layout_height="match_parent"
+                    android:id="@+id/farmManagementLayout">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/ic_farm_management_green"
+                        android:adjustViewBounds="true"
+                        android:padding="17dp"
+                        android:id="@+id/farmManagementImage"/>
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
 
     </RelativeLayout>
 

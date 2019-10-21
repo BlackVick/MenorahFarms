@@ -1,10 +1,13 @@
 package com.blackviking.menorahfarms.DashboardMenu;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -13,7 +16,15 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.blackviking.menorahfarms.Common.CheckInternet;
+import com.blackviking.menorahfarms.Models.FarmUpdateModel;
 import com.blackviking.menorahfarms.R;
+import com.blackviking.menorahfarms.ViewHolders.FarmUpdateViewHolder;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class FarmUpdates extends AppCompatActivity {
 
@@ -21,6 +32,13 @@ public class FarmUpdates extends AppCompatActivity {
     private RelativeLayout noInternetLayout;
     private LinearLayout emptyLayout;
     private android.app.AlertDialog alertDialog;
+    private RecyclerView farmUpdateRecycler;
+
+    private LinearLayoutManager layoutManager;
+
+    private FirebaseDatabase db = FirebaseDatabase.getInstance();
+    private DatabaseReference updateRef;
+    private FirebaseRecyclerAdapter<FarmUpdateModel, FarmUpdateViewHolder> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,10 +46,15 @@ public class FarmUpdates extends AppCompatActivity {
         setContentView(R.layout.activity_farm_updates);
 
 
+        //firebase
+        updateRef = db.getReference("FarmUpdates");
+
+
         /*---   WIDGETS   ---*/
         backButton = (ImageView)findViewById(R.id.backButton);
         noInternetLayout = findViewById(R.id.noInternetLayout);
         emptyLayout = findViewById(R.id.emptyLayout);
+        farmUpdateRecycler = findViewById(R.id.farmUpdateRecycler);
 
 
         //show loading dialog
@@ -46,9 +69,35 @@ public class FarmUpdates extends AppCompatActivity {
                 //check all cases
                 if (output == 1){
 
-                    alertDialog.dismiss();
-                    emptyLayout.setVisibility(View.VISIBLE);
-                    noInternetLayout.setVisibility(View.GONE);
+                    
+                    updateRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            
+                            if (dataSnapshot.exists()){
+
+                                alertDialog.dismiss();
+                                emptyLayout.setVisibility(View.GONE);
+                                noInternetLayout.setVisibility(View.GONE);
+                                farmUpdateRecycler.setVisibility(View.VISIBLE);
+                                loadUpdates();
+                                
+                            } else {
+
+                                alertDialog.dismiss();
+                                emptyLayout.setVisibility(View.VISIBLE);
+                                noInternetLayout.setVisibility(View.GONE);
+                                farmUpdateRecycler.setVisibility(View.GONE);
+                                
+                            }
+                            
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
 
                 } else
 
@@ -58,6 +107,7 @@ public class FarmUpdates extends AppCompatActivity {
                     alertDialog.dismiss();
                     noInternetLayout.setVisibility(View.VISIBLE);
                     emptyLayout.setVisibility(View.GONE);
+                    farmUpdateRecycler.setVisibility(View.GONE);
 
                 } else
 
@@ -67,6 +117,7 @@ public class FarmUpdates extends AppCompatActivity {
                     alertDialog.dismiss();
                     noInternetLayout.setVisibility(View.VISIBLE);
                     emptyLayout.setVisibility(View.GONE);
+                    farmUpdateRecycler.setVisibility(View.GONE);
 
                 }
 
@@ -79,6 +130,43 @@ public class FarmUpdates extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    private void loadUpdates() {
+
+        farmUpdateRecycler.setHasFixedSize(true);
+        layoutManager = new LinearLayoutManager(FarmUpdates.this);
+        layoutManager.setStackFromEnd(true);
+        layoutManager.setReverseLayout(true);
+        farmUpdateRecycler.setLayoutManager(layoutManager);
+
+
+        adapter = new FirebaseRecyclerAdapter<FarmUpdateModel, FarmUpdateViewHolder>(
+                FarmUpdateModel.class,
+                R.layout.farm_update_item,
+                FarmUpdateViewHolder.class,
+                updateRef
+        ) {
+            @Override
+            protected void populateViewHolder(FarmUpdateViewHolder viewHolder, final FarmUpdateModel model, int position) {
+
+                viewHolder.youtubeTitle.setText(model.getVideo_title());
+                viewHolder.youtubeView.loadUrl(model.getVideo_embed());
+                viewHolder.playInFullScreen.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        Intent fullscreenIntent = new Intent(FarmUpdates.this, FarmUpdateFullscreen.class);
+                        fullscreenIntent.putExtra("VideoUrl", model.getVideo_url());
+                        startActivity(fullscreenIntent);
+                        overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
+                    }
+                });
+
+            }
+        };
+        farmUpdateRecycler.setAdapter(adapter);
     }
 
     /*---   LOADING DIALOG   ---*/

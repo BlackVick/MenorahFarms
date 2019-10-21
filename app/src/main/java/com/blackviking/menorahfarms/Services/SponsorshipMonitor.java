@@ -368,4 +368,11 @@ public class SponsorshipMonitor extends Service {
         // TODO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        Paper.book().write(Common.isSponsorshipMonitorRunning, false);
+    }
 }

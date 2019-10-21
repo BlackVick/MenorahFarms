@@ -136,12 +136,21 @@
                 android:layout_margin="15dp"
                 android:visibility="gone"/>
 
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:background="@drawable/new_login_button"
+                android:id="@+id/deactivateFarm"
+                android:text="DEACTIVATE FARM"
+                android:textColor="@color/white"
+                android:layout_margin="15dp"
+                android:visibility="gone"/>
+
             <com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout
                 android:background="@drawable/farm_item_bacground"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:corner_radius="7dp"
-                android:elevation="4dp"
                 android:layout_marginTop="10dp"
                 android:padding="10dp"
                 android:id="@+id/activateFarmLayout"

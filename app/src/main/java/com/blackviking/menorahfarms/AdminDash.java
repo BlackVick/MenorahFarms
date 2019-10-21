@@ -24,11 +24,15 @@ import com.blackviking.menorahfarms.AdminFragments.PendingSponsorships;
 import com.blackviking.menorahfarms.AdminFragments.RunningSponsorships;
 import com.blackviking.menorahfarms.AdminFragments.StudentRequest;
 import com.blackviking.menorahfarms.Common.CheckInternet;
+import com.blackviking.menorahfarms.Common.Common;
+import com.blackviking.menorahfarms.Models.UserModel;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import io.paperdb.Paper;
 
 public class AdminDash extends AppCompatActivity {
 
@@ -51,6 +55,8 @@ public class AdminDash extends AppCompatActivity {
 
     private android.app.AlertDialog alertDialog;
 
+    private UserModel paperUser;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +72,9 @@ public class AdminDash extends AppCompatActivity {
         adminSponsorshipRef = db.getReference("RunningCycles");
         pendingSponsorshipRef = db.getReference("PendingSponsorships");
 
+
+        //paper User
+        paperUser = Paper.book().read(Common.PAPER_USER);
 
         /*---   WIDGETS   ---*/
         backButton = (ImageView)findViewById(R.id.backButton);
@@ -374,34 +383,45 @@ public class AdminDash extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                fragmentName.setText("Farm Management");
+                if (paperUser.getEmail().equalsIgnoreCase("bv.softwares@gmail.com")
+                        || paperUser.getEmail().equalsIgnoreCase("simonrileyindustries@gmail.com")){
 
-                dueSponsorshipLayout.setBackgroundResource(R.color.white);
-                dueSponsorshipImage.setImageResource(R.drawable.ic_due_sponsorships);
-                dueSponsorshipCounter.setTextColor(getResources().getColor(R.color.red));
+                    fragmentName.setText("Farm Management");
 
-                studentApplyLayout.setBackgroundResource(R.color.white);
-                studentApplyImage.setImageResource(R.drawable.ic_student_request);
-                studentApplyCounter.setTextColor(getResources().getColor(R.color.red));
+                    dueSponsorshipLayout.setBackgroundResource(R.color.white);
+                    dueSponsorshipImage.setImageResource(R.drawable.ic_due_sponsorships);
+                    dueSponsorshipCounter.setTextColor(getResources().getColor(R.color.red));
 
-                adminNotifyLayout.setBackgroundResource(R.color.white);
-                adminNotifyImage.setImageResource(R.drawable.ic_notifications);
+                    studentApplyLayout.setBackgroundResource(R.color.white);
+                    studentApplyImage.setImageResource(R.drawable.ic_student_request);
+                    studentApplyCounter.setTextColor(getResources().getColor(R.color.red));
 
-                runningSponsorshipLayout.setBackgroundResource(R.color.white);
-                runningSponsorshipImage.setImageResource(R.drawable.ic_current_sponsorships_green);
-                runningSponsorshipCounter.setTextColor(getResources().getColor(R.color.red));
+                    adminNotifyLayout.setBackgroundResource(R.color.white);
+                    adminNotifyImage.setImageResource(R.drawable.ic_notifications);
 
-                adminHistoryLayout.setBackgroundResource(R.color.white);
-                adminHistoryImage.setImageResource(R.drawable.ic_history);
+                    runningSponsorshipLayout.setBackgroundResource(R.color.white);
+                    runningSponsorshipImage.setImageResource(R.drawable.ic_current_sponsorships_green);
+                    runningSponsorshipCounter.setTextColor(getResources().getColor(R.color.red));
 
-                pendingSponsorshipLayout.setBackgroundResource(R.color.white);
-                pendingSponsorshipImage.setImageResource(R.drawable.ic_pending_sponsorships_green);
-                pendingSponsorshipCounter.setTextColor(getResources().getColor(R.color.red));
+                    adminHistoryLayout.setBackgroundResource(R.color.white);
+                    adminHistoryImage.setImageResource(R.drawable.ic_history);
 
-                farmManagementLayout.setBackgroundResource(R.color.colorPrimaryDark);
-                farmManagementImage.setImageResource(R.drawable.ic_farm_management_white);
+                    pendingSponsorshipLayout.setBackgroundResource(R.color.white);
+                    pendingSponsorshipImage.setImageResource(R.drawable.ic_pending_sponsorships_green);
+                    pendingSponsorshipCounter.setTextColor(getResources().getColor(R.color.red));
 
-                setFragment(farmManagement);
+                    farmManagementLayout.setBackgroundResource(R.color.colorPrimaryDark);
+                    farmManagementImage.setImageResource(R.drawable.ic_farm_management_white);
+
+                    setFragment(farmManagement);
+
+                } else {
+
+                    Toast.makeText(AdminDash.this, "Only ***** is permitted to edit farm", Toast.LENGTH_LONG).show();
+
+                }
+
+
 
             }
         });

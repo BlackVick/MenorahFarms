@@ -337,53 +337,76 @@ public class Cart extends AppCompatActivity {
                                                         //check all cases
                                                         if (output == 1) {
 
-                                                            final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(Cart.this).create();
-                                                            LayoutInflater inflater = Cart.this.getLayoutInflater();
-                                                            View viewOptions = inflater.inflate(R.layout.terms_layout, null);
+                                                            sponsorshipRef.child(currentuid)
+                                                                    .orderByChild("farmId")
+                                                                    .equalTo(model.getFarmId())
+                                                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                        @Override
+                                                                        public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                                            final TextView termsText = (TextView) viewOptions.findViewById(R.id.termsText);
-                                                            final Button cancel = (Button) viewOptions.findViewById(R.id.cancelCheckout);
-                                                            final Button proceed = (Button) viewOptions.findViewById(R.id.proceedCheckout);
+                                                                            if (!dataSnapshot.exists()){
 
-                                                            alertDialog.setView(viewOptions);
+                                                                                final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(Cart.this).create();
+                                                                                LayoutInflater inflater = Cart.this.getLayoutInflater();
+                                                                                View viewOptions = inflater.inflate(R.layout.terms_layout, null);
 
-                                                            alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
-                                                            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                                                                final TextView termsText = (TextView) viewOptions.findViewById(R.id.termsText);
+                                                                                final Button cancel = (Button) viewOptions.findViewById(R.id.cancelCheckout);
+                                                                                final Button proceed = (Button) viewOptions.findViewById(R.id.proceedCheckout);
 
-                                                            termsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                @Override
-                                                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                                                                alertDialog.setView(viewOptions);
 
-                                                                    String theTerms = dataSnapshot.child("terms").getValue().toString();
+                                                                                alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+                                                                                alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-                                                                    termsText.setText(theTerms);
+                                                                                termsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                                    @Override
+                                                                                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                                                }
+                                                                                        String theTerms = dataSnapshot.child("terms").getValue().toString();
 
-                                                                @Override
-                                                                public void onCancelled(DatabaseError databaseError) {
+                                                                                        termsText.setText(theTerms);
 
-                                                                }
-                                                            });
+                                                                                    }
 
-                                                            proceed.setOnClickListener(new View.OnClickListener() {
-                                                                @Override
-                                                                public void onClick(View v) {
-                                                                    alertDialog.dismiss();
-                                                                    transferCheckout(theFarmState, adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
-                                                                    //checkoutAndPay(theFarmState, adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
-                                                                    //testPay(adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
-                                                                }
-                                                            });
+                                                                                    @Override
+                                                                                    public void onCancelled(DatabaseError databaseError) {
 
-                                                            cancel.setOnClickListener(new View.OnClickListener() {
-                                                                @Override
-                                                                public void onClick(View v) {
-                                                                    alertDialog.cancel();
-                                                                }
-                                                            });
+                                                                                    }
+                                                                                });
 
-                                                            alertDialog.show();
+                                                                                proceed.setOnClickListener(new View.OnClickListener() {
+                                                                                    @Override
+                                                                                    public void onClick(View v) {
+                                                                                        alertDialog.dismiss();
+                                                                                        transferCheckout(theFarmState, adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
+                                                                                        //checkoutAndPay(theFarmState, adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
+                                                                                        //testPay(adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
+                                                                                    }
+                                                                                });
+
+                                                                                cancel.setOnClickListener(new View.OnClickListener() {
+                                                                                    @Override
+                                                                                    public void onClick(View v) {
+                                                                                        alertDialog.cancel();
+                                                                                    }
+                                                                                });
+
+                                                                                alertDialog.show();
+
+                                                                            } else {
+
+                                                                                showErrorDialog("You have already sponsored this farm.");
+
+                                                                            }
+
+                                                                        }
+
+                                                                        @Override
+                                                                        public void onCancelled(DatabaseError databaseError) {
+
+                                                                        }
+                                                                    });
 
                                                         } else if (output == 0) {
 

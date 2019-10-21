@@ -85,7 +85,7 @@
 
                 <TextView
                     android:layout_width="0dp"
-                    android:layout_weight="6"
+                    android:layout_weight="5"
                     android:layout_height="wrap_content"
                     android:text=""
                     android:textStyle="bold"
@@ -96,11 +96,11 @@
 
                 <TextView
                     android:layout_width="0dp"
-                    android:layout_weight="4"
+                    android:layout_weight="5"
                     android:layout_height="wrap_content"
                     android:text=""
-                    android:textSize="16sp"
-                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    android:textColor="@color/red"
                     android:id="@+id/farmDetailsUnitsLeft"
                     android:gravity="center_vertical|end"/>
 

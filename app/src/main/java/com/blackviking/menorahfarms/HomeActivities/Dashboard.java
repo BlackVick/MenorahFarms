@@ -34,6 +34,7 @@ import com.blackviking.menorahfarms.Models.FarmModel;
 import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.Services.CheckForSponsorship;
+import com.blackviking.menorahfarms.Services.SponsorshipMonitor;
 import com.blackviking.menorahfarms.SignIn;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.Auth;
@@ -519,6 +520,15 @@ public class Dashboard extends AppCompatActivity {
             });
 
         } else if (paperUser.getUserType().equalsIgnoreCase("Banned")) {
+
+
+            //stop sponsorship service
+            if (Paper.book().read(Common.isSponsorshipMonitorRunning)){
+
+                Intent serviceIntent = new Intent(Dashboard.this, SponsorshipMonitor.class);
+                stopService(serviceIntent);
+
+            }
 
 
             if (paperUser.getSignUpMode().equalsIgnoreCase("Google")){

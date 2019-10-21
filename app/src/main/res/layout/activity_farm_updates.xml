@@ -95,7 +95,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Coming Soon . . ."
+            android:text="More Coming Soon . . ."
             android:gravity="center"
             android:textColor="@color/colorAccent"
             android:textSize="25sp"
@@ -111,5 +111,12 @@
             android:layout_marginTop="10dp"/>
 
     </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:id="@+id/farmUpdateRecycler"
+        android:visibility="gone"/>
 
 </RelativeLayout>

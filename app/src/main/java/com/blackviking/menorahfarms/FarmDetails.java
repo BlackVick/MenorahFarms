@@ -221,8 +221,9 @@ public class FarmDetails extends AppCompatActivity {
                                     }
 
 
+
                                     farmType.setText(theFarmType);
-                                    unitsLeft.setText("2 Hours Left");
+                                    unitsLeft.setText(currentFarm.getUnitsAvailable());
                                     farmLocation.setText(theFarmLocation);
                                     farmROI.setText("Returns " + theFarmROI + "% in " + theFarmSponsorDuration + " months.");
 

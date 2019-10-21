@@ -43,6 +43,7 @@ public class Common {
 
     /*---   SUBSCRIPTION TOGGLE   ---*/
     public static String isSponsorshipMonitorRunning = "SponsorMonitor";
+    public static String isFarmServiceRunning = "FarmMonitor";
 
 
     /*---   CONTEXT MENU   ---*/

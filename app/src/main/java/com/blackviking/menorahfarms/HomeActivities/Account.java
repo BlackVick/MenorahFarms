@@ -46,6 +46,7 @@ import com.blackviking.menorahfarms.Common.Permissions;
 import com.blackviking.menorahfarms.Models.FarmModel;
 import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
+import com.blackviking.menorahfarms.Services.SponsorshipMonitor;
 import com.blackviking.menorahfarms.SignIn;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.Auth;
@@ -128,6 +129,7 @@ public class Account extends AppCompatActivity {
     private String theUserMail, theFirstName, theLastName, theProfilePicture;
 
     private boolean isWarned;
+    private boolean isMonitorRunning;
 
 
     private UserModel paperUser;
@@ -203,6 +205,12 @@ public class Account extends AppCompatActivity {
                 })
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
+
+
+        //check sponsorship monitor
+        if (Paper.book().read(Common.isSponsorshipMonitorRunning) == null)
+            Paper.book().write(Common.isSponsorshipMonitorRunning, false);
+        isMonitorRunning = Paper.book().read(Common.isSponsorshipMonitorRunning);
 
 
 
@@ -315,6 +323,14 @@ public class Account extends AppCompatActivity {
         logOutLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                //stop sponsorship service
+                if (Paper.book().read(Common.isSponsorshipMonitorRunning)){
+
+                    Intent serviceIntent = new Intent(Account.this, SponsorshipMonitor.class);
+                    stopService(serviceIntent);
+
+                }
 
                 if (paperUser.getSignUpMode().equalsIgnoreCase("Google")){
 

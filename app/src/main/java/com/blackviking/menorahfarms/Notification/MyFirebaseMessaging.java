@@ -125,7 +125,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
         } else if (title.equalsIgnoreCase("Sponsorship End")) {
 
-            Intent notificationsIntent = new Intent(this, SponsorshipHistory.class);
+            Intent notificationsIntent = new Intent(this, Dashboard.class);
             PendingIntent contentIntent = PendingIntent.getActivity(this,
                     0, notificationsIntent, 0);
 
@@ -145,7 +145,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
         } else if (title.equalsIgnoreCase("Sponsorship Start")) {
 
-            Intent notificationsIntent = new Intent(this, SponsoredFarms.class);
+            Intent notificationsIntent = new Intent(this, Dashboard.class);
             PendingIntent contentIntent = PendingIntent.getActivity(this,
                     0, notificationsIntent, 0);
 
@@ -165,7 +165,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
         } else if (title.equalsIgnoreCase("Admin")) {
 
-            Intent notificationsIntent = new Intent(this, AdminDash.class);
+            Intent notificationsIntent = new Intent(this, Dashboard.class);
             PendingIntent contentIntent = PendingIntent.getActivity(this,
                     0, notificationsIntent, 0);
 
@@ -186,7 +186,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
         } else if (title.equalsIgnoreCase("Followed Farms")) {
 
-                Intent notificationsIntent = new Intent(this, AdminDash.class);
+                Intent notificationsIntent = new Intent(this, Dashboard.class);
                 PendingIntent contentIntent = PendingIntent.getActivity(this,
                         0, notificationsIntent, 0);
 
@@ -206,7 +206,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
         } else if (title.equalsIgnoreCase("Sponsored Farms")) {
 
-                Intent notificationsIntent = new Intent(this, AdminDash.class);
+                Intent notificationsIntent = new Intent(this, Dashboard.class);
                 PendingIntent contentIntent = PendingIntent.getActivity(this,
                         0, notificationsIntent, 0);
 
@@ -303,7 +303,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
         } else if (title.equalsIgnoreCase("Sponsorship End")) {
 
-            Intent notificationsIntent = new Intent(this, SponsorshipHistory.class);
+            Intent notificationsIntent = new Intent(this, Dashboard.class);
             PendingIntent contentIntent = PendingIntent.getActivity(this,
                     0, notificationsIntent, 0);
 
@@ -323,7 +323,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
         } else if (title.equalsIgnoreCase("Sponsorship Start")) {
 
-            Intent notificationsIntent = new Intent(this, SponsoredFarms.class);
+            Intent notificationsIntent = new Intent(this, Dashboard.class);
             PendingIntent contentIntent = PendingIntent.getActivity(this,
                     0, notificationsIntent, 0);
 
@@ -343,7 +343,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
         } else if (title.equalsIgnoreCase("Admin")) {
 
-            Intent notificationsIntent = new Intent(this, AdminDash.class);
+            Intent notificationsIntent = new Intent(this, Dashboard.class);
             PendingIntent contentIntent = PendingIntent.getActivity(this,
                     0, notificationsIntent, 0);
 
@@ -364,7 +364,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
         } else if (title.equalsIgnoreCase("Followed Farms")) {
 
-            Intent notificationsIntent = new Intent(this, AdminDash.class);
+            Intent notificationsIntent = new Intent(this, Dashboard.class);
             PendingIntent contentIntent = PendingIntent.getActivity(this,
                     0, notificationsIntent, 0);
 
@@ -384,7 +384,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
         } else if (title.equalsIgnoreCase("Sponsored Farms")) {
 
-            Intent notificationsIntent = new Intent(this, AdminDash.class);
+            Intent notificationsIntent = new Intent(this, Dashboard.class);
             PendingIntent contentIntent = PendingIntent.getActivity(this,
                     0, notificationsIntent, 0);
 

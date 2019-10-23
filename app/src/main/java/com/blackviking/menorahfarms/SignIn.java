@@ -96,7 +96,7 @@ public class SignIn extends AppCompatActivity {
                 .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
                     @Override
                     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        Toast.makeText(SignIn.this, "Unknown Error Occurred", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SignIn.this, "Unable to connect to google network", Toast.LENGTH_LONG).show();
                     }
                 })
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
@@ -334,13 +334,7 @@ public class SignIn extends AppCompatActivity {
                         }
                     }
                 }
-        ).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                showErrorDialog("Sign in failed, please check provided details and try again later");
-                mDialog.dismiss();
-            }
-        });
+        );
 
     }
 
@@ -367,7 +361,7 @@ public class SignIn extends AppCompatActivity {
 
         if (TextUtils.isEmpty(theResetMail) || !isValidEmail(theResetMail)){
 
-            loginEmail.setError("Please Provide The E-Mail You Want A Password Reset For.");
+            loginEmail.setError("Please provide e-mail");
             loginEmail.requestFocus();
             mDialog.dismiss();
 
@@ -379,12 +373,12 @@ public class SignIn extends AppCompatActivity {
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()){
 
-                                showErrorDialog("Password Reset Instructions Have Been Sent To Your Mail !");
+                                showErrorDialog("Reset instructions have been sent to your mail !");
                                 mDialog.dismiss();
 
                             } else {
 
-                                showErrorDialog("Password Reset Failed !");
+                                showErrorDialog("Password reset failed !");
                                 mDialog.dismiss();
 
                             }
@@ -422,27 +416,30 @@ public class SignIn extends AppCompatActivity {
 
                                         authed.child(user.getUid())
                                                 .child("userEmail")
-                                                .setValue(user.getEmail()).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
+                                                .setValue(user.getEmail())
+                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
 
-                                                registerGoogleUser(user);
+                                                        if (task.isSuccessful()){
 
-                                            }
-                                        }).addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
+                                                            registerGoogleUser(user);
 
-                                                showErrorDialog("Authentication Could Not Be Registered. Please Try Again Later.");
-                                                mDialog.dismiss();
-                                                if (mAuth.getCurrentUser() != null){
+                                                        } else {
 
-                                                    mAuth.getCurrentUser().delete();
-                                                    mAuth.signOut();
+                                                            showErrorDialog("Registration unsuccessful. Please try again later.");
+                                                            mDialog.dismiss();
+                                                            if (mAuth.getCurrentUser() != null){
 
-                                                }
-                                            }
-                                        });
+                                                                mAuth.getCurrentUser().delete();
+                                                                mAuth.signOut();
+
+                                                            }
+
+                                                        }
+
+                                                    }
+                                                });
 
                                     }
 
@@ -458,7 +455,7 @@ public class SignIn extends AppCompatActivity {
 
                             mDialog.dismiss();
                             mAuth.signOut();
-                            showErrorDialog("Authentication Failed. Mail may already exist through another sign in method. Please confirm and try again.");
+                            showErrorDialog("Sign in failed. Please try again later.");
 
                         }
 
@@ -502,29 +499,30 @@ public class SignIn extends AppCompatActivity {
 
         userRef.child(currentUid)
                 .setValue(newUserMap)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
-                    public void onSuccess(Void aVoid) {
+                    public void onComplete(@NonNull Task<Void> task) {
 
-                        updateUIRegister(user);
+                        if (task.isSuccessful()){
+
+                            updateUIRegister(user);
+
+                        } else {
+
+                            showErrorDialog("Something happened. Please try again later.");
+                            mDialog.dismiss();
+                            if (mAuth.getCurrentUser() != null) {
+
+                                mAuth.getCurrentUser().delete();
+                                authed.child(currentUid).removeValue();
+                                mAuth.signOut();
+
+                            }
+
+                        }
 
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-
-                showErrorDialog("Something Went Wrong. Please Try Again Later.");
-                mDialog.dismiss();
-                if (mAuth.getCurrentUser() != null) {
-
-                    mAuth.getCurrentUser().delete();
-                    authed.child(currentUid).removeValue();
-                    mAuth.signOut();
-
-                }
-
-            }
-        });
+                });
 
     }
 
@@ -544,7 +542,7 @@ public class SignIn extends AppCompatActivity {
             } else {
 
                 mDialog.dismiss();
-                Toast.makeText(this, "Google Sign In Failed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Google sign in failed", Toast.LENGTH_SHORT).show();
 
             }
 

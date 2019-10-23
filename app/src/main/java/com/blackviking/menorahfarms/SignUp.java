@@ -59,13 +59,10 @@ import dmax.dialog.SpotsDialog;
 public class SignUp extends AppCompatActivity {
 
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private CallbackManager mCallbackManager;
     private ImageView showPassword, backButton;
     private MaterialEditText registerFirstName, registerLastName, registerEmail, registerPassword;
     private Button signupButton;
     private TextView loginLink;
-    private int RC_SIGN_IN = 2;
-    private GoogleApiClient mGoogleApiClient;
     private android.app.AlertDialog mDialog;
     private boolean isPasswordVisible = false;
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
@@ -254,7 +251,8 @@ public class SignUp extends AppCompatActivity {
 
     private void signInWithEmail(final String theEmail, String thePassword, final String theFirstName, final String theLastName) {
 
-        mAuth.createUserWithEmailAndPassword(theEmail, thePassword).addOnCompleteListener(
+        mAuth.createUserWithEmailAndPassword(theEmail, thePassword)
+                .addOnCompleteListener(
                 new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -265,27 +263,31 @@ public class SignUp extends AppCompatActivity {
                             currentUid = mAuth.getCurrentUser().getUid();
                             authed.child(currentUid)
                                     .child("userEmail")
-                                    .setValue(theEmail).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
+                                    .setValue(theEmail)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
 
-                                    handleSignInResponse(theEmail, theFirstName, theLastName);
+                                            if (task.isSuccessful()){
 
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
+                                                handleSignInResponse(theEmail, theFirstName, theLastName);
 
-                                    showErrorDialog("Authentication Could Not Be Registered. Please Try Again Later.");
-                                    if (mAuth.getCurrentUser() != null){
+                                            } else {
 
-                                        mDialog.dismiss();
-                                        mAuth.signOut();
+                                                showErrorDialog("Registration unsuccessful. Please try again later.");
+                                                if (mAuth.getCurrentUser() != null){
+
+                                                    mAuth.getCurrentUser().delete();
+                                                    mDialog.dismiss();
+                                                    mAuth.signOut();
 
 
-                                    }
-                                }
-                            });
+                                                }
+
+                                            }
+
+                                        }
+                                    });
 
                         } else {
 
@@ -337,207 +339,33 @@ public class SignUp extends AppCompatActivity {
 
             userRef.child(currentUid)
                     .setValue(newUserMap)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
-                        public void onSuccess(Void aVoid) {
+                        public void onComplete(@NonNull Task<Void> task) {
 
-                            updateUI(mAuth.getCurrentUser());
+                            if (task.isSuccessful()){
 
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-
-                    showErrorDialog("Something Went Wrong. Please Try Again Later.");
-                    if (mAuth.getCurrentUser() != null){
-
-                        mAuth.getCurrentUser().delete();
-                        mDialog.dismiss();
-                        authed.child(currentUid).removeValue();
-                        mAuth.signOut();
-
-                    }
-
-                }
-            });
-
-        } else {
-
-            showErrorDialog("Process Failed");
-            mDialog.dismiss();
-
-        }
-
-    }
-
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-
-        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-
-                            final FirebaseUser user = mAuth.getCurrentUser();
-
-                            if (user != null) {
-
-                                mAuth.getCurrentUser().sendEmailVerification();
-
-                                currentUid = user.getUid();
-
-                                authed.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                        if (dataSnapshot.child(currentUid).exists()){
-
-                                            mDialog.dismiss();
-                                            showErrorDialog("A User Has Already Registered With This Account, Log In Instead");
-                                            mAuth.signOut();
-
-                                        } else {
-
-                                            authed.child(user.getUid())
-                                                    .child("userEmail")
-                                                    .setValue(user.getEmail()).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-
-                                                    registerGoogleUser(user);
-
-                                                }
-                                            }).addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-
-                                                    showErrorDialog("Authentication Could Not Be Registered. Please Try Again Later.");
-                                                    if (mAuth.getCurrentUser() != null){
-
-                                                        mDialog.dismiss();
-                                                        mAuth.signOut();
-
-
-                                                    }
-                                                }
-                                            });
-
-                                        }
-
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-
-                                    }
-                                });
+                                updateUI(mAuth.getCurrentUser());
 
                             } else {
 
-                                showErrorDialog("Error Occurred, Please try Again Later");
-                                mDialog.dismiss();
+                                showErrorDialog("Something went wrong. Please try again later.");
+                                if (mAuth.getCurrentUser() != null){
+
+                                    mAuth.getCurrentUser().delete();
+                                    mDialog.dismiss();
+                                    authed.child(currentUid).removeValue();
+                                    mAuth.signOut();
+
+                                }
 
                             }
 
-                        } else {
-
-                            mDialog.dismiss();
-                            showErrorDialog("Authentication Failed. Please Try Again Later");
-
                         }
-
-                    }
-                });
-    }
-
-    private void registerGoogleUser(final FirebaseUser user) {
-
-        currentUid = user.getUid();
-
-        final Map<String, Object> newUserMap = new HashMap<>();
-        newUserMap.put("email", user.getEmail());
-        newUserMap.put("firstName", user.getDisplayName());
-        newUserMap.put("lastName", user.getDisplayName());
-        newUserMap.put("profilePicture", "");
-        newUserMap.put("profilePictureThumb", "");
-        newUserMap.put("signUpMode", "Google");
-        newUserMap.put("facebook", "");
-        newUserMap.put("instagram", "");
-        newUserMap.put("twitter", "");
-        newUserMap.put("userType", "User");
-        newUserMap.put("userPackage", "Worker");
-        newUserMap.put("phone", "");
-        newUserMap.put("birthday", "");
-        newUserMap.put("gender", "");
-        newUserMap.put("nationality", "");
-        newUserMap.put("address", "");
-        newUserMap.put("city", "");
-        newUserMap.put("state", "");
-        newUserMap.put("bank", "");
-        newUserMap.put("accountName", "");
-        newUserMap.put("accountNumber", "");
-        newUserMap.put("kinName", "");
-        newUserMap.put("kinEmail", "");
-        newUserMap.put("kinRelationship", "");
-        newUserMap.put("kinPhone", "");
-        newUserMap.put("kinAddress", "");
-        newUserMap.put("linkedIn", "");
-        newUserMap.put("accountManager", "");
-
-        userRef.child(currentUid)
-                .setValue(newUserMap)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-
-                        updateUI(user);
-
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-
-                showErrorDialog("Something Went Wrong. Please Try Again Later.");
-                if (mAuth.getCurrentUser() != null) {
-
-                    mDialog.dismiss();
-                    authed.child(currentUid).removeValue();
-                    mAuth.signOut();
-
-                }
-
-            }
-        });
-
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == RC_SIGN_IN) {
-
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-
-            if (result.isSuccess()){
-
-                GoogleSignInAccount account = result.getSignInAccount();
-                firebaseAuthWithGoogle(account);
-
-            } else {
-
-                mDialog.dismiss();
-                Toast.makeText(this, "Google Sign In Failed", Toast.LENGTH_SHORT).show();
-
-            }
-
-        } else {
-
-
-            mCallbackManager.onActivityResult(requestCode, resultCode, data);
+                    });
 
         }
+
     }
 
     private void updateUI(FirebaseUser user) {

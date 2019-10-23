@@ -41,7 +41,7 @@ public class FarmDetails extends AppCompatActivity {
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private DatabaseReference userRef, farmRef, followedRef, cartRef, followedFarmNotiRef;
+    private DatabaseReference userRef, farmRef, followedRef, cartRef, followedFarmNotiRef, sponsorshipRef;
     private String currentUid, userType, farmId, farmNotiId;
 
     private ImageView backButton, farmImage;
@@ -68,6 +68,7 @@ public class FarmDetails extends AppCompatActivity {
         /*---   FIREBASE   ---*/
         userRef = db.getReference("Users");
         farmRef = db.getReference("Farms");
+        sponsorshipRef = db.getReference("SponsoredFarms");
         followedRef = db.getReference("FollowedFarms");
         cartRef = db.getReference("Carts");
         followedFarmNotiRef = db.getReference("FollowedFarmsNotification");
@@ -354,7 +355,65 @@ public class FarmDetails extends AppCompatActivity {
                                                     //check all cases
                                                     if (output == 1){
 
-                                                        addToCart(unitNumberText, theFarmUnitPrice, theFarmROI);
+
+                                                        sponsorshipRef.child(currentUid)
+                                                                .orderByChild("farmId")
+                                                                .equalTo(farmId)
+                                                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                    @Override
+                                                                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                                                        int theCount = 0;
+
+                                                                        for (DataSnapshot snap : dataSnapshot.getChildren()){
+
+                                                                            int newCount = Integer.parseInt(snap.child("sponsoredUnits").getValue().toString());
+
+                                                                            theCount = theCount + newCount;
+
+                                                                        }
+
+                                                                        if (currentFarm.getPackagedType().equalsIgnoreCase("Worker")){
+
+                                                                            int spaceRemaining = 100 - theCount;
+
+                                                                            if (theCount < 100 && unitNumberText <= spaceRemaining){
+
+                                                                                addToCart(unitNumberText, theFarmUnitPrice, theFarmROI);
+
+                                                                            } else {
+
+                                                                                showErrorDialog("You can not exceed sponsorship limit of 100 for this package");
+
+                                                                            }
+
+                                                                        } else
+
+                                                                        if (currentFarm.getPackagedType().equalsIgnoreCase("Student")){
+
+                                                                            int spaceRemaining = 10 - theCount;
+
+                                                                            if (theCount < 10 && unitNumberText <= spaceRemaining){
+
+                                                                                addToCart(unitNumberText, theFarmUnitPrice, theFarmROI);
+
+                                                                            } else {
+
+                                                                                showErrorDialog("You can not exceed sponsorship limit of 10 for this package");
+
+                                                                            }
+
+                                                                        }
+
+
+
+                                                                    }
+
+                                                                    @Override
+                                                                    public void onCancelled(DatabaseError databaseError) {
+
+                                                                    }
+                                                                });
 
                                                     } else
 

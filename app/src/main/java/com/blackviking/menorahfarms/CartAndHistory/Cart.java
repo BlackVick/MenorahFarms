@@ -111,7 +111,7 @@ public class Cart extends AppCompatActivity {
 
     //random farm manager
     private static final Random random = new Random();
-    private static final String CHARS = "12";
+    private static final String[] CHARS = {"01", "02"};
 
 
     //dialog widgets
@@ -266,7 +266,7 @@ public class Cart extends AppCompatActivity {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                FarmModel currentFarm = dataSnapshot.getValue(FarmModel.class);
+                                final FarmModel currentFarm = dataSnapshot.getValue(FarmModel.class);
 
                                 if (currentFarm != null){
 
@@ -337,6 +337,7 @@ public class Cart extends AppCompatActivity {
                                                         //check all cases
                                                         if (output == 1) {
 
+                                                            //check
                                                             sponsorshipRef.child(currentuid)
                                                                     .orderByChild("farmId")
                                                                     .equalTo(model.getFarmId())
@@ -344,61 +345,141 @@ public class Cart extends AppCompatActivity {
                                                                         @Override
                                                                         public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                                                            if (!dataSnapshot.exists()){
+                                                                            int theCount = 0;
 
-                                                                                final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(Cart.this).create();
-                                                                                LayoutInflater inflater = Cart.this.getLayoutInflater();
-                                                                                View viewOptions = inflater.inflate(R.layout.terms_layout, null);
+                                                                            for (DataSnapshot snap : dataSnapshot.getChildren()){
 
-                                                                                final TextView termsText = (TextView) viewOptions.findViewById(R.id.termsText);
-                                                                                final Button cancel = (Button) viewOptions.findViewById(R.id.cancelCheckout);
-                                                                                final Button proceed = (Button) viewOptions.findViewById(R.id.proceedCheckout);
+                                                                                int newCount = Integer.parseInt(snap.child("sponsoredUnits").getValue().toString());
 
-                                                                                alertDialog.setView(viewOptions);
-
-                                                                                alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
-                                                                                alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-                                                                                termsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                                    @Override
-                                                                                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                                                                        String theTerms = dataSnapshot.child("terms").getValue().toString();
-
-                                                                                        termsText.setText(theTerms);
-
-                                                                                    }
-
-                                                                                    @Override
-                                                                                    public void onCancelled(DatabaseError databaseError) {
-
-                                                                                    }
-                                                                                });
-
-                                                                                proceed.setOnClickListener(new View.OnClickListener() {
-                                                                                    @Override
-                                                                                    public void onClick(View v) {
-                                                                                        alertDialog.dismiss();
-                                                                                        transferCheckout(theFarmState, adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
-                                                                                        //checkoutAndPay(theFarmState, adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
-                                                                                        //testPay(adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
-                                                                                    }
-                                                                                });
-
-                                                                                cancel.setOnClickListener(new View.OnClickListener() {
-                                                                                    @Override
-                                                                                    public void onClick(View v) {
-                                                                                        alertDialog.cancel();
-                                                                                    }
-                                                                                });
-
-                                                                                alertDialog.show();
-
-                                                                            } else {
-
-                                                                                showErrorDialog("You have already sponsored this farm.");
+                                                                                theCount = theCount + newCount;
 
                                                                             }
+
+                                                                            if (currentFarm.getPackagedType().equalsIgnoreCase("Worker")){
+
+                                                                                int spaceRemaining = 100 - theCount;
+
+                                                                                if (theCount < 100 && model.getUnits() <= spaceRemaining){
+
+                                                                                    final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(Cart.this, R.style.DialogTheme).create();
+                                                                                    LayoutInflater inflater = Cart.this.getLayoutInflater();
+                                                                                    View viewOptions = inflater.inflate(R.layout.terms_layout, null);
+
+                                                                                    final TextView termsText = (TextView) viewOptions.findViewById(R.id.termsText);
+                                                                                    final Button cancel = (Button) viewOptions.findViewById(R.id.cancelCheckout);
+                                                                                    final Button proceed = (Button) viewOptions.findViewById(R.id.proceedCheckout);
+
+                                                                                    alertDialog.setView(viewOptions);
+
+                                                                                    alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+                                                                                    alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+                                                                                    termsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                                        @Override
+                                                                                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                                                                            String theTerms = dataSnapshot.child("terms").getValue().toString();
+
+                                                                                            termsText.setText(theTerms);
+
+                                                                                        }
+
+                                                                                        @Override
+                                                                                        public void onCancelled(DatabaseError databaseError) {
+
+                                                                                        }
+                                                                                    });
+
+                                                                                    proceed.setOnClickListener(new View.OnClickListener() {
+                                                                                        @Override
+                                                                                        public void onClick(View v) {
+                                                                                            alertDialog.dismiss();
+                                                                                            transferCheckout(theFarmState, adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
+                                                                                            //checkoutAndPay(theFarmState, adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
+                                                                                            //testPay(adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
+                                                                                        }
+                                                                                    });
+
+                                                                                    cancel.setOnClickListener(new View.OnClickListener() {
+                                                                                        @Override
+                                                                                        public void onClick(View v) {
+                                                                                            alertDialog.cancel();
+                                                                                        }
+                                                                                    });
+
+                                                                                    alertDialog.show();
+
+                                                                                } else {
+
+                                                                                    showErrorDialog("You can not exceed sponsorship limit for this package");
+
+                                                                                }
+
+                                                                            } else
+
+                                                                            if (currentFarm.getPackagedType().equalsIgnoreCase("Student")){
+
+                                                                                int spaceRemaining = 10 - theCount;
+
+                                                                                if (theCount < 10 && model.getUnits() <= spaceRemaining){
+
+                                                                                    final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(Cart.this, R.style.DialogTheme).create();
+                                                                                    LayoutInflater inflater = Cart.this.getLayoutInflater();
+                                                                                    View viewOptions = inflater.inflate(R.layout.terms_layout, null);
+
+                                                                                    final TextView termsText = (TextView) viewOptions.findViewById(R.id.termsText);
+                                                                                    final Button cancel = (Button) viewOptions.findViewById(R.id.cancelCheckout);
+                                                                                    final Button proceed = (Button) viewOptions.findViewById(R.id.proceedCheckout);
+
+                                                                                    alertDialog.setView(viewOptions);
+
+                                                                                    alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+                                                                                    alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+                                                                                    termsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                                        @Override
+                                                                                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                                                                            String theTerms = dataSnapshot.child("terms").getValue().toString();
+
+                                                                                            termsText.setText(theTerms);
+
+                                                                                        }
+
+                                                                                        @Override
+                                                                                        public void onCancelled(DatabaseError databaseError) {
+
+                                                                                        }
+                                                                                    });
+
+                                                                                    proceed.setOnClickListener(new View.OnClickListener() {
+                                                                                        @Override
+                                                                                        public void onClick(View v) {
+                                                                                            alertDialog.dismiss();
+                                                                                            transferCheckout(theFarmState, adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
+                                                                                            //checkoutAndPay(theFarmState, adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
+                                                                                            //testPay(adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
+                                                                                        }
+                                                                                    });
+
+                                                                                    cancel.setOnClickListener(new View.OnClickListener() {
+                                                                                        @Override
+                                                                                        public void onClick(View v) {
+                                                                                            alertDialog.cancel();
+                                                                                        }
+                                                                                    });
+
+                                                                                    alertDialog.show();
+
+                                                                                } else {
+
+                                                                                    showErrorDialog("You can not exceed sponsorship limit for this package");
+
+                                                                                }
+
+                                                                            }
+
+
 
                                                                         }
 
@@ -449,7 +530,7 @@ public class Cart extends AppCompatActivity {
 
     private void transferCheckout(final String theFarmState, final String key, final String theFarmType, final String theFarmROI, final String theFarmUnitPrice, final String theFarmSponsorDuration, final long totalPayout, final int units, final String farmId) {
 
-        final android.app.AlertDialog alertDialog2 = new android.app.AlertDialog.Builder(Cart.this).create();
+        final android.app.AlertDialog alertDialog2 = new android.app.AlertDialog.Builder(Cart.this, R.style.DialogTheme).create();
         LayoutInflater inflater = Cart.this.getLayoutInflater();
         View viewOptions = inflater.inflate(R.layout.add_payment_proof_layout, null);
 
@@ -484,9 +565,9 @@ public class Cart extends AppCompatActivity {
 
                                     if (theDets != null){
 
-                                        menorahAccountName.setText("Account Name: " + theDets.getAccount_name());
-                                        menorahAccountNumber.setText("Account No: " + theDets.getAccount_number());
-                                        menorahBank.setText("Bank: " + theDets.getBank());
+                                        menorahAccountName.setText(theDets.getAccount_name());
+                                        menorahAccountNumber.setText(theDets.getAccount_number());
+                                        menorahBank.setText(theDets.getBank());
 
                                     }
 
@@ -518,7 +599,7 @@ public class Cart extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if (imageUri == null && actionText.getText().toString().equalsIgnoreCase("UPLOAD")) {
+                if (imageUri == null && actionText.getText().toString().equalsIgnoreCase("UPLOAD EVIDENCE OF PAYMENT")) {
 
                     if (checkPermissionsArray(Permissions.PERMISSIONS)){
 
@@ -1002,7 +1083,7 @@ public class Cart extends AppCompatActivity {
     private void pushToDb(final android.app.AlertDialog alertDialog2) {
 
         //assign farm manager
-        userRef.child(currentuid).child("accountManager").setValue(setAdminToken(1));
+        userRef.child(currentuid).child("accountManager").setValue(CHARS[new Random().nextInt(CHARS.length)]);
 
         final UserModel user2 = Paper.book().read(Common.PAPER_USER);
 
@@ -1286,13 +1367,13 @@ public class Cart extends AppCompatActivity {
 
     }
 
-    public static String setAdminToken(int length) {
+    /*public static String setAdminToken(int length) {
         StringBuilder token = new StringBuilder(length);
         for (int i = 0; i < length; i++) {
             token.append(CHARS.charAt(random.nextInt(CHARS.length())));
         }
         return token.toString();
-    }
+    }*/
 
     private void openDeleteDialog(final String key) {
 

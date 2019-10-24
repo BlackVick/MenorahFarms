@@ -53,7 +53,8 @@
                 android:layout_marginTop="5dp"
                 android:layout_marginStart="15dp"
                 android:layout_marginEnd="35dp"
-                android:gravity="start"/>
+                android:gravity="start"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
             <com.rengwuxian.materialedittext.MaterialEditText
                 android:layout_width="match_parent"
@@ -77,7 +78,8 @@
                 app:met_floatingLabelAnimating="true"
                 app:met_primaryColor="@color/black"
                 app:met_singleLineEllipsis="true"
-                app:met_hideUnderline="true"/>
+                app:met_hideUnderline="true"
+                android:fontFamily="@font/proxima_nova_regular"/>
 
             <View
                 android:layout_width="match_parent"
@@ -108,7 +110,8 @@
                 app:met_floatingLabelAnimating="true"
                 app:met_primaryColor="@color/black"
                 app:met_singleLineEllipsis="true"
-                app:met_hideUnderline="true"/>
+                app:met_hideUnderline="true"
+                android:fontFamily="@font/proxima_nova_regular"/>
 
             <View
                 android:layout_width="match_parent"
@@ -139,7 +142,8 @@
                 app:met_floatingLabelAnimating="true"
                 app:met_primaryColor="@color/black"
                 app:met_singleLineEllipsis="true"
-                app:met_hideUnderline="true"/>
+                app:met_hideUnderline="true"
+                android:fontFamily="@font/proxima_nova_regular"/>
 
             <View
                 android:layout_width="match_parent"
@@ -177,7 +181,8 @@
                     app:met_floatingLabelAnimating="true"
                     app:met_primaryColor="@color/black"
                     app:met_singleLineEllipsis="true"
-                    app:met_hideUnderline="true"/>
+                    app:met_hideUnderline="true"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
                 <ImageView
                     android:layout_width="0dp"
@@ -207,7 +212,8 @@
                 android:textSize="16sp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
-                android:layout_marginTop="15dp"/>
+                android:layout_marginTop="15dp"
+                android:fontFamily="@font/proxima_nova_regular"/>
 
             <Button
                 android:layout_width="match_parent"
@@ -222,7 +228,8 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:text="Create Account"
-                android:id="@+id/signUpButton"/>
+                android:id="@+id/signUpButton"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
         </LinearLayout>
 
@@ -241,6 +248,7 @@
         android:layout_marginStart="30dp"
         android:layout_marginEnd="30dp"
         android:layout_marginTop="20dp"
-        android:layout_marginBottom="40dp"/>
+        android:layout_marginBottom="40dp"
+        android:fontFamily="@font/proxima_nova_bold"/>
 
 </RelativeLayout>

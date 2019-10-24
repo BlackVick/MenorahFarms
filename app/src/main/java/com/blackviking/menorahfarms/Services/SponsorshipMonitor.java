@@ -66,9 +66,6 @@ public class SponsorshipMonitor extends Service {
         mService = Common.getFCMService();
 
 
-        /*---   USER   ---*/
-        userId = Paper.book().read(Common.USER_ID);
-
     }
 
     @Override
@@ -80,6 +77,9 @@ public class SponsorshipMonitor extends Service {
     }
 
     private void startMonitor() {
+
+        /*---   USER   ---*/
+        userId = Paper.book().read(Common.USER_ID);
 
         //execute network check async task
         CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){

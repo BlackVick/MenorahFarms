@@ -42,7 +42,8 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:gravity="center_vertical"
-                android:paddingStart="30dp"/>
+                android:paddingStart="30dp"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
         </LinearLayout>
 

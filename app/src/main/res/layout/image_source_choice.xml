@@ -37,7 +37,7 @@
                 android:textColor="@color/black"
                 android:textStyle="bold"
                 android:gravity="center"
-                android:fontFamily="casual"/>
+                android:fontFamily="@font/proxima_nova_bold"/>
 
         </LinearLayout>
 
@@ -63,7 +63,7 @@
                 android:textColor="@color/black"
                 android:textStyle="bold"
                 android:gravity="center"
-                android:fontFamily="casual"/>
+                android:fontFamily="@font/proxima_nova_bold"/>
 
         </LinearLayout>
 

@@ -63,14 +63,14 @@ public class Dashboard extends AppCompatActivity {
     private LinearLayout dashboardSwitch, farmstoreSwitch, accountSwitch;
     private TextView dashboardText, farmstoreText, accountText;
 
-    private TextView welcome, sponsorCycle, totalReturnsText, nextEndOfCycleDate;
+    private TextView welcome, sponsorCycle, totalReturnsText, nextEndOfCycleDate, cartItemCount;
     private ImageView cartButton;
     private CircleImageView userAvatar;
     private RelativeLayout goToFarmstoreButton;
     private RelativeLayout sponsoredFarmsLayout, farmsToWatchLayout, farmUpdatesLayout, allFarmsLayout, projectManagerLayout, notificationLayout, faqLayout, adminLayout;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference userRef, sponsoredRef, farmRef;
+    private DatabaseReference userRef, sponsoredRef, farmRef, cartRef;
     private String currentUid;
     private boolean isMonitorRunning;
     private UserModel paperUser;
@@ -90,6 +90,7 @@ public class Dashboard extends AppCompatActivity {
         userRef = db.getReference("Users");
         sponsoredRef = db.getReference("SponsoredFarms");
         farmRef = db.getReference("Farms");
+        cartRef = db.getReference("Carts");
         if (mAuth.getCurrentUser() != null)
             currentUid = mAuth.getCurrentUser().getUid();
 
@@ -119,6 +120,7 @@ public class Dashboard extends AppCompatActivity {
         notificationLayout = (RelativeLayout)findViewById(R.id.notificationLayout);
         faqLayout = (RelativeLayout)findViewById(R.id.faqLayout);
         adminLayout = (RelativeLayout)findViewById(R.id.adminLayout);
+        cartItemCount = findViewById(R.id.cartItemCount);
 
 
         /*---   BOTTOM NAV   ---*/
@@ -275,6 +277,13 @@ public class Dashboard extends AppCompatActivity {
             Paper.book().write(Common.isSponsorshipMonitorRunning, false);
         isMonitorRunning = Paper.book().read(Common.isSponsorshipMonitorRunning);
 
+        if (!isMonitorRunning) {
+
+            Intent checkSponsorship = new Intent(Dashboard.this, CheckForSponsorship.class);
+            startService(checkSponsorship);
+
+        }
+
 
 
         /*---   CART   ---*/
@@ -408,14 +417,6 @@ public class Dashboard extends AppCompatActivity {
                                     totalReturnsText.setText(Common.convertToPrice(Dashboard.this, totalReturn));
 
 
-
-                                    if (!isMonitorRunning) {
-
-                                        Intent checkSponsorship = new Intent(Dashboard.this, CheckForSponsorship.class);
-                                        startService(checkSponsorship);
-
-                                    }
-
                                 } else {
 
                                     sponsorCycle.setText("Running Cycles : 0");
@@ -467,6 +468,24 @@ public class Dashboard extends AppCompatActivity {
                             }
                         }
                 );
+
+        //always cart item count
+        cartRef.child(currentUid)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        int count = (int) dataSnapshot.getChildrenCount();
+
+                        cartItemCount.setText(String.valueOf(count));
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
 
     }
 

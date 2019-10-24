@@ -24,9 +24,10 @@
                 android:layout_height="wrap_content"
                 android:text="Take A Few Minutes To Read Our Terms of Operation and Agreement."
                 android:textColor="@color/black"
-                android:textSize="18sp"
+                android:textSize="17sp"
                 android:textStyle="bold"
-                android:gravity="center"/>
+                android:gravity="center"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -35,18 +36,20 @@
                 android:text=""
                 android:textSize="16sp"
                 android:textColor="@color/black"
-                android:id="@+id/termsText"/>
+                android:id="@+id/termsText"
+                android:fontFamily="@font/proxima_nova_regular"/>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Please note that, by proceeding from this point, you agree to all stated terms above."
                 android:textColor="@color/black"
-                android:textSize="18sp"
+                android:textSize="15sp"
                 android:textStyle="bold"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
-                android:gravity="start"/>
+                android:gravity="start"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
         </LinearLayout>
 
@@ -65,7 +68,7 @@
         <Button
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="20dp"
             android:id="@+id/cancelCheckout"
@@ -73,12 +76,13 @@
             android:text="Cancel"
             android:textStyle="bold"
             android:textSize="17sp"
-            android:textColor="@color/red"/>
+            android:textColor="@color/red"
+            android:fontFamily="@font/proxima_nova_bold"/>
 
         <Button
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="10dp"
             android:id="@+id/proceedCheckout"
@@ -86,7 +90,8 @@
             android:text="Proceed"
             android:textStyle="bold"
             android:textSize="17sp"
-            android:textColor="@color/colorPrimary"/>
+            android:textColor="@color/colorPrimary"
+            android:fontFamily="@font/proxima_nova_bold"/>
 
     </LinearLayout>
 

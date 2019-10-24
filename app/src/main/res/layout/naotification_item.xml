@@ -35,7 +35,8 @@
                 android:textStyle="bold"
                 android:textSize="19sp"
                 android:textColor="@color/colorPrimaryDark"
-                android:padding="4dp"/>
+                android:padding="4dp"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -44,7 +45,8 @@
                 android:text=""
                 android:textSize="15sp"
                 android:textColor="@color/black"
-                android:padding="4dp"/>
+                android:padding="4dp"
+                android:fontFamily="@font/proxima_nova_regular"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -55,7 +57,8 @@
                 android:textColor="@color/grey"
                 android:gravity="end"
                 android:padding="4dp"
-                android:layout_marginTop="5dp"/>
+                android:layout_marginTop="5dp"
+                android:fontFamily="@font/proxima_nova_regular"/>
 
         </LinearLayout>
 

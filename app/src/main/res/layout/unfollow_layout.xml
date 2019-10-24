@@ -21,8 +21,9 @@
             android:text="Un-follow Farm"
             android:gravity="center"
             android:textColor="@color/colorAccent"
-            android:textSize="25sp"
-            android:textStyle="bold"/>
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/proxima_nova_bold"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -30,8 +31,9 @@
             android:text="Are you sure you want to un-follow this farm?"
             android:gravity="center"
             android:textColor="@color/grey"
-            android:textSize="17sp"
-            android:layout_marginTop="10dp"/>
+            android:textSize="15sp"
+            android:layout_marginTop="10dp"
+            android:fontFamily="@font/proxima_nova_regular"/>
 
     </LinearLayout>
 
@@ -47,7 +49,7 @@
         <Button
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="30dp"
             android:layout_marginBottom="10dp"
@@ -56,12 +58,13 @@
             android:text="NO"
             android:textStyle="bold"
             android:textSize="17sp"
-            android:textColor="@color/red"/>
+            android:textColor="@color/red"
+            android:fontFamily="@font/proxima_nova_bold"/>
 
         <Button
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
             android:layout_marginStart="30dp"
             android:layout_marginEnd="30dp"
             android:layout_marginBottom="10dp"
@@ -70,7 +73,8 @@
             android:text="YES"
             android:textStyle="bold"
             android:textSize="17sp"
-            android:textColor="@color/colorPrimary"/>
+            android:textColor="@color/colorPrimary"
+            android:fontFamily="@font/proxima_nova_bold"/>
 
     </LinearLayout>
 

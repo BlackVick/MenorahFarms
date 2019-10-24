@@ -25,7 +25,8 @@
                 android:textColor="@color/colorAccent"
                 android:textSize="14sp"
                 android:gravity="center"
-                android:layout_margin="30dp"/>
+                android:layout_margin="30dp"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
         </LinearLayout>
 
@@ -59,7 +60,8 @@
                     android:text="Followed Farms"
                     android:textSize="14sp"
                     android:textColor="@color/colorPrimaryDark"
-                    android:id="@+id/followedFarmsNoti"/>
+                    android:id="@+id/followedFarmsNoti"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <RadioButton
                     android:layout_width="0dp"
@@ -68,7 +70,8 @@
                     android:text="Sponsored Farms"
                     android:textSize="14sp"
                     android:textColor="@color/colorPrimaryDark"
-                    android:id="@+id/sponsoredFarmsNoti"/>
+                    android:id="@+id/sponsoredFarmsNoti"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
             </RadioGroup>
 
@@ -108,7 +111,8 @@
                         android:drawablePadding="6dp"
                         android:hint="Title"
                         android:textColorHint="@color/grey"
-                        android:id="@+id/followedTopic"/>
+                        android:id="@+id/followedTopic"
+                        android:fontFamily="@font/proxima_nova_regular"/>
 
                     <EditText
                         android:layout_width="match_parent"
@@ -126,11 +130,12 @@
                         android:hint="Message"
                         android:textColorHint="@color/grey"
                         android:id="@+id/followedMessage"
-                        android:minLines="4"/>
+                        android:minLines="4"
+                        android:fontFamily="@font/proxima_nova_regular"/>
 
                     <Button
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="40dp"
                         android:layout_marginStart="25dp"
                         android:layout_marginEnd="25dp"
                         android:layout_marginTop="50dp"
@@ -139,7 +144,8 @@
                         android:textColor="@color/white"
                         android:textSize="17sp"
                         android:textStyle="bold"
-                        android:id="@+id/sendFollowedNotiBtn"/>
+                        android:id="@+id/sendFollowedNotiBtn"
+                        android:fontFamily="@font/proxima_nova_bold"/>
 
                 </LinearLayout>
 
@@ -181,7 +187,8 @@
                         android:drawablePadding="6dp"
                         android:hint="Title"
                         android:textColorHint="@color/grey"
-                        android:id="@+id/sponsoredTopic"/>
+                        android:id="@+id/sponsoredTopic"
+                        android:fontFamily="@font/proxima_nova_regular"/>
 
                     <EditText
                         android:layout_width="match_parent"
@@ -199,7 +206,8 @@
                         android:hint="Message"
                         android:textColorHint="@color/grey"
                         android:id="@+id/sponsoredMessage"
-                        android:minLines="4"/>
+                        android:minLines="4"
+                        android:fontFamily="@font/proxima_nova_regular"/>
 
                     <Button
                         android:layout_width="match_parent"
@@ -212,7 +220,8 @@
                         android:textColor="@color/white"
                         android:textSize="17sp"
                         android:textStyle="bold"
-                        android:id="@+id/sendSponsoredNotiBtn"/>
+                        android:id="@+id/sendSponsoredNotiBtn"
+                        android:fontFamily="@font/proxima_nova_bold"/>
 
                 </LinearLayout>
 

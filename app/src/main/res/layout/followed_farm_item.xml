@@ -48,8 +48,9 @@
                 android:text=""
                 android:textColor="@color/colorPrimary"
                 android:padding="2dp"
-                android:textSize="20sp"
-                android:textStyle="bold"/>
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -58,7 +59,8 @@
                 android:text=""
                 android:textColor="@color/black"
                 android:padding="1dp"
-                android:textSize="14sp"/>
+                android:textSize="14sp"
+                android:fontFamily="@font/proxima_nova_regular"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -67,7 +69,8 @@
                 android:text=""
                 android:textColor="@color/black"
                 android:padding="1dp"
-                android:textSize="14sp"/>
+                android:textSize="14sp"
+                android:fontFamily="@font/proxima_nova_regular"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -76,7 +79,8 @@
                 android:text=""
                 android:textColor="@color/black"
                 android:padding="1dp"
-                android:textSize="15sp"/>
+                android:textSize="14sp"
+                android:fontFamily="@font/proxima_nova_regular"/>
 
             <Button
                 android:layout_width="wrap_content"
@@ -89,7 +93,8 @@
                 android:layout_gravity="end"
                 android:layout_marginEnd="5dp"
                 android:layout_marginTop="7dp"
-                android:id="@+id/unfollowButton"/>
+                android:id="@+id/unfollowButton"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
         </LinearLayout>
 

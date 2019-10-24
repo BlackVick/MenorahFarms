@@ -44,7 +44,8 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:gravity="center_vertical"
-                android:paddingStart="30dp"/>
+                android:paddingStart="30dp"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
         </LinearLayout>
 
@@ -82,7 +83,8 @@
                 android:textStyle="bold"
                 android:textSize="20sp"
                 android:textColor="@color/black"
-                android:layout_centerVertical="true"/>
+                android:layout_centerVertical="true"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
         </RelativeLayout>
 
@@ -132,7 +134,8 @@
                     android:textStyle="bold"
                     android:textSize="22sp"
                     android:textColor="@color/black"
-                    android:id="@+id/accountManagerName"/>
+                    android:id="@+id/accountManagerName"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -144,7 +147,8 @@
                     android:gravity="center"
                     android:layout_gravity="center"
                     android:textSize="16sp"
-                    android:textColor="@color/black"/>
+                    android:textColor="@color/black"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
                 <Button
                     android:layout_width="wrap_content"
@@ -158,7 +162,8 @@
                     android:drawablePadding="10dp"
                     android:padding="15dp"
                     android:id="@+id/whatsappManagerButton"
-                    android:layout_gravity="center"/>
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
             </LinearLayout>
 
@@ -192,7 +197,8 @@
                     android:gravity="center"
                     android:layout_marginTop="30dp"
                     android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"/>
+                    android:layout_marginEnd="20dp"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </LinearLayout>
 
@@ -214,7 +220,8 @@
                 android:gravity="center"
                 android:textColor="@color/colorAccent"
                 android:textSize="25sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -223,7 +230,8 @@
                 android:gravity="center"
                 android:textColor="@color/grey"
                 android:textSize="15sp"
-                android:layout_marginTop="10dp"/>
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/proxima_nova_regular"/>
 
         </LinearLayout>
 

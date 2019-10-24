@@ -51,7 +51,8 @@
                 android:text=""
                 android:textSize="22sp"
                 android:textColor="@color/white"
-                android:id="@+id/userWelcome"/>
+                android:id="@+id/userWelcome"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -60,18 +61,40 @@
                 android:textSize="14sp"
                 android:textColor="@color/white"
                 android:id="@+id/userSponsorCycle"
-                android:layout_marginTop="6dp"/>
+                android:layout_marginTop="6dp"
+                android:fontFamily="@font/proxima_nova_regular"/>
 
         </LinearLayout>
 
-        <ImageView
+        <RelativeLayout
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="40dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_menorah_cart_white"
-            android:id="@+id/userCart"
-            android:padding="3dp"/>
+            android:layout_height="55dp"
+            android:layout_marginEnd="3dp"
+            android:layout_marginTop="3dp"
+            android:layout_gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:padding="1dp"
+                android:id="@+id/userCart"
+                android:src="@drawable/ic_new_menorah_cart"
+                android:layout_centerInParent="true"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:text=""
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:fontFamily="@font/proxima_nova_bold"
+                android:id="@+id/cartItemCount"/>
+
+        </RelativeLayout>
 
     </LinearLayout>
 
@@ -109,7 +132,8 @@
                     android:text="Total Expected \nROI"
                     android:textSize="16sp"
                     android:textColor="@color/grey"
-                    android:padding="1dp"/>
+                    android:padding="1dp"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -118,18 +142,8 @@
                     android:textColor="@color/black"
                     android:textSize="15sp"
                     android:padding="1dp"
-                    android:id="@+id/totalReturns"/>
-
-                <!--<TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="View History"
-                    android:textSize="14sp"
-                    android:textColor="@color/colorPrimary"
-                    android:drawableEnd="@drawable/ic_menorah_forward_icon_green"
-                    android:drawablePadding="10dp"
-                    android:padding="1dp"
-                    android:gravity="center_vertical"/>-->
+                    android:id="@+id/totalReturns"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </LinearLayout>
 
@@ -147,7 +161,8 @@
                     android:text="Next End Of Cycle \nDate"
                     android:textSize="16sp"
                     android:textColor="@color/grey"
-                    android:padding="1dp"/>
+                    android:padding="1dp"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -156,18 +171,8 @@
                     android:textColor="@color/black"
                     android:textSize="15sp"
                     android:padding="1dp"
-                    android:id="@+id/nextEndOfCycleDate"/>
-
-                <!--<TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="View Sponsorships"
-                    android:textSize="13sp"
-                    android:textColor="@color/colorPrimary"
-                    android:drawableEnd="@drawable/ic_menorah_forward_icon_green"
-                    android:drawablePadding="10dp"
-                    android:padding="1dp"
-                    android:gravity="center_vertical"/>-->
+                    android:id="@+id/nextEndOfCycleDate"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </LinearLayout>
 
@@ -217,7 +222,8 @@
                         android:paddingTop="10dp"
                         android:paddingBottom="10dp"
                         android:drawableStart="@drawable/ic_menorah_basket_white"
-                        android:drawablePadding="15dp"/>
+                        android:drawablePadding="15dp"
+                        android:fontFamily="@font/proxima_nova_bold"/>
 
                 </RelativeLayout>
 
@@ -270,7 +276,8 @@
                             android:textSize="14sp"
                             android:textStyle="bold"
                             android:layout_margin="6dp"
-                            android:id="@+id/sponsoredText"/>
+                            android:id="@+id/sponsoredText"
+                            android:fontFamily="@font/proxima_nova_bold"/>
 
                     </RelativeLayout>
 
@@ -313,7 +320,8 @@
                             android:textSize="14sp"
                             android:textStyle="bold"
                             android:layout_margin="6dp"
-                            android:id="@+id/followedText"/>
+                            android:id="@+id/followedText"
+                            android:fontFamily="@font/proxima_nova_bold"/>
 
                     </RelativeLayout>
 
@@ -356,7 +364,8 @@
                             android:textSize="14sp"
                             android:textStyle="bold"
                             android:layout_margin="6dp"
-                            android:id="@+id/updateText"/>
+                            android:id="@+id/updateText"
+                            android:fontFamily="@font/proxima_nova_bold"/>
 
                     </RelativeLayout>
 
@@ -410,7 +419,8 @@
                             android:textSize="14sp"
                             android:textStyle="bold"
                             android:layout_margin="6dp"
-                            android:id="@+id/allFarmsText"/>
+                            android:id="@+id/allFarmsText"
+                            android:fontFamily="@font/proxima_nova_bold"/>
 
                     </RelativeLayout>
 
@@ -453,7 +463,8 @@
                             android:textSize="14sp"
                             android:textStyle="bold"
                             android:layout_margin="6dp"
-                            android:id="@+id/managerText"/>
+                            android:id="@+id/managerText"
+                            android:fontFamily="@font/proxima_nova_bold"/>
 
                     </RelativeLayout>
 
@@ -496,7 +507,8 @@
                             android:textSize="14sp"
                             android:textStyle="bold"
                             android:layout_margin="6dp"
-                            android:id="@+id/notificationText"/>
+                            android:id="@+id/notificationText"
+                            android:fontFamily="@font/proxima_nova_bold"/>
 
                     </RelativeLayout>
 
@@ -551,7 +563,8 @@
                             android:textSize="14sp"
                             android:textStyle="bold"
                             android:layout_margin="6dp"
-                            android:id="@+id/faqText"/>
+                            android:id="@+id/faqText"
+                            android:fontFamily="@font/proxima_nova_bold"/>
 
                     </RelativeLayout>
 
@@ -595,7 +608,8 @@
                             android:textSize="14sp"
                             android:textStyle="bold"
                             android:layout_margin="6dp"
-                            android:id="@+id/adminText"/>
+                            android:id="@+id/adminText"
+                            android:fontFamily="@font/proxima_nova_bold"/>
 
                     </RelativeLayout>
 
@@ -636,7 +650,8 @@
                             android:textColor="@color/colorAccent"
                             android:textSize="14sp"
                             android:textStyle="bold"
-                            android:layout_margin="6dp"/>
+                            android:layout_margin="6dp"
+                            android:fontFamily="@font/proxima_nova_bold"/>
 
                     </RelativeLayout>
 

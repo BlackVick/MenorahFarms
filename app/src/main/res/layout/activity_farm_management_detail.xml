@@ -43,7 +43,8 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:gravity="center_vertical"
-                android:paddingStart="30dp"/>
+                android:paddingStart="30dp"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
         </LinearLayout>
 
@@ -95,7 +96,8 @@
                     android:textSize="23sp"
                     android:textColor="@color/black"
                     android:id="@+id/farmManageDetailsType"
-                    android:gravity="center_vertical"/>
+                    android:gravity="center_vertical"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
             </LinearLayout>
 
@@ -106,7 +108,8 @@
                 android:textColor="@color/grey"
                 android:textSize="13sp"
                 android:id="@+id/farmManageDetailLocation"
-                android:layout_marginTop="10dp"/>
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/proxima_nova_regular"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -115,7 +118,8 @@
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:id="@+id/farmManageDetailROI"
-                android:layout_marginTop="10dp"/>
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/proxima_nova_regular"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -124,7 +128,8 @@
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:id="@+id/farmManageDetailStatus"
-                android:layout_marginTop="10dp"/>
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/proxima_nova_regular"/>
 
             <Button
                 android:layout_width="match_parent"
@@ -134,7 +139,8 @@
                 android:text="ACTIVATE FARM"
                 android:textColor="@color/white"
                 android:layout_margin="15dp"
-                android:visibility="gone"/>
+                android:visibility="gone"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
             <Button
                 android:layout_width="match_parent"
@@ -144,7 +150,8 @@
                 android:text="DEACTIVATE FARM"
                 android:textColor="@color/white"
                 android:layout_margin="15dp"
-                android:visibility="gone"/>
+                android:visibility="gone"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
             <com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout
                 android:background="@drawable/farm_item_bacground"
@@ -167,7 +174,8 @@
                         android:layout_height="wrap_content"
                         android:text="How many hours should farm remain activated?"
                         android:textColor="@color/black"
-                        android:textSize="14sp"/>
+                        android:textSize="14sp"
+                        android:fontFamily="@font/proxima_nova_regular"/>
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -188,7 +196,8 @@
                                 android:textSize="16sp"
                                 android:textColor="@color/black"
                                 android:layout_gravity="center"
-                                android:gravity="center"/>
+                                android:gravity="center"
+                                android:fontFamily="@font/proxima_nova_regular"/>
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
@@ -224,7 +233,8 @@
                                         android:text=""
                                         android:textColor="@color/white"
                                         android:textSize="16sp"
-                                        android:id="@+id/hourNumber"/>
+                                        android:id="@+id/hourNumber"
+                                        android:fontFamily="@font/proxima_nova_regular"/>
 
                                 </RelativeLayout>
 
@@ -254,7 +264,8 @@
                         android:id="@+id/confirmActivation"
                         android:text="CONFIRM ACTIVATION"
                         android:textColor="@color/white"
-                        android:layout_margin="15dp"/>
+                        android:layout_margin="15dp"
+                        android:fontFamily="@font/proxima_nova_bold"/>
 
                 </LinearLayout>
 

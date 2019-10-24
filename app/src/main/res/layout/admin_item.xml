@@ -18,7 +18,8 @@
         android:padding="3dp"
         android:textColor="@color/colorAccent"
         android:ellipsize="end"
-        android:maxLines="1"/>
+        android:maxLines="1"
+        android:fontFamily="@font/proxima_nova_bold"/>
 
     <View
         android:layout_width="match_parent"

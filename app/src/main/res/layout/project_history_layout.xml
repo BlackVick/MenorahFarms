@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:padding="10dp">
+    android:padding="10dp"
+    android:layout_marginTop="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -57,7 +58,8 @@
                     android:gravity="start|center_vertical"
                     android:layout_marginStart="10dp"
                     android:textStyle="bold"
-                    android:id="@+id/historyProjectDets"/>
+                    android:id="@+id/historyProjectDets"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
             </LinearLayout>
 
@@ -71,7 +73,8 @@
             android:textStyle="bold"
             android:textColor="@color/black"
             android:textSize="20sp"
-            android:id="@+id/historyProjectNickName"/>
+            android:id="@+id/historyProjectNickName"
+            android:fontFamily="@font/proxima_nova_bold"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -81,7 +84,8 @@
             android:textColor="@color/grey"
             android:textStyle="normal"
             android:layout_marginTop="2dp"
-            android:id="@+id/historyProjectLocation"/>
+            android:id="@+id/historyProjectLocation"
+            android:fontFamily="@font/proxima_nova_regular"/>
         
         <LinearLayout
             android:layout_width="match_parent"
@@ -102,7 +106,8 @@
                     android:layout_height="wrap_content"
                     android:text="UNIT(S) \nSPONSORED"
                     android:textColor="@color/grey"
-                    android:textSize="15sp"/>
+                    android:textSize="13sp"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -112,7 +117,8 @@
                     android:textColor="@color/black"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:id="@+id/historyProjectUnits"/>
+                    android:id="@+id/historyProjectUnits"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
             </LinearLayout>
 
@@ -134,7 +140,8 @@
                     android:layout_height="wrap_content"
                     android:text="SPONSORSHIP \nPRICE"
                     android:textColor="@color/grey"
-                    android:textSize="15sp"/>
+                    android:textSize="13sp"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -144,7 +151,8 @@
                     android:textColor="@color/black"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:id="@+id/historyProjectPrice"/>
+                    android:id="@+id/historyProjectPrice"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
             </LinearLayout>
 
@@ -166,7 +174,8 @@
                     android:layout_height="wrap_content"
                     android:text="SPONSORSHIP \nRETURN"
                     android:textColor="@color/grey"
-                    android:textSize="15sp"/>
+                    android:textSize="13sp"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -176,11 +185,20 @@
                     android:textColor="@color/black"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:id="@+id/historyProjectReturn"/>
+                    android:id="@+id/historyProjectReturn"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
             </LinearLayout>
             
         </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="@drawable/view_back"
+            android:layout_marginTop="7dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"/>
 
     </LinearLayout>
 

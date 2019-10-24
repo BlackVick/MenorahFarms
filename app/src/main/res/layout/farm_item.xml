@@ -27,9 +27,10 @@
         android:text=""
         android:textColor="@color/black"
         android:padding="1dp"
-        android:textSize="20sp"
+        android:textSize="17sp"
         android:textStyle="bold"
-        android:layout_marginStart="5dp"/>
+        android:layout_marginStart="5dp"
+        android:fontFamily="@font/proxima_nova_bold"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -40,7 +41,8 @@
         android:textColor="@color/grey"
         android:padding="1dp"
         android:textSize="13sp"
-        android:layout_marginStart="5dp"/>
+        android:layout_marginStart="5dp"
+        android:fontFamily="@font/proxima_nova_regular"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -50,9 +52,10 @@
         android:text=""
         android:textColor="@color/packageName"
         android:padding="1dp"
-        android:textSize="15sp"
+        android:textSize="14sp"
         android:visibility="gone"
-        android:layout_marginStart="5dp"/>
+        android:layout_marginStart="5dp"
+        android:fontFamily="@font/proxima_nova_regular"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -62,8 +65,9 @@
         android:text=""
         android:textColor="@color/colorPrimary"
         android:padding="1dp"
-        android:textSize="15sp"
-        android:layout_marginStart="5dp"/>
+        android:textSize="14sp"
+        android:layout_marginStart="5dp"
+        android:fontFamily="@font/proxima_nova_regular"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -73,8 +77,9 @@
         android:text=""
         android:textColor="@color/black"
         android:padding="1dp"
-        android:textSize="15sp"
-        android:layout_marginStart="5dp"/>
+        android:textSize="14sp"
+        android:layout_marginStart="5dp"
+        android:fontFamily="@font/proxima_nova_regular"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -87,7 +92,8 @@
         android:textSize="13sp"
         android:layout_marginTop="6dp"
         android:layout_marginStart="5dp"
-        android:layout_marginBottom="10dp"/>
+        android:layout_marginBottom="10dp"
+        android:fontFamily="@font/proxima_nova_regular"/>
 
 </com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout>
 

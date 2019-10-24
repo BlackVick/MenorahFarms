@@ -33,7 +33,8 @@
             android:text=""
             android:id="@+id/loadingText"
             android:textSize="13sp"
-            android:textColor="@color/black"/>
+            android:textColor="@color/black"
+            android:fontFamily="@font/proxima_nova_regular"/>
 
     </com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout>
 

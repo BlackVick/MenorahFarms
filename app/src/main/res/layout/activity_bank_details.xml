@@ -42,7 +42,8 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:gravity="center_vertical"
-                android:paddingStart="30dp"/>
+                android:paddingStart="30dp"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
         </LinearLayout>
 
@@ -138,7 +139,8 @@
                         app:met_floatingLabelAnimating="true"
                         app:met_primaryColor="@color/black"
                         app:met_singleLineEllipsis="true"
-                        app:met_hideUnderline="true"/>
+                        app:met_hideUnderline="true"
+                        android:fontFamily="@font/proxima_nova_regular"/>
 
                     <View
                         android:layout_width="match_parent"
@@ -194,7 +196,8 @@
                         app:met_floatingLabelAnimating="true"
                         app:met_primaryColor="@color/black"
                         app:met_singleLineEllipsis="true"
-                        app:met_hideUnderline="true"/>
+                        app:met_hideUnderline="true"
+                        android:fontFamily="@font/proxima_nova_regular"/>
 
                     <View
                         android:layout_width="match_parent"
@@ -250,7 +253,8 @@
                         app:met_floatingLabelAnimating="true"
                         app:met_primaryColor="@color/black"
                         app:met_singleLineEllipsis="true"
-                        app:met_hideUnderline="true"/>
+                        app:met_hideUnderline="true"
+                        android:fontFamily="@font/proxima_nova_regular"/>
 
                     <View
                         android:layout_width="match_parent"
@@ -281,6 +285,7 @@
         android:text="UPDATE"
         android:textSize="17sp"
         android:textColor="@color/white"
-        android:id="@+id/updateProfileButton"/>
+        android:id="@+id/updateProfileButton"
+        android:fontFamily="@font/proxima_nova_bold"/>
 
 </RelativeLayout>

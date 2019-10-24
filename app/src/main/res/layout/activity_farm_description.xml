@@ -42,7 +42,8 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:gravity="center_vertical"
-                android:paddingStart="30dp"/>
+                android:paddingStart="30dp"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
         </LinearLayout>
 
@@ -73,7 +74,8 @@
                     android:textSize="18sp"
                     android:textColor="@color/black"
                     android:textStyle="bold"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_gravity="center_vertical"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -83,7 +85,8 @@
                     android:textColor="@color/black"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
-                    android:id="@+id/farmDescUnits"/>
+                    android:id="@+id/farmDescUnits"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </LinearLayout>
 
@@ -100,7 +103,8 @@
                     android:textSize="18sp"
                     android:textColor="@color/black"
                     android:textStyle="bold"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_gravity="center_vertical"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -110,7 +114,8 @@
                     android:textColor="@color/black"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
-                    android:id="@+id/farmDescROI"/>
+                    android:id="@+id/farmDescROI"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </LinearLayout>
 
@@ -127,7 +132,8 @@
                     android:textSize="18sp"
                     android:textColor="@color/black"
                     android:textStyle="bold"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_gravity="center_vertical"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -137,7 +143,8 @@
                     android:textColor="@color/black"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
-                    android:id="@+id/farmDescDuration"/>
+                    android:id="@+id/farmDescDuration"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </LinearLayout>
 
@@ -154,7 +161,8 @@
                     android:textSize="18sp"
                     android:textColor="@color/black"
                     android:textStyle="bold"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_gravity="center_vertical"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -164,7 +172,8 @@
                     android:textColor="@color/black"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
-                    android:id="@+id/farmDescPrice"/>
+                    android:id="@+id/farmDescPrice"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </LinearLayout>
 
@@ -181,7 +190,8 @@
                     android:textSize="18sp"
                     android:textColor="@color/black"
                     android:textStyle="bold"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_gravity="center_vertical"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -191,7 +201,8 @@
                     android:textColor="@color/black"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
-                    android:id="@+id/farmDescLocation"/>
+                    android:id="@+id/farmDescLocation"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </LinearLayout>
 
@@ -202,7 +213,8 @@
                 android:textStyle="italic"
                 android:textColor="@color/black"
                 android:textSize="19sp"
-                android:layout_marginTop="25dp"/>
+                android:layout_marginTop="25dp"
+                android:fontFamily="@font/proxima_nova_light"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -211,7 +223,8 @@
                 android:text=""
                 android:textSize="15sp"
                 android:textColor="@color/black"
-                android:id="@+id/farmDescTerms"/>
+                android:id="@+id/farmDescTerms"
+                android:fontFamily="@font/proxima_nova_regular"/>
 
         </LinearLayout>
 

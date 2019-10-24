@@ -28,7 +28,8 @@
             android:text="No Farms Are Currently Selling"
             android:textSize="20sp"
             android:textColor="@color/offBlack"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:fontFamily="@font/proxima_nova_bold"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -39,7 +40,8 @@
             android:layout_marginTop="10dp"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
-            android:textColor="@color/grey"/>
+            android:textColor="@color/grey"
+            android:fontFamily="@font/proxima_nova_regular"/>
 
     </LinearLayout>
 

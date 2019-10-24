@@ -56,7 +56,8 @@
                     android:text=""
                     android:textSize="18sp"
                     android:textColor="@color/white"
-                    android:id="@+id/userFullName"/>
+                    android:id="@+id/userFullName"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -65,7 +66,8 @@
                     android:textSize="12sp"
                     android:textColor="@color/white"
                     android:id="@+id/userEmail"
-                    android:layout_marginTop="6dp"/>
+                    android:layout_marginTop="6dp"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
                 <Button
                     android:layout_width="wrap_content"
@@ -80,21 +82,40 @@
                     android:paddingBottom="2dp"
                     android:layout_marginTop="6dp"
                     android:id="@+id/changePasswordButton"
-                    android:visibility="invisible"/>
+                    android:visibility="invisible"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </LinearLayout>
 
-            <ImageView
+            <RelativeLayout
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:adjustViewBounds="true"
-                android:padding="3dp"
+                android:layout_height="55dp"
                 android:layout_marginEnd="3dp"
                 android:layout_marginTop="3dp"
-                android:id="@+id/cartButton"
-                android:layout_gravity="center_vertical"
-                android:src="@drawable/ic_menorah_cart_green"/>
+                android:layout_gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:padding="1dp"
+                    android:id="@+id/cartButton"
+                    android:src="@drawable/ic_new_menorah_cart"
+                    android:layout_centerInParent="true"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentEnd="true"
+                    android:text=""
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    android:fontFamily="@font/proxima_nova_bold"
+                    android:id="@+id/cartItemCount"/>
+
+            </RelativeLayout>
 
         </LinearLayout>
 
@@ -126,7 +147,8 @@
                         android:textSize="13sp"
                         android:textColor="@color/black"
                         android:layout_marginTop="10dp"
-                        android:id="@+id/profileProgressText"/>
+                        android:id="@+id/profileProgressText"
+                        android:fontFamily="@font/proxima_nova_regular"/>
 
                     <ProgressBar
                         android:id="@+id/profileProgress"
@@ -195,7 +217,8 @@
                                 android:textSize="14sp"
                                 android:textStyle="bold"
                                 android:layout_margin="6dp"
-                                android:id="@+id/personalText"/>
+                                android:id="@+id/personalText"
+                                android:fontFamily="@font/proxima_nova_bold"/>
 
                         </RelativeLayout>
 
@@ -236,7 +259,8 @@
                                 android:textStyle="bold"
                                 android:textSize="14sp"
                                 android:layout_margin="6dp"
-                                android:id="@+id/contactText"/>
+                                android:id="@+id/contactText"
+                                android:fontFamily="@font/proxima_nova_bold"/>
 
                         </RelativeLayout>
 
@@ -278,7 +302,8 @@
                                 android:textStyle="bold"
                                 android:layout_margin="6dp"
                                 android:layout_alignParentBottom="true"
-                                android:id="@+id/bankText"/>
+                                android:id="@+id/bankText"
+                                android:fontFamily="@font/proxima_nova_bold"/>
 
                         </RelativeLayout>
 
@@ -331,7 +356,8 @@
                                 android:textStyle="bold"
                                 android:layout_margin="6dp"
                                 android:layout_alignParentBottom="true"
-                                android:id="@+id/kinText"/>
+                                android:id="@+id/kinText"
+                                android:fontFamily="@font/proxima_nova_bold"/>
 
                         </RelativeLayout>
 
@@ -373,7 +399,8 @@
                                 android:textStyle="bold"
                                 android:layout_margin="6dp"
                                 android:layout_alignParentBottom="true"
-                                android:id="@+id/socialText"/>
+                                android:id="@+id/socialText"
+                                android:fontFamily="@font/proxima_nova_bold"/>
 
                         </RelativeLayout>
 
@@ -415,7 +442,8 @@
                                 android:textSize="14sp"
                                 android:layout_margin="6dp"
                                 android:layout_alignParentBottom="true"
-                                android:id="@+id/studentText"/>
+                                android:id="@+id/studentText"
+                                android:fontFamily="@font/proxima_nova_bold"/>
 
                         </RelativeLayout>
 
@@ -469,7 +497,8 @@
                                 android:textSize="14sp"
                                 android:layout_margin="6dp"
                                 android:layout_alignParentBottom="true"
-                                android:id="@+id/historyTextText"/>
+                                android:id="@+id/historyTextText"
+                                android:fontFamily="@font/proxima_nova_bold"/>
 
                         </RelativeLayout>
 
@@ -511,7 +540,8 @@
                                 android:textStyle="bold"
                                 android:layout_margin="6dp"
                                 android:id="@+id/logoutText"
-                                android:layout_alignParentBottom="true"/>
+                                android:layout_alignParentBottom="true"
+                                android:fontFamily="@font/proxima_nova_bold"/>
 
                         </RelativeLayout>
 
@@ -594,7 +624,8 @@
                         android:gravity="center"
                         android:textColor="@color/colorAccent"
                         android:textSize="25sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold"
+                        android:fontFamily="@font/proxima_nova_bold"/>
 
                     <TextView
                         android:layout_width="match_parent"
@@ -603,7 +634,8 @@
                         android:gravity="center"
                         android:textColor="@color/grey"
                         android:textSize="15sp"
-                        android:layout_marginTop="10dp"/>
+                        android:layout_marginTop="10dp"
+                        android:fontFamily="@font/proxima_nova_regular"/>
 
                     <Button
                         android:layout_width="match_parent"
@@ -614,9 +646,10 @@
                         android:background="@drawable/read_more_ring"
                         android:text="Resend Mail"
                         android:textColor="@color/colorPrimary"
-                        android:textSize="19sp"
+                        android:textSize="16sp"
                         android:textStyle="bold"
-                        android:id="@+id/resendActivationBtn"/>
+                        android:id="@+id/resendActivationBtn"
+                        android:fontFamily="@font/proxima_nova_bold"/>
 
                 </LinearLayout>
 

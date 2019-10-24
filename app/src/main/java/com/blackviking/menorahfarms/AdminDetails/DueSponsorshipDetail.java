@@ -58,7 +58,7 @@ public class DueSponsorshipDetail extends AppCompatActivity {
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference userRef, dueSponsorshipRef, notificationRef, adminHistoryRef,
             historyRef, sponsoredFarmsRef, adminSponsorshipRef, sponsoredFarmNotiRef, farmRef;
-    private String userId, sponsorshipId, dueSponsorshipId;
+    private String dueSponsorshipId;
     private SponsoredFarmModel currentSponsorship;
 
 
@@ -173,7 +173,7 @@ public class DueSponsorshipDetail extends AppCompatActivity {
 
     }
 
-    private void loadAllDetails(String userId, String sponsorshipId) {
+    private void loadAllDetails(final String userId, final String sponsorshipId) {
 
         userRef.child(userId)
                 .addValueEventListener(
@@ -209,18 +209,22 @@ public class DueSponsorshipDetail extends AppCompatActivity {
 
                                 currentSponsorship = dataSnapshot.getValue(SponsoredFarmModel.class);
 
-                                theDueFarmType = currentSponsorship.getSponsoredFarmType();
-                                theDueUnitPrice = currentSponsorship.getUnitPrice();
-                                theDueUnits = currentSponsorship.getSponsoredUnits();
-                                theDueRoi = currentSponsorship.getSponsoredFarmRoi();
-                                theDueTotalPaid = String.valueOf(currentSponsorship.getTotalAmountPaid());
-                                theDueDuration = currentSponsorship.getSponsorshipDuration();
-                                theDueStartDate = currentSponsorship.getCycleStartDate();
-                                theDueEndDate = currentSponsorship.getCycleEndDate();
-                                theDueTotalReturn = currentSponsorship.getSponsorReturn();
-                                theDueRefNumber = currentSponsorship.getSponsorRefNumber();
+                                if (currentSponsorship != null) {
 
-                                setAllValues();
+                                    theDueFarmType = currentSponsorship.getSponsoredFarmType();
+                                    theDueUnitPrice = currentSponsorship.getUnitPrice();
+                                    theDueUnits = currentSponsorship.getSponsoredUnits();
+                                    theDueRoi = currentSponsorship.getSponsoredFarmRoi();
+                                    theDueTotalPaid = String.valueOf(currentSponsorship.getTotalAmountPaid());
+                                    theDueDuration = currentSponsorship.getSponsorshipDuration();
+                                    theDueStartDate = currentSponsorship.getCycleStartDate();
+                                    theDueEndDate = currentSponsorship.getCycleEndDate();
+                                    theDueTotalReturn = currentSponsorship.getSponsorReturn();
+                                    theDueRefNumber = currentSponsorship.getSponsorRefNumber();
+
+                                    setAllValues(userId, sponsorshipId, currentSponsorship);
+
+                                }
 
                             }
 
@@ -234,7 +238,7 @@ public class DueSponsorshipDetail extends AppCompatActivity {
 
     }
 
-    private void setAllValues() {
+    private void setAllValues(final String userId, final String sponsorshipId, final SponsoredFarmModel currentSponsorship) {
 
         //cancel loading screen
         alertDialog.dismiss();
@@ -274,7 +278,7 @@ public class DueSponsorshipDetail extends AppCompatActivity {
                         //check all cases
                         if (output == 1){
 
-                            settleSponsorship();
+                            settleSponsorship(userId, sponsorshipId, currentSponsorship);
 
                         } else
 
@@ -302,7 +306,7 @@ public class DueSponsorshipDetail extends AppCompatActivity {
 
     }
 
-    private void settleSponsorship() {
+    private void settleSponsorship(final String theUserId, final String theSponsorshipId, final SponsoredFarmModel currentSponsorship) {
 
         final Date todayDate = Calendar.getInstance().getTime();
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
@@ -310,7 +314,7 @@ public class DueSponsorshipDetail extends AppCompatActivity {
 
 
         final Map<String, Object> historyMap = new HashMap<>();
-        historyMap.put("sponsorshipUser", userId);
+        historyMap.put("sponsorshipUser", theUserId);
         historyMap.put("sponsorReturn", currentSponsorship.getSponsorReturn());
         historyMap.put("cycleEndDate", currentSponsorship.getCycleEndDate());
         historyMap.put("cycleStartDate", currentSponsorship.getCycleStartDate());
@@ -334,7 +338,7 @@ public class DueSponsorshipDetail extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()){
-                            historyRef.child(userId)
+                            historyRef.child(theUserId)
                                     .child(pushId)
                                     .setValue(historyMap)
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -343,10 +347,11 @@ public class DueSponsorshipDetail extends AppCompatActivity {
 
                                             if (task.isSuccessful()){
 
-                                                removeFromCycle(currentSponsorship.getFarmId(), sponsorshipId);
+                                                removeFromCycle(currentSponsorship.getFarmId(), theSponsorshipId);
 
-                                                sponsoredFarmsRef.child(userId)
-                                                        .child(sponsorshipId)
+                                                removeNotification(currentSponsorship.getFarmId(), theUserId);
+                                                sponsoredFarmsRef.child(theUserId)
+                                                        .child(theSponsorshipId)
                                                         .removeValue()
                                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                             @Override
@@ -363,8 +368,7 @@ public class DueSponsorshipDetail extends AppCompatActivity {
                                                                                     if (task.isSuccessful()){
 
                                                                                         mDialog.dismiss();
-                                                                                        removeNotification(currentSponsorship.getFarmId());
-                                                                                        sendNotification();
+                                                                                        sendNotification(theUserId);
                                                                                         Toast.makeText(DueSponsorshipDetail.this, "Sponsorship was successfully settled", Toast.LENGTH_LONG).show();
 
                                                                                     }
@@ -431,7 +435,7 @@ public class DueSponsorshipDetail extends AppCompatActivity {
 
     }
 
-    private void removeNotification(String farmId) {
+    private void removeNotification(String farmId, final String theUserId) {
 
         farmRef.child(farmId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -443,7 +447,7 @@ public class DueSponsorshipDetail extends AppCompatActivity {
                         if (theFarm != null){
 
                             sponsoredFarmNotiRef.child(theFarm.getFarmNotiId())
-                                    .child(userId)
+                                    .child(theUserId)
                                     .removeValue();
 
                         }
@@ -487,7 +491,7 @@ public class DueSponsorshipDetail extends AppCompatActivity {
 
     }
 
-    private void sendNotification() {
+    private void sendNotification(final String theUserId) {
 
         final Date todayDate = Calendar.getInstance().getTime();
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy  hh:mm");
@@ -499,7 +503,7 @@ public class DueSponsorshipDetail extends AppCompatActivity {
         notificationMap.put("time", todayString);
 
 
-        notificationRef.child(userId)
+        notificationRef.child(theUserId)
                 .push()
                 .setValue(notificationMap)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -508,7 +512,7 @@ public class DueSponsorshipDetail extends AppCompatActivity {
                         Map<String, String> dataSend = new HashMap<>();
                         dataSend.put("title", "Sponsorship");
                         dataSend.put("message", "Your sponsorship with Reference Number " + theDueRefNumber + " has been settled.");
-                        DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(userId).toString(), dataSend);
+                        DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(theUserId).toString(), dataSend);
 
                         mService.sendNotification(dataMessage)
                                 .enqueue(new retrofit2.Callback<MyResponse>() {

@@ -27,7 +27,8 @@
             android:id="@+id/youtubeTitle"
             android:background="@color/overlayBackground"
             android:layout_alignParentBottom="true"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:fontFamily="@font/proxima_nova_bold"/>
 
         <com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout
             android:layout_width="30dp"

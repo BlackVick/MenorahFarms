@@ -55,7 +55,8 @@
                     android:textColor="@color/black"
                     android:padding="2dp"
                     android:textSize="20sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -64,7 +65,8 @@
                     android:text=""
                     android:textColor="@color/black"
                     android:padding="1dp"
-                    android:textSize="12sp"/>
+                    android:textSize="12sp"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -73,7 +75,8 @@
                     android:text=""
                     android:textColor="@color/black"
                     android:padding="1dp"
-                    android:textSize="12sp"/>
+                    android:textSize="12sp"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -82,7 +85,8 @@
                     android:text=""
                     android:textColor="@color/black"
                     android:padding="1dp"
-                    android:textSize="12sp"/>
+                    android:textSize="12sp"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </LinearLayout>
 
@@ -105,8 +109,9 @@
                         android:text=""
                         android:textColor="@color/black"
                         android:padding="2dp"
-                        android:textSize="16sp"
-                        android:textStyle="bold"/>
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/proxima_nova_bold"/>
 
                     <TextView
                         android:layout_width="match_parent"
@@ -116,7 +121,8 @@
                         android:textColor="@color/black"
                         android:padding="1dp"
                         android:textSize="12sp"
-                        android:layout_marginTop="10dp"/>
+                        android:layout_marginTop="10dp"
+                        android:fontFamily="@font/proxima_nova_regular"/>
 
                 </LinearLayout>
 
@@ -145,7 +151,8 @@
                 android:padding="3dp"
                 android:layout_gravity="center_vertical"
                 android:layout_margin="4dp"
-                android:id="@+id/removeFromCart"/>
+                android:id="@+id/removeFromCart"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
             <Button
                 android:layout_width="0dp"
@@ -155,7 +162,8 @@
                 android:layout_margin="4dp"
                 android:text="Checkout"
                 android:textColor="@color/white"
-                android:id="@+id/checkout"/>
+                android:id="@+id/checkout"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
         </LinearLayout>
 

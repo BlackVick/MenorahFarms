@@ -42,7 +42,8 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:gravity="center_vertical"
-                android:paddingStart="30dp"/>
+                android:paddingStart="30dp"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
         </LinearLayout>
 
@@ -74,7 +75,8 @@
                     android:textSize="18sp"
                     android:textColor="@color/black"
                     android:textStyle="bold"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_gravity="center_vertical"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -84,7 +86,8 @@
                     android:textColor="@color/black"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
-                    android:id="@+id/dueUserName"/>
+                    android:id="@+id/dueUserName"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </LinearLayout>
 
@@ -101,7 +104,8 @@
                     android:textSize="18sp"
                     android:textColor="@color/black"
                     android:textStyle="bold"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_gravity="center_vertical"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -111,7 +115,8 @@
                     android:textColor="@color/black"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
-                    android:id="@+id/dueUserEmail"/>
+                    android:id="@+id/dueUserEmail"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </LinearLayout>
 
@@ -128,7 +133,8 @@
                     android:textSize="18sp"
                     android:textColor="@color/black"
                     android:textStyle="bold"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_gravity="center_vertical"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -138,7 +144,8 @@
                     android:textColor="@color/black"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
-                    android:id="@+id/dueUserBank"/>
+                    android:id="@+id/dueUserBank"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </LinearLayout>
 
@@ -155,7 +162,8 @@
                     android:textSize="18sp"
                     android:textColor="@color/black"
                     android:textStyle="bold"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_gravity="center_vertical"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -165,7 +173,8 @@
                     android:textColor="@color/black"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
-                    android:id="@+id/dueFarmType"/>
+                    android:id="@+id/dueFarmType"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </LinearLayout>
 
@@ -182,7 +191,8 @@
                     android:textSize="18sp"
                     android:textColor="@color/black"
                     android:textStyle="bold"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_gravity="center_vertical"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -192,7 +202,8 @@
                     android:textColor="@color/black"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
-                    android:id="@+id/dueUnitPrice"/>
+                    android:id="@+id/dueUnitPrice"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </LinearLayout>
 
@@ -209,7 +220,8 @@
                     android:textSize="18sp"
                     android:textColor="@color/black"
                     android:textStyle="bold"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_gravity="center_vertical"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -219,7 +231,8 @@
                     android:textColor="@color/black"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
-                    android:id="@+id/dueUnits"/>
+                    android:id="@+id/dueUnits"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </LinearLayout>
 
@@ -236,7 +249,8 @@
                     android:textSize="18sp"
                     android:textColor="@color/black"
                     android:textStyle="bold"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_gravity="center_vertical"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -246,7 +260,8 @@
                     android:textColor="@color/black"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
-                    android:id="@+id/dueRoi"/>
+                    android:id="@+id/dueRoi"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </LinearLayout>
 
@@ -263,7 +278,8 @@
                     android:textSize="18sp"
                     android:textColor="@color/black"
                     android:textStyle="bold"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_gravity="center_vertical"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -273,7 +289,8 @@
                     android:textColor="@color/black"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
-                    android:id="@+id/dueTotalPaid"/>
+                    android:id="@+id/dueTotalPaid"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </LinearLayout>
 
@@ -290,7 +307,8 @@
                     android:textSize="18sp"
                     android:textColor="@color/black"
                     android:textStyle="bold"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_gravity="center_vertical"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -300,7 +318,8 @@
                     android:textColor="@color/black"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
-                    android:id="@+id/dueDuration"/>
+                    android:id="@+id/dueDuration"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </LinearLayout>
 
@@ -317,7 +336,8 @@
                     android:textSize="18sp"
                     android:textColor="@color/black"
                     android:textStyle="bold"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_gravity="center_vertical"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -327,7 +347,8 @@
                     android:textColor="@color/black"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
-                    android:id="@+id/dueStartDate"/>
+                    android:id="@+id/dueStartDate"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </LinearLayout>
 
@@ -344,7 +365,8 @@
                     android:textSize="18sp"
                     android:textColor="@color/black"
                     android:textStyle="bold"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_gravity="center_vertical"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -354,7 +376,8 @@
                     android:textColor="@color/black"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
-                    android:id="@+id/dueEndDate"/>
+                    android:id="@+id/dueEndDate"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </LinearLayout>
 
@@ -371,7 +394,8 @@
                     android:textSize="18sp"
                     android:textColor="@color/black"
                     android:textStyle="bold"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_gravity="center_vertical"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -381,7 +405,8 @@
                     android:textColor="@color/black"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
-                    android:id="@+id/dueTotalReturn"/>
+                    android:id="@+id/dueTotalReturn"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </LinearLayout>
 
@@ -398,7 +423,8 @@
                     android:textSize="18sp"
                     android:textColor="@color/black"
                     android:textStyle="bold"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_gravity="center_vertical"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -408,7 +434,8 @@
                     android:textColor="@color/black"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
-                    android:id="@+id/dueRefNumber"/>
+                    android:id="@+id/dueRefNumber"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </LinearLayout>
 
@@ -421,7 +448,8 @@
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:id="@+id/dueSettled"/>
+                android:id="@+id/dueSettled"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
         </LinearLayout>
 

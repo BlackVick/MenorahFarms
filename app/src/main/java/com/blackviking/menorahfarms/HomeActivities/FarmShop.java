@@ -91,6 +91,9 @@ public class FarmShop extends AppCompatActivity {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
 
+                            //dismiss dialog
+                            alertDialog.dismiss();
+
                             setFarms();
 
                         }
@@ -165,8 +168,6 @@ public class FarmShop extends AppCompatActivity {
         tabLayout.setVisibility(View.VISIBLE);
         viewPager.setVisibility(View.VISIBLE);
 
-        //dismiss dialog
-        alertDialog.dismiss();
     }
 
     /*---   LOADING DIALOG   ---*/

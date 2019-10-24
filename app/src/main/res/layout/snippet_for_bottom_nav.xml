@@ -43,7 +43,8 @@
                 android:textSize="13sp"
                 android:textColor="@color/black"
                 android:layout_margin="2dp"
-                android:id="@+id/dashboardText"/>
+                android:id="@+id/dashboardText"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
         </LinearLayout>
 
@@ -73,7 +74,8 @@
                 android:textSize="13sp"
                 android:textColor="@color/black"
                 android:layout_margin="2dp"
-                android:id="@+id/farmShopText"/>
+                android:id="@+id/farmShopText"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
         </LinearLayout>
 
@@ -103,7 +105,8 @@
                 android:textSize="13sp"
                 android:textColor="@color/black"
                 android:layout_margin="2dp"
-                android:id="@+id/accountText"/>
+                android:id="@+id/accountText"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
         </LinearLayout>
 

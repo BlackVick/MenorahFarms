@@ -24,7 +24,8 @@
             android:textSize="16sp"
             android:textColor="@color/colorAccent"
             android:layout_marginTop="20dp"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:fontFamily="@font/proxima_nova_bold"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -33,7 +34,8 @@
             android:textSize="15sp"
             android:text=""
             android:layout_marginTop="15dp"
-            android:id="@+id/dialogMessage"/>
+            android:id="@+id/dialogMessage"
+            android:fontFamily="@font/proxima_nova_regular"/>
 
         <Button
             android:layout_width="wrap_content"
@@ -45,7 +47,8 @@
             android:layout_marginTop="20dp"
             android:text="OK"
             android:textColor="@color/colorPrimary"
-            android:id="@+id/dialogButton"/>
+            android:id="@+id/dialogButton"
+            android:fontFamily="@font/proxima_nova_bold"/>
 
     </LinearLayout>
 

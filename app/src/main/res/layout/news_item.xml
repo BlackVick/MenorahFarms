@@ -47,7 +47,8 @@
                 android:textStyle="bold"
                 android:maxLines="2"
                 android:ellipsize="end"
-                android:id="@+id/newsTitle"/>
+                android:id="@+id/newsTitle"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -65,7 +66,8 @@
                     android:paddingStart="7dp"
                     android:paddingEnd="4dp"
                     android:id="@+id/newsInfoBtn"
-                    android:layout_marginEnd="8dp"/>
+                    android:layout_marginEnd="8dp"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -77,7 +79,8 @@
                     android:text=""
                     android:textColor="@color/grey"
                     android:textSize="12sp"
-                    android:id="@+id/newsTime"/>
+                    android:id="@+id/newsTime"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </RelativeLayout>
 

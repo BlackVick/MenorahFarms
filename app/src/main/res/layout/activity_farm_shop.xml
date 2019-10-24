@@ -27,7 +27,8 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:gravity="center_vertical"
-                android:paddingStart="30dp"/>
+                android:paddingStart="30dp"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
         </LinearLayout>
 
@@ -63,7 +64,8 @@
                 android:gravity="center"
                 android:layout_marginTop="30dp"
                 android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"/>
+                android:layout_marginEnd="20dp"
+                android:fontFamily="@font/proxima_nova_regular"/>
 
         </LinearLayout>
 

@@ -42,7 +42,8 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:gravity="center_vertical"
-                android:paddingStart="30dp"/>
+                android:paddingStart="30dp"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
         </LinearLayout>
 
@@ -92,7 +93,8 @@
                     android:textSize="23sp"
                     android:textColor="@color/black"
                     android:id="@+id/farmDetailsType"
-                    android:gravity="center_vertical"/>
+                    android:gravity="center_vertical"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="0dp"
@@ -102,7 +104,8 @@
                     android:textSize="14sp"
                     android:textColor="@color/red"
                     android:id="@+id/farmDetailsUnitsLeft"
-                    android:gravity="center_vertical|end"/>
+                    android:gravity="center_vertical|end"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </LinearLayout>
 
@@ -113,7 +116,8 @@
                 android:textColor="@color/grey"
                 android:textSize="13sp"
                 android:id="@+id/farmDetailLocation"
-                android:layout_marginTop="10dp"/>
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/proxima_nova_regular"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -122,7 +126,8 @@
                 android:textColor="@color/black"
                 android:textSize="23sp"
                 android:id="@+id/farmDetailROI"
-                android:layout_marginTop="10dp"/>
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/proxima_nova_regular"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -135,7 +140,8 @@
                 android:layout_marginTop="40dp"
                 android:layout_marginBottom="10dp"
                 android:gravity="center_vertical"
-                android:id="@+id/farmDescription"/>
+                android:id="@+id/farmDescription"
+                android:fontFamily="@font/proxima_nova_regular"/>
 
             <com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout
                 android:background="@drawable/farm_item_bacground"
@@ -169,7 +175,8 @@
                                 android:layout_height="wrap_content"
                                 android:text="Price"
                                 android:textSize="16sp"
-                                android:textColor="@color/black" />
+                                android:textColor="@color/black"
+                                android:fontFamily="@font/proxima_nova_regular" />
 
                             <TextView
                                 android:layout_marginTop="8dp"
@@ -180,7 +187,8 @@
                                 android:textColor="@color/black"
                                 android:textStyle="bold"
                                 android:id="@+id/farmDetailUnitPrice"
-                                android:gravity="center_vertical"/>
+                                android:gravity="center_vertical"
+                                android:fontFamily="@font/proxima_nova_bold"/>
 
                         </LinearLayout>
 
@@ -198,7 +206,8 @@
                                 android:text="Farm Unit(s)"
                                 android:textSize="16sp"
                                 android:textColor="@color/black"
-                                android:layout_gravity="start"/>
+                                android:layout_gravity="start"
+                                android:fontFamily="@font/proxima_nova_regular"/>
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
@@ -234,7 +243,8 @@
                                         android:text=""
                                         android:textColor="@color/white"
                                         android:textSize="16sp"
-                                        android:id="@+id/unitNumber"/>
+                                        android:id="@+id/unitNumber"
+                                        android:fontFamily="@font/proxima_nova_regular"/>
 
                                 </RelativeLayout>
 
@@ -275,7 +285,8 @@
                             android:text=""
                             android:textStyle="normal"
                             android:textColor="@color/black"
-                            android:textSize="16sp"/>
+                            android:textSize="16sp"
+                            android:fontFamily="@font/proxima_nova_regular"/>
 
                         <View
                             android:layout_width="match_parent"
@@ -290,7 +301,8 @@
                             android:text=""
                             android:textColor="@color/colorPrimaryDark"
                             android:textSize="16sp"
-                            android:layout_marginTop="10dp"/>
+                            android:layout_marginTop="10dp"
+                            android:fontFamily="@font/proxima_nova_regular"/>
 
                         <TextView
                             android:layout_width="match_parent"
@@ -300,7 +312,8 @@
                             android:textColor="@color/colorPrimaryDark"
                             android:textSize="18sp"
                             android:layout_marginTop="10dp"
-                            android:layout_marginBottom="15dp"/>
+                            android:layout_marginBottom="15dp"
+                            android:fontFamily="@font/proxima_nova_regular"/>
 
                     </LinearLayout>
 
@@ -334,7 +347,8 @@
                         android:textColor="@color/white"
                         android:drawableStart="@drawable/ic_follow_farm_white"
                         android:drawablePadding="10dp"
-                        android:gravity="center"/>
+                        android:gravity="center"
+                        android:fontFamily="@font/proxima_nova_regular"/>
 
                 </RelativeLayout>
 
@@ -356,7 +370,8 @@
                         android:textColor="@color/white"
                         android:drawableStart="@drawable/ic_followed"
                         android:drawablePadding="10dp"
-                        android:gravity="center"/>
+                        android:gravity="center"
+                        android:fontFamily="@font/proxima_nova_regular"/>
 
                 </RelativeLayout>
 
@@ -375,9 +390,10 @@
                         android:text="Add To Cart"
                         android:textSize="17sp"
                         android:textColor="@color/white"
-                        android:drawableStart="@drawable/ic_menorah_cart_white"
+                        android:drawableStart="@drawable/ic_new_menorah_cart_small"
                         android:drawablePadding="10dp"
-                        android:gravity="center"/>
+                        android:gravity="center"
+                        android:fontFamily="@font/proxima_nova_regular"/>
 
                 </RelativeLayout>
 

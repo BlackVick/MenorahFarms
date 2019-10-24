@@ -96,7 +96,7 @@ public class Account extends AppCompatActivity {
     private LinearLayout dashboardSwitch, farmstoreSwitch, accountSwitch;
     private TextView dashboardText, farmstoreText, accountText;
 
-    private TextView userName, userEmail, profileProgressText;
+    private TextView userName, userEmail, profileProgressText, cartItemCount;
     private ImageView cartButton;
     private Button resetPassword;
     private CircleImageView userAvatar;
@@ -113,7 +113,7 @@ public class Account extends AppCompatActivity {
 
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference userRef, farmRef;
+    private DatabaseReference userRef, farmRef, cartRef;
     private String currentUid, loginType;
 
     private android.app.AlertDialog mDialog;
@@ -149,6 +149,7 @@ public class Account extends AppCompatActivity {
         userRef = db.getReference("Users");
         imageRef = storage.getReference("ProfileImages");
         farmRef = db.getReference("Farms");
+        cartRef = db.getReference("Carts");
         if (mAuth.getCurrentUser() != null)
             currentUid = mAuth.getCurrentUser().getUid();
 
@@ -188,6 +189,8 @@ public class Account extends AppCompatActivity {
         reloadPage = (ImageView)findViewById(R.id.reloadPage);
         resendActivationBtn = (Button)findViewById(R.id.resendActivationBtn);
 
+        cartItemCount = findViewById(R.id.cartItemCount);
+
 
 
         /*---   GOOGLE INIT   ---*/
@@ -205,6 +208,52 @@ public class Account extends AppCompatActivity {
                 })
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
+
+
+        //cart count
+        //execute network check async task
+        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
+            @Override
+            public void processFinish(Integer output) {
+
+                //check all cases
+                if (output == 1){
+
+                    //always cart item count
+                    cartRef.child(currentUid)
+                            .addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                    int count = (int) dataSnapshot.getChildrenCount();
+
+                                    cartItemCount.setText(String.valueOf(count));
+
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
+                } else
+
+                if (output == 0){
+
+                    Toast.makeText(Account.this, "No internet access", Toast.LENGTH_SHORT).show();
+
+                } else
+
+                if (output == 2){
+
+                    Toast.makeText(Account.this, "No network detected", Toast.LENGTH_SHORT).show();
+
+                }
+
+            }
+        }).execute();
+
 
 
         //check sponsorship monitor

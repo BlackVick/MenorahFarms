@@ -46,7 +46,8 @@
                     android:textSize="17sp"
                     android:textColor="@color/colorPrimary"
                     android:id="@+id/userName"
-                    android:layout_margin="2dp"/>
+                    android:layout_margin="2dp"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -55,7 +56,8 @@
                     android:textSize="14sp"
                     android:textColor="@color/offBlack"
                     android:id="@+id/userSponsorRef"
-                    android:layout_margin="2dp"/>
+                    android:layout_margin="2dp"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -64,7 +66,8 @@
                     android:textSize="13sp"
                     android:textColor="@color/offBlack"
                     android:id="@+id/userAmountPaid"
-                    android:layout_margin="2dp"/>
+                    android:layout_margin="2dp"
+                    android:fontFamily="@font/proxima_nova_regular"/>
 
             </LinearLayout>
 
@@ -89,7 +92,8 @@
                 android:layout_marginEnd="10dp"
                 android:textColor="@color/colorPrimary"
                 android:textSize="15sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
         </RelativeLayout>
 

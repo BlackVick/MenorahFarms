@@ -43,7 +43,8 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:gravity="center_vertical"
-                android:paddingStart="30dp"/>
+                android:paddingStart="30dp"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
         </LinearLayout>
 
@@ -78,7 +79,8 @@
                 android:gravity="center"
                 android:layout_marginTop="30dp"
                 android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"/>
+                android:layout_marginEnd="20dp"
+                android:fontFamily="@font/proxima_nova_regular"/>
 
         </LinearLayout>
 
@@ -144,7 +146,8 @@
                         android:textStyle="bold"
                         android:layout_alignParentEnd="true"
                         android:layout_margin="4dp"
-                        android:id="@+id/dueSponsorshipCounter"/>
+                        android:id="@+id/dueSponsorshipCounter"
+                        android:fontFamily="@font/proxima_nova_regular"/>
 
                 </RelativeLayout>
 
@@ -172,7 +175,8 @@
                         android:textStyle="bold"
                         android:layout_alignParentEnd="true"
                         android:layout_margin="4dp"
-                        android:id="@+id/studentApplyCounter"/>
+                        android:id="@+id/studentApplyCounter"
+                        android:fontFamily="@font/proxima_nova_regular"/>
 
                 </RelativeLayout>
 
@@ -217,7 +221,8 @@
                         android:textStyle="bold"
                         android:layout_alignParentEnd="true"
                         android:layout_margin="4dp"
-                        android:id="@+id/runningSponsorshipCounter"/>
+                        android:id="@+id/runningSponsorshipCounter"
+                        android:fontFamily="@font/proxima_nova_regular"/>
 
                 </RelativeLayout>
 
@@ -262,7 +267,8 @@
                         android:textStyle="bold"
                         android:layout_alignParentEnd="true"
                         android:layout_margin="4dp"
-                        android:id="@+id/pendingSponsorshipCounter"/>
+                        android:id="@+id/pendingSponsorshipCounter"
+                        android:fontFamily="@font/proxima_nova_regular"/>
 
                 </RelativeLayout>
 

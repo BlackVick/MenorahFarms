@@ -33,7 +33,8 @@
                     android:textStyle="bold"
                     android:textSize="20sp"
                     android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp" />
+                    android:layout_marginEnd="10dp"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -45,7 +46,8 @@
                     android:layout_marginTop="7dp"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="10dp"
-                    android:id="@+id/summaryReturns"/>
+                    android:id="@+id/summaryReturns"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
             </LinearLayout>
 
@@ -64,7 +66,8 @@
                     android:textStyle="bold"
                     android:textSize="20sp"
                     android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp" />
+                    android:layout_marginEnd="10dp"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -76,7 +79,8 @@
                     android:layout_marginTop="7dp"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="10dp"
-                    android:id="@+id/summaryCycleEnd"/>
+                    android:id="@+id/summaryCycleEnd"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
             </LinearLayout>
 
@@ -95,7 +99,8 @@
                     android:textStyle="bold"
                     android:textSize="20sp"
                     android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp" />
+                    android:layout_marginEnd="10dp"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -107,7 +112,8 @@
                     android:layout_marginTop="7dp"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="10dp"
-                    android:id="@+id/summarySponsored"/>
+                    android:id="@+id/summarySponsored"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
             </LinearLayout>
 
@@ -126,7 +132,8 @@
                     android:textStyle="bold"
                     android:textSize="20sp"
                     android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp" />
+                    android:layout_marginEnd="10dp"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -138,7 +145,8 @@
                     android:layout_marginTop="7dp"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="10dp"
-                    android:id="@+id/summaryCollected"/>
+                    android:id="@+id/summaryCollected"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
             </LinearLayout>
 

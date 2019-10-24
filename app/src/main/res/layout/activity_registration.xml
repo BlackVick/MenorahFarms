@@ -46,7 +46,8 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="25dp"
-                android:id="@+id/upText"/>
+                android:id="@+id/upText"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
             <com.rengwuxian.materialedittext.MaterialEditText
                 android:layout_width="match_parent"
@@ -70,7 +71,8 @@
                 app:met_floatingLabelAnimating="true"
                 app:met_primaryColor="@color/black"
                 app:met_singleLineEllipsis="true"
-                app:met_hideUnderline="true"/>
+                app:met_hideUnderline="true"
+                android:fontFamily="@font/proxima_nova_regular"/>
 
             <View
                 android:layout_width="match_parent"
@@ -102,7 +104,8 @@
                 app:met_floatingLabelAnimating="true"
                 app:met_primaryColor="@color/black"
                 app:met_singleLineEllipsis="true"
-                app:met_hideUnderline="true"/>
+                app:met_hideUnderline="true"
+                android:fontFamily="@font/proxima_nova_regular"/>
 
             <View
                 android:layout_width="match_parent"
@@ -125,7 +128,8 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:text="Finish"
-                android:id="@+id/signUpButton"/>
+                android:id="@+id/signUpButton"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
         </LinearLayout>
 
@@ -147,7 +151,8 @@
             android:textColor="@color/white"
             android:textSize="14sp"
             android:text="@string/poweredBy"
-            android:layout_margin="5dp"/>
+            android:layout_margin="5dp"
+            android:fontFamily="@font/proxima_nova_regular"/>
 
     </RelativeLayout>
 

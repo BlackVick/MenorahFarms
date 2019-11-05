@@ -652,6 +652,23 @@ public class AdminNotify extends Fragment {
 
     private void sendBroadcastNoti(String theTopic, final String theMessage, final String theKey) {
 
+        Map<String, String> dataSend = new HashMap<>();
+        dataSend.put("title", "Menorah Farms");
+        dataSend.put("message", theMessage);
+        DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(theKey).toString(), dataSend);
+
+        mService.sendNotification(dataMessage)
+                .enqueue(new retrofit2.Callback<MyResponse>() {
+                    @Override
+                    public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<MyResponse> call, Throwable t) {
+                    }
+                });
+
         final Date todayDate = Calendar.getInstance().getTime();
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy  hh:mm");
         String todayString = formatter.format(todayDate);
@@ -670,22 +687,7 @@ public class AdminNotify extends Fragment {
 
                         if (task.isSuccessful()){
 
-                            Map<String, String> dataSend = new HashMap<>();
-                            dataSend.put("title", "Menorah Farms");
-                            dataSend.put("message", theMessage);
-                            DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(theKey).toString(), dataSend);
 
-                            mService.sendNotification(dataMessage)
-                                    .enqueue(new retrofit2.Callback<MyResponse>() {
-                                        @Override
-                                        public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
-
-                                        }
-
-                                        @Override
-                                        public void onFailure(Call<MyResponse> call, Throwable t) {
-                                        }
-                                    });
 
                         }
 

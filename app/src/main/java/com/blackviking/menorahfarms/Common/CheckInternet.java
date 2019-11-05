@@ -60,7 +60,7 @@ public class CheckInternet extends AsyncTask<String,Void,Integer>{
         try {
             Socket socket=new Socket();
             SocketAddress socketAddress=new InetSocketAddress("8.8.8.8",53);
-            socket.connect(socketAddress,4000);
+            socket.connect(socketAddress,1000);
             socket.close();
             result=1;
         } catch (IOException e) {
@@ -75,15 +75,7 @@ public class CheckInternet extends AsyncTask<String,Void,Integer>{
     protected void onPostExecute(Integer result) {
         if (isConnected())
         {
-            if (result==1)
-            {
-                delegate.processFinish(result);
-            }
-
-            if(result==0)
-            {
-                delegate.processFinish(result);
-            }
+            delegate.processFinish(1);
         }
         else
         {

@@ -36,7 +36,6 @@ import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.Services.CheckForSponsorship;
 import com.blackviking.menorahfarms.Services.SponsorshipMonitor;
 import com.blackviking.menorahfarms.SignIn;
-import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;

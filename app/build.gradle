@@ -7,10 +7,11 @@ android {
         applicationId "com.blackviking.menorahfarms"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 29
-        versionName "1.29"
+        versionCode 30
+        versionName "1.30"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        resConfigs "en", "US"
     }
     buildTypes {
         release {
@@ -76,18 +77,12 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.squareup.okhttp3:okhttp:3.4.2'
 
-    /*---   PAYSTACK   ---*/
-    implementation 'com.github.Flutterwave:rave-android:1.0.38'
-
     /*---   DAY CALCULATION   ---*/
     implementation 'net.danlew:android.joda:2.10.1.2'
 
     /*---   ANIMATIONS   ---*/
     implementation 'com.daimajia.easing:library:2.0@aar'
     implementation 'com.daimajia.androidanimations:library:2.3@aar'
-
-    /*---   FACEBOOK   ---*/
-    implementation 'com.facebook.android:facebook-login:[5,6)'
 
 
     testImplementation 'junit:junit:4.12'

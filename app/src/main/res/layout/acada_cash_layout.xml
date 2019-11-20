@@ -28,7 +28,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="AcadaCash Farms for undergraduates are available only to verified undergraduates. \n\nWould you like to switch your account to a student account now?"
+            android:text="AcadaCash Farms are available for sponsorship only to verified undergraduates and current NYSC members. \n\nWould you like to switch your account to a student account now?"
             android:gravity="center"
             android:textColor="@color/grey"
             android:textSize="15sp"

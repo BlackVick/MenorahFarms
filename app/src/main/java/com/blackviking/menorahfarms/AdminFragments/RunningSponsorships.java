@@ -33,8 +33,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-import static com.facebook.FacebookSdk.getApplicationContext;
-
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -322,7 +320,7 @@ public class RunningSponsorships extends Fragment {
 
                     }
 
-                    CustomSearchAdapter searchAdapter = new CustomSearchAdapter(getApplicationContext(), arrayList, getActivity());
+                    CustomSearchAdapter searchAdapter = new CustomSearchAdapter(getContext(), arrayList, getActivity());
                     runningCycleRecycler.setAdapter(searchAdapter);
                     searchAdapter.notifyDataSetChanged();
 

@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">Menorah Farms</string>
-    <string name="facebook_app_id">2434484176610800</string>
-    <string name="fb_login_protocol_scheme">fb2434484176610800</string>
     <string name="poweredBy">2019 | Menorah Farms &#169;</string>
     <string name="noInternet">We could not communicate with the server. Please check internet connection and try again later.</string>
     <string name="transferNotice">Please make transfer for the total amount of units you are sponsoring to the BANK ACCOUNT BELOW and upload a proof of payment (Screenshot of transaction statement).</string>

@@ -21,7 +21,6 @@ import com.blackviking.menorahfarms.HomeActivities.Dashboard;
 import com.blackviking.menorahfarms.Models.UserModel;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
-import com.facebook.login.LoginManager;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -244,7 +243,6 @@ public class Registration extends AppCompatActivity {
             mAuth.getCurrentUser().delete();
             userRef.child(currentUid).removeValue();
             authed.child(currentUid).removeValue();
-            LoginManager.getInstance().logOut();
             mAuth.signOut();
             finish();
 

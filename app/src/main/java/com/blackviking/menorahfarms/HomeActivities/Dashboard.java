@@ -74,6 +74,7 @@ public class Dashboard extends AppCompatActivity {
     private boolean isMonitorRunning;
     private UserModel paperUser;
     private android.app.AlertDialog alertDialog, alertDialogError;
+    private boolean isLoading = false;
 
     //google
     private GoogleApiClient mGoogleApiClient;
@@ -516,6 +517,7 @@ public class Dashboard extends AppCompatActivity {
                                     .placeholder(R.drawable.profile)
                                     .into(userAvatar);
                         }
+
                     });
 
         } else {
@@ -597,6 +599,9 @@ public class Dashboard extends AppCompatActivity {
     /*---   LOADING DIALOG   ---*/
     public void showLoadingDialog(String theMessage){
 
+        //loading
+        isLoading = true;
+
         alertDialog = new android.app.AlertDialog.Builder(this).create();
         LayoutInflater inflater = this.getLayoutInflater();
         View viewOptions = inflater.inflate(R.layout.loading_dialog,null);
@@ -611,11 +616,18 @@ public class Dashboard extends AppCompatActivity {
 
         loadingText.setText(theMessage);
 
+        alertDialog.setCancelable(false);
         alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
-                finish();
+                isLoading = false;
+            }
+        });
+        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                isLoading = false;
             }
         });
 
@@ -650,5 +662,13 @@ public class Dashboard extends AppCompatActivity {
 
         alertDialogError.show();
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isLoading){
+            alertDialog.dismiss();
+        }
+        finish();
     }
 }

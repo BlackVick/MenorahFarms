@@ -1,6 +1,7 @@
 package com.blackviking.menorahfarms.AccountMenus;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -44,6 +45,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -86,6 +88,7 @@ public class StudentDetails extends AppCompatActivity {
     private StorageReference imageRef;
     private String thumbDownloadUrl = "";
     private android.app.AlertDialog alertDialog;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -400,10 +403,13 @@ public class StudentDetails extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
 
                 //show dialog
-                mDialog = new SpotsDialog(this, "Upload In Progress");
-                mDialog.setCancelable(false);
-                mDialog.setCanceledOnTouchOutside(false);
-                mDialog.show();
+                progressDialog = new ProgressDialog(StudentDetails.this);
+                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                progressDialog.setTitle("Upload In Progress. . .");
+                progressDialog.setProgress(0);
+                progressDialog.setCanceledOnTouchOutside(false);
+                progressDialog.setCancelable(false);
+                progressDialog.show();
 
                 //execute network check async task
                 CheckInternet asyncTask = (CheckInternet) new CheckInternet(StudentDetails.this, new CheckInternet.AsyncResponse(){
@@ -434,14 +440,6 @@ public class StudentDetails extends AppCompatActivity {
 
                                 final UploadTask uploadTask = imageThumbRef1.putBytes(thumb_byte);
 
-                                mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                                    @Override
-                                    public void onCancel(DialogInterface dialog) {
-                                        imageUri = null;
-                                        uploadTask.cancel();
-                                    }
-                                });
-
                                 uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                                     @Override
                                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumb_task) {
@@ -450,13 +448,21 @@ public class StudentDetails extends AppCompatActivity {
 
                                         if (thumb_task.isSuccessful()) {
 
-                                            mDialog.dismiss();
+                                            progressDialog.dismiss();
 
                                         } else {
                                             Toast.makeText(StudentDetails.this, "Upload Failed. Please Try Again", Toast.LENGTH_SHORT).show();
-                                            mDialog.dismiss();
+                                            progressDialog.dismiss();
                                             imageUri = null;
                                         }
+                                    }
+                                }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                                    @Override
+                                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+
+                                        int currentProgress = (int) (100*taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                                        progressDialog.setProgress(currentProgress);
+
                                     }
                                 });
 
@@ -469,7 +475,7 @@ public class StudentDetails extends AppCompatActivity {
                         if (output == 0){
 
                             //no internet
-                            mDialog.dismiss();
+                            progressDialog.dismiss();
                             showErrorDialog("No internet access");
 
                         } else
@@ -477,7 +483,7 @@ public class StudentDetails extends AppCompatActivity {
                         if (output == 2){
 
                             //no internet
-                            mDialog.dismiss();
+                            progressDialog.dismiss();
                             showErrorDialog("Not connected to any network");
 
                         }

@@ -52,6 +52,7 @@ public class SponsoredFarms extends AppCompatActivity {
     private LinearLayoutManager layoutManager;
 
     private android.app.AlertDialog alertDialog;
+    private boolean isLoading = false;
     private RelativeLayout noInternetLayout;
 
     @Override
@@ -286,6 +287,9 @@ public class SponsoredFarms extends AppCompatActivity {
     /*---   LOADING DIALOG   ---*/
     public void showLoadingDialog(String theMessage){
 
+        //loading
+        isLoading = true;
+
         alertDialog = new android.app.AlertDialog.Builder(this).create();
         LayoutInflater inflater = this.getLayoutInflater();
         View viewOptions = inflater.inflate(R.layout.loading_dialog,null);
@@ -300,11 +304,18 @@ public class SponsoredFarms extends AppCompatActivity {
 
         loadingText.setText(theMessage);
 
+        alertDialog.setCancelable(false);
         alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
-                finish();
+                isLoading = false;
+            }
+        });
+        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                isLoading = false;
             }
         });
 
@@ -314,7 +325,9 @@ public class SponsoredFarms extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (isLoading){
+            alertDialog.dismiss();
+        }
         finish();
     }
 }

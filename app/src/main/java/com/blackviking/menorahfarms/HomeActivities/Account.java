@@ -133,6 +133,7 @@ public class Account extends AppCompatActivity {
 
     private UserModel paperUser;
     private android.app.AlertDialog alertDialog, alertDialogError;
+    private boolean isLoading = false;
 
 
     //google
@@ -272,6 +273,10 @@ public class Account extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                if (isLoading){
+                    alertDialog.dismiss();
+                }
+
                 Intent dashboardIntent = new Intent(Account.this, Dashboard.class);
                 startActivity(dashboardIntent);
                 finish();
@@ -282,6 +287,10 @@ public class Account extends AppCompatActivity {
         farmstoreSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if (isLoading){
+                    alertDialog.dismiss();
+                }
 
                 Intent farmstoreIntent = new Intent(Account.this, FarmShop.class);
                 startActivity(farmstoreIntent);
@@ -945,7 +954,10 @@ public class Account extends AppCompatActivity {
     /*---   WARNING DIALOG   ---*/
     public void showErrorDialog(String theWarning){
 
-        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this).create();
+        //loading
+        isLoading = true;
+
+        alertDialog = new android.app.AlertDialog.Builder(this).create();
         LayoutInflater inflater = this.getLayoutInflater();
         View viewOptions = inflater.inflate(R.layout.dialog_layout,null);
 
@@ -960,6 +972,19 @@ public class Account extends AppCompatActivity {
 
         message.setText(theWarning);
 
+        alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                isLoading = false;
+            }
+        });
+        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                isLoading = false;
+            }
+        });
+
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -969,5 +994,13 @@ public class Account extends AppCompatActivity {
 
         alertDialog.show();
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isLoading){
+            alertDialog.dismiss();
+        }
+        finish();
     }
 }

@@ -28,6 +28,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blackviking.menorahfarms.AdminDetails.PendingSponsorshipDetail;
 import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Common.Permissions;
@@ -44,6 +45,9 @@ import com.blackviking.menorahfarms.Notification.MyResponse;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.ViewHolders.CartViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.flutterwave.raveandroid.RaveConstants;
+import com.flutterwave.raveandroid.RavePayActivity;
+import com.flutterwave.raveandroid.RavePayManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -90,7 +94,7 @@ public class Cart extends AppCompatActivity {
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private DatabaseReference cartRef, userRef, farmRef, sponsorshipRef, payHistoryRef, termsRef, menorahBankRef, pendingSponsorshipRef,
+    private DatabaseReference cartRef, userRef, farmRef, sponsorshipRef, payHistoryRef, termsRef, runningCycleRef,
             notificationRef;
     private String currentuid;
     private String paymentReference;
@@ -104,26 +108,12 @@ public class Cart extends AppCompatActivity {
     private APIService mService;
 
     private android.app.AlertDialog loadingDialog, mDialog;
+    private boolean isLoading = false;
     private UserModel paperUser;
 
     //random farm manager
     private static final Random random = new Random();
     private static final String[] CHARS = {"01", "02"};
-
-
-    //dialog widgets
-    private TextView menorahBank, menorahAccountName, menorahAccountNumber, actionText;
-    private RelativeLayout finishCheckout;
-    private ProgressBar checkoutProgress;
-
-
-    //image
-    private static final int VERIFY_PERMISSIONS_REQUEST = 757;
-    private static final int GALLERY_REQUEST_CODE = 265;
-    private Uri imageUri;
-    private FirebaseStorage storage = FirebaseStorage.getInstance();
-    private StorageReference imageRef;
-    private String originalImageUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,9 +129,7 @@ public class Cart extends AppCompatActivity {
         payHistoryRef = db.getReference("TransactionHistory");
         termsRef = db.getReference("TermsAndConditions");
         notificationRef = db.getReference("Notifications");
-        menorahBankRef = db.getReference("MenorahBankDetails");
-        imageRef = storage.getReference("PaymentProofs");
-        pendingSponsorshipRef = db.getReference("PendingSponsorships");
+        runningCycleRef = db.getReference("RunningCycles");
         if (mAuth.getCurrentUser() != null)
             currentuid = mAuth.getCurrentUser().getUid();
 
@@ -391,8 +379,8 @@ public class Cart extends AppCompatActivity {
                                                                                         @Override
                                                                                         public void onClick(View v) {
                                                                                             alertDialog.dismiss();
-                                                                                            transferCheckout(theFarmState, adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
-                                                                                            //checkoutAndPay(theFarmState, adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
+                                                                                            //transferCheckout(theFarmState, adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
+                                                                                            checkoutAndPay(theFarmState, adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
                                                                                             //testPay(adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
                                                                                         }
                                                                                     });
@@ -453,8 +441,8 @@ public class Cart extends AppCompatActivity {
                                                                                         @Override
                                                                                         public void onClick(View v) {
                                                                                             alertDialog.dismiss();
-                                                                                            transferCheckout(theFarmState, adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
-                                                                                            //checkoutAndPay(theFarmState, adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
+                                                                                            //transferCheckout(theFarmState, adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
+                                                                                            checkoutAndPay(theFarmState, adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
                                                                                             //testPay(adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
                                                                                         }
                                                                                     });
@@ -525,111 +513,10 @@ public class Cart extends AppCompatActivity {
 
     }
 
-    private void transferCheckout(final String theFarmState, final String key, final String theFarmType, final String theFarmROI, final String theFarmUnitPrice, final String theFarmSponsorDuration, final long totalPayout, final int units, final String farmId) {
-
-        final android.app.AlertDialog alertDialog2 = new android.app.AlertDialog.Builder(Cart.this, R.style.DialogTheme).create();
-        LayoutInflater inflater = Cart.this.getLayoutInflater();
-        View viewOptions = inflater.inflate(R.layout.add_payment_proof_layout, null);
-
-        menorahBank = viewOptions.findViewById(R.id.menorahBank);
-        menorahAccountName = viewOptions.findViewById(R.id.menorahAccountName);
-        menorahAccountNumber = viewOptions.findViewById(R.id.menorahAccountNumber);
-        actionText = viewOptions.findViewById(R.id.actionText);
-        finishCheckout = viewOptions.findViewById(R.id.finishCheckout);
-        checkoutProgress = viewOptions.findViewById(R.id.checkoutProgress);
-
-        alertDialog2.setView(viewOptions);
-
-        alertDialog2.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
-        alertDialog2.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
 
-        //fill bank info
-        //execute network check async task
-        CheckInternet asyncTask = (CheckInternet) new CheckInternet(Cart.this, new CheckInternet.AsyncResponse() {
-            @Override
-            public void processFinish(Integer output) {
-
-                //check all cases
-                if (output == 1) {
-
-                    menorahBankRef.addListenerForSingleValueEvent(
-                            new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                    MenorahDetailsModel theDets = dataSnapshot.getValue(MenorahDetailsModel.class);
-
-                                    if (theDets != null){
-
-                                        menorahAccountName.setText(theDets.getAccount_name());
-                                        menorahAccountNumber.setText(theDets.getAccount_number());
-                                        menorahBank.setText(theDets.getBank());
-
-                                    }
-
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-
-                                }
-                            }
-                    );
-
-                } else if (output == 0) {
-
-                    Toast.makeText(Cart.this, "No internet access", Toast.LENGTH_SHORT).show();
-
-                } else if (output == 2) {
-
-                    Toast.makeText(Cart.this, "No network access", Toast.LENGTH_SHORT).show();
-
-                }
-
-            }
-        }).execute();
-
-
-        //upload btn
-        finishCheckout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if (imageUri == null && actionText.getText().toString().equalsIgnoreCase("UPLOAD EVIDENCE OF PAYMENT")) {
-
-                    if (checkPermissionsArray(Permissions.PERMISSIONS)){
-
-                        Intent pickPhoto = new Intent(Intent.ACTION_PICK,
-                                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        startActivityForResult(pickPhoto, GALLERY_REQUEST_CODE);
-
-
-                    } else {
-
-                        verifyPermissions(Permissions.PERMISSIONS);
-
-                    }
-
-                } else if (imageUri != null && originalImageUrl != null
-                            && !originalImageUrl.equals("") && actionText.getText().toString().equalsIgnoreCase("FINISH")){
-
-                    finishTransferCheckout(alertDialog2, theFarmState, key, theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, totalPayout, units, farmId);
-
-                }
-
-            }
-        });
-
-        alertDialog2.show();
-
-    }
-
-    private void finishTransferCheckout(final android.app.AlertDialog alertDialog2, final String theFarmState, final String key, final String theFarmType, final String theFarmROI, final String theFarmUnitPrice, final String theFarmSponsorDuration, final long totalPayout, final int units, final String farmId) {
-
-        //loading
-        actionText.setVisibility(View.GONE);
-        checkoutProgress.setVisibility(View.VISIBLE);
+    //FlutterWave Payment Gateway
+    private void checkoutAndPay(final String theFarmState, final String theCartKey, final String theFarmType, final String theFarmROI, final String theFarmUnitPrice, final String theFarmSponsorDuration, final long totalPayout, final int units, final String farmId) {
 
         //execute network check async task
         CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
@@ -639,6 +526,7 @@ public class Cart extends AppCompatActivity {
                 //check all cases
                 if (output == 1){
 
+                    //get user
                     final UserModel user1 = Paper.book().read(Common.PAPER_USER);
 
                     /*---   GLOBAL SET   ---*/
@@ -649,7 +537,7 @@ public class Cart extends AppCompatActivity {
                     currentFarmId = farmId;
                     currentTotalPayout = totalPayout;
                     currentUnits = units;
-                    currentCartKey = key;
+                    currentCartKey = theCartKey;
 
 
                     char firstInit = user1.getFirstName().charAt(0);
@@ -680,36 +568,66 @@ public class Cart extends AppCompatActivity {
                     futureString = formatterFuture.format(futureDate);
 
 
-                    if (theFarmState.equalsIgnoreCase("Now Selling")){
+                    farmRef.child(farmId)
+                            .addListenerForSingleValueEvent(
+                                    new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        pushToDb(alertDialog2);
+                                            FarmModel laFarm = dataSnapshot.getValue(FarmModel.class);
 
-                    } else {
+                                            if (laFarm != null){
 
-                        //loading
-                        actionText.setVisibility(View.VISIBLE);
-                        checkoutProgress.setVisibility(View.GONE);
-                        showErrorDialog("Sorry, this farm is sold out.");
+                                                if (laFarm.getFarmState().equalsIgnoreCase("Now Selling")){
 
-                    }
+                                                    /*---   PAYMENT   ---*/
+                                                    new RavePayManager(Cart.this).setAmount(totalPrice)
+                                                            .setCountry("NG")
+                                                            .setCurrency("NGN")
+                                                            .setEmail(user1.getEmail())
+                                                            .setfName(user1.getFirstName())
+                                                            .setlName(user1.getLastName())
+                                                            .setNarration("Sponsorship Payment For " + String.valueOf(units) + " Units Of " + theFarmType + " Farm, On This Day " + todayString + ".")
+                                                            .setPublicKey(publicKey)
+                                                            .setEncryptionKey(encryptionKey)
+                                                            .setTxRef(paymentReference)
+                                                            .acceptAccountPayments(false)
+                                                            .acceptCardPayments(true)
+                                                            .onStagingEnv(false)
+                                                            .isPreAuth(true)
+                                                            .shouldDisplayFee(true)
+                                                            .showStagingLabel(false)
+                                                            .withTheme(R.style.FlutterPayTheme)
+                                                            .initialize();
 
+                                                } else {
+
+                                                    //loading
+                                                    showErrorDialog("Farm is sold out.");
+
+                                                }
+
+                                            }
+
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+
+                                        }
+                                    }
+                            );
 
                 } else
 
                 if (output == 0){
 
-                    //loading
-                    actionText.setVisibility(View.VISIBLE);
-                    checkoutProgress.setVisibility(View.GONE);
                     Toast.makeText(Cart.this, "No internet access", Toast.LENGTH_SHORT).show();
 
                 } else
 
                 if (output == 2){
 
-                    //loading
-                    actionText.setVisibility(View.VISIBLE);
-                    checkoutProgress.setVisibility(View.GONE);
                     Toast.makeText(Cart.this, "No network connection", Toast.LENGTH_SHORT).show();
 
                 }
@@ -719,6 +637,260 @@ public class Cart extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == RaveConstants.RAVE_REQUEST_CODE && data != null) {
+            String message = data.getStringExtra("response");
+
+            if (resultCode == RavePayActivity.RESULT_SUCCESS) {
+
+                //show loading dialog
+                showLoadingDialog("Authorizing payment . . .");
+
+                //execute network check async task
+                CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
+                    @Override
+                    public void processFinish(Integer output) {
+
+                        //check all cases
+                        if (output == 1){
+
+                            pushToDb();
+
+                        } else
+
+                        if (output == 0){
+
+                            loadingDialog.dismiss();
+                            showErrorDialog("No internet access");
+
+                        } else
+
+                        if (output == 2){
+
+                            loadingDialog.dismiss();
+                            showErrorDialog("You are not connected to any network");
+
+                        }
+
+                    }
+                }).execute();
+
+            } else if (resultCode == RavePayActivity.RESULT_ERROR) {
+
+                Toast.makeText(this, "Transaction failed", Toast.LENGTH_SHORT).show();
+
+            } else if (resultCode == RavePayActivity.RESULT_CANCELLED) {
+
+                Toast.makeText(this, "Transaction cancelled", Toast.LENGTH_SHORT).show();
+
+            }
+        }
+
+    }
+
+
+
+
+
+//    //Transfer Payment Gateway
+//    private void transferCheckout(final String theFarmState, final String key, final String theFarmType, final String theFarmROI, final String theFarmUnitPrice, final String theFarmSponsorDuration, final long totalPayout, final int units, final String farmId) {
+//
+//        final android.app.AlertDialog alertDialog2 = new android.app.AlertDialog.Builder(Cart.this, R.style.DialogTheme).create();
+//        LayoutInflater inflater = Cart.this.getLayoutInflater();
+//        View viewOptions = inflater.inflate(R.layout.add_payment_proof_layout, null);
+//
+//        menorahBank = viewOptions.findViewById(R.id.menorahBank);
+//        menorahAccountName = viewOptions.findViewById(R.id.menorahAccountName);
+//        menorahAccountNumber = viewOptions.findViewById(R.id.menorahAccountNumber);
+//        actionText = viewOptions.findViewById(R.id.actionText);
+//        finishCheckout = viewOptions.findViewById(R.id.finishCheckout);
+//        checkoutProgress = viewOptions.findViewById(R.id.checkoutProgress);
+//
+//        alertDialog2.setView(viewOptions);
+//
+//        alertDialog2.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+//        alertDialog2.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//
+//
+//        //fill bank info
+//        //execute network check async task
+//        CheckInternet asyncTask = (CheckInternet) new CheckInternet(Cart.this, new CheckInternet.AsyncResponse() {
+//            @Override
+//            public void processFinish(Integer output) {
+//
+//                //check all cases
+//                if (output == 1) {
+//
+//                    menorahBankRef.addListenerForSingleValueEvent(
+//                            new ValueEventListener() {
+//                                @Override
+//                                public void onDataChange(DataSnapshot dataSnapshot) {
+//
+//                                    MenorahDetailsModel theDets = dataSnapshot.getValue(MenorahDetailsModel.class);
+//
+//                                    if (theDets != null){
+//
+//                                        menorahAccountName.setText(theDets.getAccount_name());
+//                                        menorahAccountNumber.setText(theDets.getAccount_number());
+//                                        menorahBank.setText(theDets.getBank());
+//
+//                                    }
+//
+//                                }
+//
+//                                @Override
+//                                public void onCancelled(DatabaseError databaseError) {
+//
+//                                }
+//                            }
+//                    );
+//
+//                } else if (output == 0) {
+//
+//                    Toast.makeText(Cart.this, "No internet access", Toast.LENGTH_SHORT).show();
+//
+//                } else if (output == 2) {
+//
+//                    Toast.makeText(Cart.this, "No network access", Toast.LENGTH_SHORT).show();
+//
+//                }
+//
+//            }
+//        }).execute();
+//
+//
+//        //upload btn
+//        finishCheckout.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                if (imageUri == null && actionText.getText().toString().equalsIgnoreCase("UPLOAD EVIDENCE OF PAYMENT")) {
+//
+//                    if (checkPermissionsArray(Permissions.PERMISSIONS)){
+//
+//                        Intent pickPhoto = new Intent(Intent.ACTION_PICK,
+//                                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//                        startActivityForResult(pickPhoto, GALLERY_REQUEST_CODE);
+//
+//
+//                    } else {
+//
+//                        verifyPermissions(Permissions.PERMISSIONS);
+//
+//                    }
+//
+//                } else if (imageUri != null && originalImageUrl != null
+//                            && !originalImageUrl.equals("") && actionText.getText().toString().equalsIgnoreCase("FINISH")){
+//
+//                    finishTransferCheckout(alertDialog2, theFarmState, key, theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, totalPayout, units, farmId);
+//
+//                }
+//
+//            }
+//        });
+//
+//        alertDialog2.show();
+//
+//    }
+//
+//    private void finishTransferCheckout(final android.app.AlertDialog alertDialog2, final String theFarmState, final String key, final String theFarmType, final String theFarmROI, final String theFarmUnitPrice, final String theFarmSponsorDuration, final long totalPayout, final int units, final String farmId) {
+//
+//        //loading
+//        actionText.setVisibility(View.GONE);
+//        checkoutProgress.setVisibility(View.VISIBLE);
+//
+//        //execute network check async task
+//        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
+//            @Override
+//            public void processFinish(Integer output) {
+//
+//                //check all cases
+//                if (output == 1){
+//
+//                    final UserModel user1 = Paper.book().read(Common.PAPER_USER);
+//
+//                    /*---   GLOBAL SET   ---*/
+//                    currentFarmType = theFarmType;
+//                    currentFarmRoi = theFarmROI;
+//                    currentUnitPrice = theFarmUnitPrice;
+//                    currentDuration = theFarmSponsorDuration;
+//                    currentFarmId = farmId;
+//                    currentTotalPayout = totalPayout;
+//                    currentUnits = units;
+//                    currentCartKey = key;
+//
+//
+//                    char firstInit = user1.getFirstName().charAt(0);
+//                    char lastInit = user1.getLastName().charAt(0);
+//
+//                    String initials = String.valueOf(firstInit) + String.valueOf(lastInit);
+//
+//                    paymentReference = initials + "-MF-" + System.currentTimeMillis();
+//
+//                    /*---   PRICE TO PAY   ---*/
+//                    int thePrice = Integer.parseInt(theFarmUnitPrice);
+//                    totalPrice = thePrice * units;
+//
+//
+//                    /*---   DURATION   ---*/
+//                    int theDuration = Integer.parseInt(theFarmSponsorDuration);
+//                    int theDays = 30 * theDuration;
+//
+//                    Date todayDate = Calendar.getInstance().getTime();
+//                    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+//                    todayString = formatter.format(todayDate);
+//
+//                    Calendar cal = Calendar.getInstance();
+//                    cal.setTime(todayDate);
+//                    cal.add(Calendar.DATE, theDays);
+//                    Date futureDate = cal.getTime();
+//                    SimpleDateFormat formatterFuture = new SimpleDateFormat("dd-MM-yyyy");
+//                    futureString = formatterFuture.format(futureDate);
+//
+//
+//                    if (theFarmState.equalsIgnoreCase("Now Selling")){
+//
+//                        pushToDb(alertDialog2);
+//
+//                    } else {
+//
+//                        //loading
+//                        actionText.setVisibility(View.VISIBLE);
+//                        checkoutProgress.setVisibility(View.GONE);
+//                        showErrorDialog("Sorry, this farm is sold out.");
+//
+//                    }
+//
+//
+//                } else
+//
+//                if (output == 0){
+//
+//                    //loading
+//                    actionText.setVisibility(View.VISIBLE);
+//                    checkoutProgress.setVisibility(View.GONE);
+//                    Toast.makeText(Cart.this, "No internet access", Toast.LENGTH_SHORT).show();
+//
+//                } else
+//
+//                if (output == 2){
+//
+//                    //loading
+//                    actionText.setVisibility(View.VISIBLE);
+//                    checkoutProgress.setVisibility(View.GONE);
+//                    Toast.makeText(Cart.this, "No network connection", Toast.LENGTH_SHORT).show();
+//
+//                }
+//
+//            }
+//        }).execute();
+//
+//    }
+
+
+
+    //Test Gateway
     private void testPay(String theFarmState, String theCartKey, final String theFarmType, String theFarmROI, String theFarmUnitPrice, String theFarmSponsorDuration, long totalPayout, final int units, String farmId) {
 
         /*---   GLOBAL SET   ---*/
@@ -765,47 +937,58 @@ public class Cart extends AppCompatActivity {
 
     }
 
-    private void verifyPermissions(String[] permissions) {
 
-        ActivityCompat.requestPermissions(
-                this,
-                permissions,
-                VERIFY_PERMISSIONS_REQUEST
-        );
-    }
 
-    private boolean checkPermissionsArray(String[] permissions) {
+//    //Permissions
+//    private void verifyPermissions(String[] permissions) {
+//
+//        ActivityCompat.requestPermissions(
+//                this,
+//                permissions,
+//                VERIFY_PERMISSIONS_REQUEST
+//        );
+//    }
+//
+//    private boolean checkPermissionsArray(String[] permissions) {
+//
+//        for (int i = 0; i < permissions.length; i++){
+//
+//            String check = permissions[i];
+//            if (!checkPermissions(check)){
+//                return false;
+//            }
+//
+//        }
+//        return true;
+//    }
+//
+//    private boolean checkPermissions(String permission) {
+//
+//        int permissionRequest = ActivityCompat.checkSelfPermission(this, permission);
+//
+//        if (permissionRequest != PackageManager.PERMISSION_GRANTED){
+//
+//            return false;
+//        } else {
+//
+//            return true;
+//        }
+//    }
 
-        for (int i = 0; i < permissions.length; i++){
 
-            String check = permissions[i];
-            if (!checkPermissions(check)){
-                return false;
-            }
 
-        }
-        return true;
-    }
+    //add to database
+    private void pushToDb(/*final android.app.AlertDialog alertDialog2*/) {
 
-    private boolean checkPermissions(String permission) {
-
-        int permissionRequest = ActivityCompat.checkSelfPermission(this, permission);
-
-        if (permissionRequest != PackageManager.PERMISSION_GRANTED){
-
-            return false;
-        } else {
-
-            return true;
-        }
-    }
-
-    private void pushToDb(final android.app.AlertDialog alertDialog2) {
+        //get user
+        final UserModel user2 = Paper.book().read(Common.PAPER_USER);
 
         //assign farm manager
-        userRef.child(currentuid).child("accountManager").setValue(CHARS[new Random().nextInt(CHARS.length)]);
+        if (paperUser.getAccountManager().equalsIgnoreCase("")) {
+            userRef.child(currentuid).child("accountManager").setValue(CHARS[new Random().nextInt(CHARS.length)]);
+        }
 
-        final UserModel user2 = Paper.book().read(Common.PAPER_USER);
+
 
 
         //user personal map
@@ -822,24 +1005,23 @@ public class Cart extends AppCompatActivity {
         sponsorshipMap.put("startPoint", ServerValue.TIMESTAMP);
         sponsorshipMap.put("totalAmountPaid", totalPrice);
         sponsorshipMap.put("farmId", currentFarmId);
-        sponsorshipMap.put("status", "pending");
+        sponsorshipMap.put("status", "sponsoring");
 
         //pending sponsorship map
-        Map<String, Object> adminPendingSponsorshipMap = new HashMap<>();
-        adminPendingSponsorshipMap.put("sponsorReturn", String.valueOf(currentTotalPayout));
-        adminPendingSponsorshipMap.put("cycleEndDate", futureString);
-        adminPendingSponsorshipMap.put("cycleStartDate", todayString);
-        adminPendingSponsorshipMap.put("sponsorRefNumber", paymentReference);
-        adminPendingSponsorshipMap.put("unitPrice", currentUnitPrice);
-        adminPendingSponsorshipMap.put("sponsoredUnits", String.valueOf(currentUnits));
-        adminPendingSponsorshipMap.put("sponsoredFarmType", currentFarmType);
-        adminPendingSponsorshipMap.put("sponsoredFarmRoi", currentFarmRoi);
-        adminPendingSponsorshipMap.put("sponsorshipDuration", currentDuration);
-        adminPendingSponsorshipMap.put("startPoint", ServerValue.TIMESTAMP);
-        adminPendingSponsorshipMap.put("totalAmountPaid", totalPrice);
-        adminPendingSponsorshipMap.put("farmId", currentFarmId);
-        adminPendingSponsorshipMap.put("userId", currentuid);
-        adminPendingSponsorshipMap.put("paymentProof", originalImageUrl);
+        Map<String, Object> runningCycleMap = new HashMap<>();
+        runningCycleMap.put("sponsorReturn", String.valueOf(currentTotalPayout));
+        runningCycleMap.put("cycleEndDate", futureString);
+        runningCycleMap.put("cycleStartDate", todayString);
+        runningCycleMap.put("sponsorRefNumber", paymentReference);
+        runningCycleMap.put("unitPrice", currentUnitPrice);
+        runningCycleMap.put("sponsoredUnits", String.valueOf(currentUnits));
+        runningCycleMap.put("sponsoredFarmType", currentFarmType);
+        runningCycleMap.put("sponsoredFarmRoi", currentFarmRoi);
+        runningCycleMap.put("sponsorshipDuration", currentDuration);
+        runningCycleMap.put("startPoint", ServerValue.TIMESTAMP);
+        runningCycleMap.put("totalAmountPaid", totalPrice);
+        runningCycleMap.put("farmId", currentFarmId);
+        runningCycleMap.put("userId", currentuid);
 
         //admin
         final Map<String, Object> logMap = new HashMap<>();
@@ -848,14 +1030,15 @@ public class Cart extends AppCompatActivity {
         logMap.put("paymentRef", paymentReference);
         logMap.put("paymentDate", todayString);
         logMap.put("farmSponsored", currentFarmId);
-        logMap.put("paymentProof", originalImageUrl);
+        logMap.put("paymentProof", "");
 
         DatabaseReference pushRef = sponsorshipRef.push();
         String pushId = pushRef.getKey();
 
-        //add to pending sponsorships cycle
-        addToPendingSponsorships(pushId, currentFarmId, adminPendingSponsorshipMap);
+        //add to running sponsorships cycle
+        addToRunningCycle(pushId, currentFarmId, runningCycleMap);
 
+        //add to user sponsorship list
         sponsorshipRef.child(currentuid)
                 .child(pushId)
                 .setValue(sponsorshipMap)
@@ -864,6 +1047,9 @@ public class Cart extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
 
                         if (task.isSuccessful()){
+
+                            cartRef.child(currentuid).child(currentCartKey).removeValue();
+                            sendApprovalNotification();
 
                             payHistoryRef.child(currentuid)
                                     .push()
@@ -874,17 +1060,10 @@ public class Cart extends AppCompatActivity {
 
                                             if (task.isSuccessful()){
 
-                                                //dialog dismiss
-                                                alertDialog2.dismiss();
-
-                                                cartRef.child(currentuid).child(currentCartKey).removeValue();
-                                                sendNotification();
+                                                loadingDialog.dismiss();
 
                                             } else {
 
-                                                //loading
-                                                actionText.setVisibility(View.VISIBLE);
-                                                checkoutProgress.setVisibility(View.GONE);
                                                 showErrorDialog("Unknown error occurred, please contact admin immediately");
 
                                             }
@@ -894,9 +1073,6 @@ public class Cart extends AppCompatActivity {
 
                         } else {
 
-                            //loading
-                            actionText.setVisibility(View.VISIBLE);
-                            checkoutProgress.setVisibility(View.GONE);
                             showErrorDialog("Unknown error occurred, please contact admin immediately");
 
                         }
@@ -906,7 +1082,7 @@ public class Cart extends AppCompatActivity {
 
     }
 
-    private void addToPendingSponsorships(final String pushId, String currentFarmId, final Map<String, Object> adminPendingSponsorshipMap) {
+    private void addToRunningCycle(final String pushId, String currentFarmId, final Map<String, Object> runningCycleMap) {
 
         farmRef.child(currentFarmId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -917,9 +1093,9 @@ public class Cart extends AppCompatActivity {
 
                         if (theFarm != null){
 
-                            pendingSponsorshipRef.child(theFarm.getFarmNotiId())
+                            runningCycleRef.child(theFarm.getFarmNotiId())
                                     .child(pushId)
-                                    .setValue(adminPendingSponsorshipMap);
+                                    .setValue(runningCycleMap);
 
                         }
 
@@ -933,114 +1109,56 @@ public class Cart extends AppCompatActivity {
 
     }
 
-    private void sendNotification() {
+    private void sendApprovalNotification() {
 
         final Date todayDate = Calendar.getInstance().getTime();
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy  hh:mm");
         String todayString = formatter.format(todayDate);
 
+        //notification map
         final Map<String, Object> notificationMap = new HashMap<>();
-        notificationMap.put("topic", "Sponsorship Pending");
-        notificationMap.put("message", "Your proof of payment has been received successfully and your sponsorship cycle will start as soon as proof is verified. You will be notified once your sponsorship has been approved.");
+        notificationMap.put("topic", "Sponsorship Approved");
+        notificationMap.put("message", "Your sponsorship has been approved. You can monitor your sponsored farm from the Sponsored Farms page through your dashboard.");
         notificationMap.put("time", todayString);
 
-
-        //notification to admin
-        sendAlertToAdmin();
-        /*final Map<String, Object> adminNotificationMap = new HashMap<>();
-        adminNotificationMap.put("topic", "Sponsorship Start");
-        adminNotificationMap.put("message", "New Sponsorship Alert.");
-        adminNotificationMap.put("time", todayString);
-
-        userRef.orderByChild("userType")
-                .equalTo("Admin")
-                .addListenerForSingleValueEvent(
-                        new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                for (DataSnapshot snap : dataSnapshot.getChildren()){
-
-                                    final String adminKey = snap.getKey();
-
-                                    notificationRef.child(adminKey)
-                                            .push()
-                                            .setValue(adminNotificationMap)
-                                            .addOnSuccessListener(
-                                                    new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-
-                                                            Map<String, String> dataSend = new HashMap<>();
-                                                            dataSend.put("title", "Sponsorship Start");
-                                                            dataSend.put("message", "A new user just sponsored a farm.");
-                                                            DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(adminKey).toString(), dataSend);
-
-                                                            mService.sendNotification(dataMessage)
-                                                                    .enqueue(new retrofit2.Callback<MyResponse>() {
-                                                                        @Override
-                                                                        public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
-
-                                                                        }
-
-                                                                        @Override
-                                                                        public void onFailure(Call<MyResponse> call, Throwable t) {
-                                                                        }
-                                                                    });
-
-                                                        }
-                                                    }
-                                            ).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-
-                                        }
-                                    });
-
-                                }
-
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        }
-                );*/
 
         notificationRef.child(currentuid)
                 .push()
                 .setValue(notificationMap)
-                .addOnSuccessListener(
-                        new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
 
-                                Map<String, String> dataSend = new HashMap<>();
-                                dataSend.put("title", "Sponsorship");
-                                dataSend.put("message", "Your proof of payment has been received successfully and your sponsorship cycle will start as soon as proof is verified. You will be notified once your sponsorship has been approved.");
-                                DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(currentuid).toString(), dataSend);
+                        if (task.isSuccessful()){
 
-                                mService.sendNotification(dataMessage)
-                                        .enqueue(new retrofit2.Callback<MyResponse>() {
-                                            @Override
-                                            public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                            Map<String, String> dataSend = new HashMap<>();
+                            dataSend.put("title", "Sponsorship Start");
+                            dataSend.put("message", "Your sponsorship has been approved. You can monitor your sponsored farm from the Sponsored Farms page through your dashboard.");
+                            DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(currentuid).toString(), dataSend);
 
-                                            }
+                            mService.sendNotification(dataMessage)
+                                    .enqueue(new retrofit2.Callback<MyResponse>() {
+                                        @Override
+                                        public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
 
-                                            @Override
-                                            public void onFailure(Call<MyResponse> call, Throwable t) {
-                                            }
-                                        });
+                                        }
 
-                            }
+                                        @Override
+                                        public void onFailure(Call<MyResponse> call, Throwable t) {
+                                        }
+                                    });
+
+                            //notification to admin
+                            sendAlertToAdmin();
+
+                        } else {
+
+                            Toast.makeText(Cart.this, "Error occurred while sending notification", Toast.LENGTH_SHORT).show();
+
                         }
-                ).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
 
-            }
-        });
+                    }
+                });
 
     }
 
@@ -1087,13 +1205,8 @@ public class Cart extends AppCompatActivity {
 
     }
 
-    /*public static String setAdminToken(int length) {
-        StringBuilder token = new StringBuilder(length);
-        for (int i = 0; i < length; i++) {
-            token.append(CHARS.charAt(random.nextInt(CHARS.length())));
-        }
-        return token.toString();
-    }*/
+
+
 
     private void openDeleteDialog(final String key) {
 
@@ -1168,7 +1281,9 @@ public class Cart extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (isLoading){
+            loadingDialog.dismiss();
+        }
         finish();
     }
 
@@ -1204,6 +1319,9 @@ public class Cart extends AppCompatActivity {
     /*---   LOADING DIALOG   ---*/
     public void showLoadingDialog(String theMessage){
 
+        //loading
+        isLoading = true;
+
         loadingDialog = new android.app.AlertDialog.Builder(this).create();
         LayoutInflater inflater = this.getLayoutInflater();
         View viewOptions = inflater.inflate(R.layout.loading_dialog,null);
@@ -1218,11 +1336,18 @@ public class Cart extends AppCompatActivity {
 
         loadingText.setText(theMessage);
 
+        loadingDialog.setCancelable(false);
         loadingDialog.setCanceledOnTouchOutside(false);
         loadingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
-                finish();
+                isLoading = false;
+            }
+        });
+        loadingDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                isLoading = false;
             }
         });
 

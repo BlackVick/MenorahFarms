@@ -53,7 +53,9 @@ public class AdminDash extends AppCompatActivity {
     private View line;
     private FrameLayout adminFrame;
 
+    //loading
     private android.app.AlertDialog alertDialog;
+    private boolean isLoading = false;
 
     private UserModel paperUser;
 
@@ -543,6 +545,9 @@ public class AdminDash extends AppCompatActivity {
     /*---   LOADING DIALOG   ---*/
     public void showLoadingDialog(String theMessage){
 
+        //loading
+        isLoading = true;
+
         alertDialog = new android.app.AlertDialog.Builder(this).create();
         LayoutInflater inflater = this.getLayoutInflater();
         View viewOptions = inflater.inflate(R.layout.loading_dialog,null);
@@ -557,20 +562,32 @@ public class AdminDash extends AppCompatActivity {
 
         loadingText.setText(theMessage);
 
+        alertDialog.setCancelable(false);
         alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
-                finish();
+                isLoading = false;
+            }
+        });
+        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                isLoading = false;
             }
         });
 
         alertDialog.show();
 
+
+
     }
 
     @Override
     public void onBackPressed() {
+        if (isLoading){
+            alertDialog.dismiss();
+        }
         finish();
     }
 }

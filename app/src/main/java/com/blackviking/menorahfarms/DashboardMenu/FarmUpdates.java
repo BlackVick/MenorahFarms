@@ -33,6 +33,7 @@ public class FarmUpdates extends AppCompatActivity {
     private LinearLayout emptyLayout;
     private android.app.AlertDialog alertDialog;
     private RecyclerView farmUpdateRecycler;
+    private boolean isLoading = false;
 
     private LinearLayoutManager layoutManager;
 
@@ -172,6 +173,9 @@ public class FarmUpdates extends AppCompatActivity {
     /*---   LOADING DIALOG   ---*/
     public void showLoadingDialog(String theMessage){
 
+        //loading
+        isLoading = true;
+
         alertDialog = new android.app.AlertDialog.Builder(this).create();
         LayoutInflater inflater = this.getLayoutInflater();
         View viewOptions = inflater.inflate(R.layout.loading_dialog,null);
@@ -186,11 +190,18 @@ public class FarmUpdates extends AppCompatActivity {
 
         loadingText.setText(theMessage);
 
+        alertDialog.setCancelable(false);
         alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
-                finish();
+                isLoading = false;
+            }
+        });
+        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                isLoading = false;
             }
         });
 
@@ -200,7 +211,9 @@ public class FarmUpdates extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (isLoading){
+            alertDialog.dismiss();
+        }
         finish();
     }
 }

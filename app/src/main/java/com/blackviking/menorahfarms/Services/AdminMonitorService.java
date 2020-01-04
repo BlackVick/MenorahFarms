@@ -13,6 +13,8 @@ import android.support.v4.app.NotificationCompat;
 import com.blackviking.menorahfarms.AdminDetails.FarmManagementDetail;
 import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
+import com.blackviking.menorahfarms.Models.FarmModel;
+import com.blackviking.menorahfarms.Models.RunningCycleModel;
 import com.blackviking.menorahfarms.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -20,6 +22,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
@@ -33,7 +36,7 @@ import static com.blackviking.menorahfarms.Common.ApplicationClass.CHANNEL_2_ID;
 public class AdminMonitorService extends Service {
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference farmRef;
+    private DatabaseReference farmRef, runningCycleRef;
 
     /*---   TIMED TEST   ---*/
     private CountDownTimer mCountDownTimer;
@@ -44,6 +47,10 @@ public class AdminMonitorService extends Service {
     private int remainingHours;
 
     private String farmType, farmId;
+
+    //for limits
+    private String limitString;
+    private int limitInt = 0, soldInt = 0;
 
     public AdminMonitorService() {
     }
@@ -99,6 +106,64 @@ public class AdminMonitorService extends Service {
         }.start();
 
 
+
+        //for count limits
+        farmRef.child(farmId)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        FarmModel theFarm = dataSnapshot.getValue(FarmModel.class);
+
+                        limitString = theFarm.getUnitsSold();
+                        limitInt = Integer.parseInt(limitString);
+
+
+                        //get sold
+                        runningCycleRef = db.getReference("RunningCycles")
+                                .child(farmType);
+                        runningCycleRef.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                for (DataSnapshot snap : dataSnapshot.getChildren()){
+
+                                    RunningCycleModel theCycles = snap.getValue(RunningCycleModel.class);
+
+                                    int unitSponsored = Integer.parseInt(theCycles.getSponsoredUnits());
+                                    soldInt = soldInt + unitSponsored;
+
+                                }
+
+                                if (soldInt >= limitInt){
+
+                                    endFarmActivation(farmType);
+
+                                }
+
+
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+
+
+
+
+
         //notification
         Intent farmDetailIntent = new Intent(this, FarmManagementDetail.class);
         farmDetailIntent.putExtra("FarmId", farmId);
@@ -108,7 +173,7 @@ public class AdminMonitorService extends Service {
 
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_2_ID)
                 .setContentTitle("Farm Management")
-                .setContentText(farmType + " is currently active for sponsorship")
+                .setContentText(farmType + " is currently active for sponsorship: " + soldInt)
                 .setSmallIcon(R.drawable.ic_admin_notification)
                 .setContentIntent(pendingIntent)
                 .build();

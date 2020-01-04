@@ -467,10 +467,16 @@ public class SignIn extends AppCompatActivity {
 
         currentUid = user.getUid();
 
+        //name separation
+        String[] parts = user.getDisplayName().split("\\s+");
+        final String theFirstName = parts[0];
+        final String theLastName = parts[1];
+        final String theEmail = user.getEmail();
+
         final Map<String, Object> newUserMap = new HashMap<>();
-        newUserMap.put("email", user.getEmail());
-        newUserMap.put("firstName", user.getDisplayName());
-        newUserMap.put("lastName", user.getDisplayName());
+        newUserMap.put("email", theEmail);
+        newUserMap.put("firstName", theFirstName);
+        newUserMap.put("lastName", theLastName);
         newUserMap.put("profilePicture", "");
         newUserMap.put("profilePictureThumb", "");
         newUserMap.put("signUpMode", "Google");

@@ -57,6 +57,7 @@ public class AccountManager extends AppCompatActivity {
     private String currentUid;
 
     private android.app.AlertDialog alertDialog;
+    private boolean isLoading = false;
     private UserModel paperUser;
 
     @Override
@@ -281,6 +282,9 @@ public class AccountManager extends AppCompatActivity {
     /*---   LOADING DIALOG   ---*/
     public void showLoadingDialog(String theMessage){
 
+        //loading
+        isLoading = true;
+
         alertDialog = new android.app.AlertDialog.Builder(this).create();
         LayoutInflater inflater = this.getLayoutInflater();
         View viewOptions = inflater.inflate(R.layout.loading_dialog,null);
@@ -295,11 +299,18 @@ public class AccountManager extends AppCompatActivity {
 
         loadingText.setText(theMessage);
 
+        alertDialog.setCancelable(false);
         alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
-                finish();
+                isLoading = false;
+            }
+        });
+        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                isLoading = false;
             }
         });
 
@@ -309,7 +320,9 @@ public class AccountManager extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (isLoading){
+            alertDialog.dismiss();
+        }
         finish();
     }
 }

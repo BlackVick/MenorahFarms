@@ -7,8 +7,8 @@ android {
         applicationId "com.blackviking.menorahfarms"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 30
-        versionName "1.30"
+        versionCode 32
+        versionName "1.32"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         resConfigs "en", "US"
@@ -83,6 +83,9 @@ dependencies {
     /*---   ANIMATIONS   ---*/
     implementation 'com.daimajia.easing:library:2.0@aar'
     implementation 'com.daimajia.androidanimations:library:2.3@aar'
+
+    /*---   FLUTTERWAVE   ---*/
+    implementation 'com.github.Flutterwave:rave-android:1.0.43'
 
 
     testImplementation 'junit:junit:4.12'

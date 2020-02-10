@@ -110,7 +110,7 @@ public class FarmDetails extends AppCompatActivity {
         showLoadingDialog("Loading farm details . . .");
 
         //execute network check async task
-        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
+        new CheckInternet(this, new CheckInternet.AsyncResponse(){
             @Override
             public void processFinish(Integer output) {
 
@@ -514,35 +514,6 @@ public class FarmDetails extends AppCompatActivity {
             showErrorDialog(Common.checkKYC(FarmDetails.this));
 
         }
-
-    }
-
-    private void showAffirmDialog() {
-
-        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(FarmDetails.this).create();
-        LayoutInflater inflater = FarmDetails.this.getLayoutInflater();
-        View viewOptions = inflater.inflate(R.layout.dialog_layout,null);
-
-        final TextView message = (TextView) viewOptions.findViewById(R.id.dialogMessage);
-        final Button okButton = (Button) viewOptions.findViewById(R.id.dialogButton);
-
-        alertDialog.setView(viewOptions);
-
-        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
-        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-
-        message.setText("Added to cart successfully");
-
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-                finish();
-            }
-        });
-
-        alertDialog.show();
 
     }
 

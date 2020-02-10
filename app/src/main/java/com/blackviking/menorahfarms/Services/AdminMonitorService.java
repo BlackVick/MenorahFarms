@@ -121,7 +121,7 @@ public class AdminMonitorService extends Service {
 
                         //get sold
                         runningCycleRef = db.getReference("RunningCycles")
-                                .child(farmType);
+                                .child("FishFarm");
                         runningCycleRef.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -173,7 +173,7 @@ public class AdminMonitorService extends Service {
 
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_2_ID)
                 .setContentTitle("Farm Management")
-                .setContentText(farmType + " is currently active for sponsorship: " + soldInt)
+                .setContentText(farmType + " is currently active for sponsorship: (" + soldInt + ")")
                 .setSmallIcon(R.drawable.ic_admin_notification)
                 .setContentIntent(pendingIntent)
                 .build();

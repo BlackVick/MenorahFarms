@@ -6,7 +6,6 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -23,7 +22,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        tools:ignore="GoogleAppIndexingWarning">
+
         <activity
             android:name=".Splash"
             android:configChanges="orientation"
@@ -35,6 +36,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!--  Image cropper  -->
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:configChanges="orientation"
@@ -47,20 +50,24 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:theme="@style/LoginBackground" />
+
         <activity
             android:name=".SignUp"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:theme="@style/LoginBackground" />
+
         <activity
             android:name=".Registration"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:theme="@style/LoginBackground" />
+
         <activity
             android:name=".DashboardMenu.SponsoredFarms"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".DashboardMenu.FollowedFarms"
             android:configChanges="orientation"
@@ -167,11 +174,13 @@
             android:configChanges="orientation"
             android:screenOrientation="sensorLandscape"></activity>
 
+        <!--  crashylytics key  -->
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="97c5e0bb9711d1cf829d94e2147e8567b6542b37"
             tools:replace="android:value" />
 
+        <!--  File Provider intengrity  -->
         <provider
             android:name=".Common.GenericFileProvider"
             android:authorities="${applicationId}.provider"
@@ -182,18 +191,13 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
+        <!--  admin sponsorship monitor -->
         <service
             android:name=".Services.AdminMonitorService"
             android:enabled="true"
             android:exported="true" />
-        <service
-            android:name=".Services.SponsorshipMonitor"
-            android:enabled="true"
-            android:exported="true" />
-        <service
-            android:name=".Services.CheckForSponsorship"
-            android:enabled="true"
-            android:exported="true" />
+
+        <!--  firebase messaging  -->
         <service
             android:name=".Notification.MyFirebaseMessaging"
             android:enabled="true"

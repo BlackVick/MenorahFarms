@@ -31,6 +31,7 @@ import com.blackviking.menorahfarms.DashboardMenu.FollowedFarms;
 import com.blackviking.menorahfarms.DashboardMenu.Notifications;
 import com.blackviking.menorahfarms.DashboardMenu.SponsoredFarms;
 import com.blackviking.menorahfarms.Models.FarmModel;
+import com.blackviking.menorahfarms.Models.RunningCycleModel;
 import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.Services.CheckForSponsorship;
@@ -468,6 +469,34 @@ public class Dashboard extends AppCompatActivity {
                             }
                         }
                 );
+
+        //temp code
+        //get sold
+        /*DatabaseReference runningCycleRef = db.getReference("RunningCycles")
+                .child("FishFarm");
+        runningCycleRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                int count = 0;
+                for (DataSnapshot snap : dataSnapshot.getChildren()){
+
+                    RunningCycleModel theCycles = snap.getValue(RunningCycleModel.class);
+
+                    int unitSponsored = Integer.parseInt(theCycles.getSponsoredUnits());
+                    count = unitSponsored + count;
+
+                }
+
+                cartItemCount.setText(String.valueOf(count) + " / 600");
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });*/
 
         //always cart item count
         cartRef.child(currentUid)

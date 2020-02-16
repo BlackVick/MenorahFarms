@@ -5,8 +5,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +17,6 @@ import android.widget.Toast;
 
 import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
-import com.blackviking.menorahfarms.Models.DueSponsorshipModel;
 import com.blackviking.menorahfarms.Models.StudentModel;
 import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.Notification.APIService;
@@ -25,8 +24,6 @@ import com.blackviking.menorahfarms.Notification.DataMessage;
 import com.blackviking.menorahfarms.Notification.MyResponse;
 import com.blackviking.menorahfarms.R;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -74,9 +71,9 @@ public class StudentRequestDetails extends AppCompatActivity {
 
 
         /*---   FIREBASE   ---*/
-        userRef = db.getReference("Users");
-        studentRef = db.getReference("StudentDetails");
-        notificationRef = db.getReference("Notifications");
+        userRef = db.getReference(Common.USERS_NODE);
+        studentRef = db.getReference(Common.STUDENT_DETAILS_NODE);
+        notificationRef = db.getReference(Common.NOTIFICATIONS_NODE);
 
 
         //show dialog
@@ -84,52 +81,44 @@ public class StudentRequestDetails extends AppCompatActivity {
 
 
         /*---   WIDGETS   ---*/
-        backButton = (ImageView)findViewById(R.id.backButton);
-        studentId = (ImageView)findViewById(R.id.studentId);
-        studentName = (TextView)findViewById(R.id.studentName);
-        studentEmail = (TextView)findViewById(R.id.studentEmail);
-        studentSchool = (TextView)findViewById(R.id.studentSchool);
-        studentDepartment = (TextView)findViewById(R.id.studentDepartment);
-        denyStudent = (Button)findViewById(R.id.denyStudent);
-        approveStudent = (Button)findViewById(R.id.approveStudent);
+        backButton = findViewById(R.id.backButton);
+        studentId = findViewById(R.id.studentId);
+        studentName = findViewById(R.id.studentName);
+        studentEmail = findViewById(R.id.studentEmail);
+        studentSchool = findViewById(R.id.studentSchool);
+        studentDepartment = findViewById(R.id.studentDepartment);
+        denyStudent = findViewById(R.id.denyStudent);
+        approveStudent = findViewById(R.id.approveStudent);
 
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        backButton.setOnClickListener(v -> finish());
 
 
-        //execute network check async task
-        CheckInternet asyncTask = (CheckInternet) new CheckInternet(StudentRequestDetails.this, new CheckInternet.AsyncResponse(){
-            @Override
-            public void processFinish(Integer output) {
+        //run network check
+        new CheckInternet(StudentRequestDetails.this, output -> {
 
-                //check all cases
-                if (output == 1){
+            //check all cases
+            if (output == 1){
 
-                    loadStudentRequest();
+                loadStudentRequest();
 
-                } else
+            } else
 
-                if (output == 0){
+            if (output == 0){
 
-                    //no internet
-                    alertDialog.dismiss();
-                    Toast.makeText(StudentRequestDetails.this, "No internet access", Toast.LENGTH_SHORT).show();
+                //no internet
+                alertDialog.dismiss();
+                Toast.makeText(StudentRequestDetails.this, "No internet access", Toast.LENGTH_SHORT).show();
 
-                } else
+            } else
 
-                if (output == 2){
+            if (output == 2){
 
-                    //no internet
-                    alertDialog.dismiss();
-                    Toast.makeText(StudentRequestDetails.this, "Not connected to any network", Toast.LENGTH_SHORT).show();
-
-                }
+                //no internet
+                alertDialog.dismiss();
+                Toast.makeText(StudentRequestDetails.this, "Not connected to any network", Toast.LENGTH_SHORT).show();
 
             }
+
         }).execute();
 
     }

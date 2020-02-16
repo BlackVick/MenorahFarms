@@ -71,7 +71,7 @@
 
     </RelativeLayout>
 
-    <android.support.design.widget.TabLayout
+    <com.google.android.material.tabs.TabLayout
         android:id="@+id/farmshopTabs"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
@@ -82,24 +82,24 @@
         app:tabTextColor="@color/grey"
         android:visibility="gone">
 
-        <android.support.design.widget.TabItem
+        <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Now Selling" />
 
-        <android.support.design.widget.TabItem
+        <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Sold Out" />
 
-        <android.support.design.widget.TabItem
+        <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Opening Soon" />
 
-    </android.support.design.widget.TabLayout>
+    </com.google.android.material.tabs.TabLayout>
 
-    <android.support.v4.view.ViewPager
+    <androidx.viewpager.widget.ViewPager
         android:layout_below="@+id/farmshopTabs"
         android:layout_above="@+id/navLayout"
         android:id="@+id/farmshopViewPager"

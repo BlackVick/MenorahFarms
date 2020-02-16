@@ -7,14 +7,15 @@ import android.content.Intent;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
-import android.support.v4.app.NotificationCompat;
+import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
 
 import com.blackviking.menorahfarms.AdminDetails.FarmManagementDetail;
 import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Models.FarmModel;
 import com.blackviking.menorahfarms.Models.RunningCycleModel;
+import com.blackviking.menorahfarms.Models.SponsorshipDetailsModel;
 import com.blackviking.menorahfarms.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -22,7 +23,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
@@ -36,7 +36,7 @@ import static com.blackviking.menorahfarms.Common.ApplicationClass.CHANNEL_2_ID;
 public class AdminMonitorService extends Service {
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference farmRef, runningCycleRef;
+    private DatabaseReference farmRef, sponsorshipDetailRef;
 
     /*---   TIMED TEST   ---*/
     private CountDownTimer mCountDownTimer;
@@ -44,13 +44,11 @@ public class AdminMonitorService extends Service {
     private long mEndTime;
     private long totalTimeInSeconds;
 
-    private int remainingHours;
-
     private String farmType, farmId;
 
     //for limits
-    private String limitString;
-    private int limitInt = 0, soldInt = 0;
+    private String activeDurationString;
+    private int limitInt = 0, soldInt = 0, unitsLeft = 0;
 
     public AdminMonitorService() {
     }
@@ -64,12 +62,13 @@ public class AdminMonitorService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         //Firebase
-        farmRef = db.getReference("Farms");
+        farmRef = db.getReference(Common.FARM_NODE);
+        sponsorshipDetailRef = db.getReference(Common.SPONSORSHIP_DETAILS_NODE);
 
         //intent data
         farmType = intent.getStringExtra("FarmType");
         farmId = intent.getStringExtra("FarmId");
-        String activeDurationString = intent.getStringExtra("DurationHours");
+        activeDurationString = intent.getStringExtra("DurationHours");
 
         //paper
         Paper.book().write(Common.isFarmServiceRunning, true);
@@ -83,10 +82,10 @@ public class AdminMonitorService extends Service {
         //duration in millis
         mTimeLeftInMillis = TimeUnit.SECONDS.toMillis(totalTimeInSeconds);
 
-
         //timer
         mEndTime = System.currentTimeMillis() + mTimeLeftInMillis;
 
+        //start timer
         mCountDownTimer = new CountDownTimer(mTimeLeftInMillis, 60000) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -105,80 +104,47 @@ public class AdminMonitorService extends Service {
             }
         }.start();
 
+        //for limits
+        sponsorshipDetailRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                SponsorshipDetailsModel theDetails = dataSnapshot.getValue(SponsorshipDetailsModel.class);
+
+                limitInt = theDetails.getTotal_units();
+                soldInt = theDetails.getUnits_sold();
+                unitsLeft = theDetails.getUnits_available();
+
+                //check limits
+                if (soldInt >= limitInt || unitsLeft <= 0){
+
+                    endFarmActivation(farmType);
+
+                }
+
+                //notification
+                Intent farmDetailIntent = new Intent(getApplicationContext(), FarmManagementDetail.class);
+                farmDetailIntent.putExtra("FarmId", farmId);
+                PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(),
+                        0, farmDetailIntent, 0);
 
 
-        //for count limits
-        farmRef.child(farmId)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+                Notification notification = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_2_ID)
+                        .setContentTitle("Farm Management")
+                        .setContentText(farmType + " is currently active for sponsorship: (" + soldInt + ") sold.")
+                        .setSmallIcon(R.drawable.ic_admin_notification)
+                        .setContentIntent(pendingIntent)
+                        .build();
 
-                        FarmModel theFarm = dataSnapshot.getValue(FarmModel.class);
+                startForeground(99, notification);
 
-                        limitString = theFarm.getUnitsSold();
-                        limitInt = Integer.parseInt(limitString);
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                        //get sold
-                        runningCycleRef = db.getReference("RunningCycles")
-                                .child("FishFarm");
-                        runningCycleRef.addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                for (DataSnapshot snap : dataSnapshot.getChildren()){
-
-                                    RunningCycleModel theCycles = snap.getValue(RunningCycleModel.class);
-
-                                    int unitSponsored = Integer.parseInt(theCycles.getSponsoredUnits());
-                                    soldInt = soldInt + unitSponsored;
-
-                                }
-
-                                if (soldInt >= limitInt){
-
-                                    endFarmActivation(farmType);
-
-                                }
-
-
-
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
-
-
-
-
-
-        //notification
-        Intent farmDetailIntent = new Intent(this, FarmManagementDetail.class);
-        farmDetailIntent.putExtra("FarmId", farmId);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,
-                0, farmDetailIntent, 0);
-
-
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL_2_ID)
-                .setContentTitle("Farm Management")
-                .setContentText(farmType + " is currently active for sponsorship: (" + soldInt + ")")
-                .setSmallIcon(R.drawable.ic_admin_notification)
-                .setContentIntent(pendingIntent)
-                .build();
-
-        startForeground(9, notification);
+            }
+        });
 
         return START_NOT_STICKY;
     }
@@ -188,85 +154,65 @@ public class AdminMonitorService extends Service {
         //cancel timer
         mCountDownTimer.cancel();
 
-        //execute network check async task
-        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
-            @Override
-            public void processFinish(Integer output) {
+        //run network check
+        new CheckInternet(this, output -> {
 
-                //check all cases
-                if (output == 1){
+            //check all cases
+            if (output == 1){
 
-                    farmRef.orderByChild("farmNotiId")
-                            .equalTo(farmType)
-                            .addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
+                farmRef.orderByChild("farmNotiId")
+                        .equalTo(farmType)
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                    for (DataSnapshot snap : dataSnapshot.getChildren()){
+                                for (DataSnapshot snap : dataSnapshot.getChildren()){
 
-                                        //farm id
-                                        String farmId = snap.getKey();
+                                    //farm id
+                                    String theFarmId = snap.getKey();
 
-                                        //deactivate map
-                                        final Map<String, Object> deactivateFarmMap = new HashMap<>();
-                                        deactivateFarmMap.put("farmState", "Sold Out");
-                                        deactivateFarmMap.put("unitsAvailable", "");
+                                    //deactivate map
+                                    final Map<String, Object> deactivateFarmMap = new HashMap<>();
+                                    deactivateFarmMap.put("farmState", "Sold Out");
+                                    deactivateFarmMap.put("unitsAvailable", "");
 
-                                        farmRef.child(farmId)
-                                                .updateChildren(deactivateFarmMap)
-                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
-
-                                                        if (task.isSuccessful()){
-
-
-
-                                                        }
-
-                                                    }
-                                                });
-
-                                    }
-
-                                    Paper.book().write(Common.isFarmServiceRunning, false);
-                                    stopSelf();
+                                    farmRef.child(theFarmId)
+                                            .updateChildren(deactivateFarmMap);
 
                                 }
 
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
+                                Paper.book().write(Common.isFarmServiceRunning, false);
+                                stopSelf();
 
-                                }
-                            });
+                            }
 
-                } else
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
 
-                if (output == 0){
+                            }
+                        });
 
-                    retryFinish(farmType);
+            } else
 
-                } else
+            if (output == 0){
 
-                if (output == 2){
+                retryFinish(farmType);
 
-                    retryFinish(farmType);
+            } else
 
-                }
+            if (output == 2){
+
+                retryFinish(farmType);
 
             }
+
         }).execute();
 
     }
 
     private void retryFinish(final String farmType) {
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                endFarmActivation(farmType);
-            }
-        }, 300000);
+        new Handler().postDelayed(() -> endFarmActivation(farmType), 60000);
 
     }
 
@@ -279,88 +225,57 @@ public class AdminMonitorService extends Service {
         final int hoursLeft = (int) (millisToSecs / 60) / 60;
         final int minutes = (int) (millisToSecs / 60) % 60;
 
-        //execute network check async task
-        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
-            @Override
-            public void processFinish(Integer output) {
+        //run network check
+        new CheckInternet(this, output -> {
 
-                //check all cases
-                if (output == 1){
+            //check all cases
+            if (output == 1){
 
-                    farmRef.orderByChild("farmNotiId")
-                            .equalTo(farmType)
-                            .addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
+                farmRef.orderByChild("farmNotiId")
+                        .equalTo(farmType)
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                    for (DataSnapshot snap : dataSnapshot.getChildren()){
+                                for (DataSnapshot snap : dataSnapshot.getChildren()){
 
-                                        String farmId = snap.getKey();
+                                    String farmId = snap.getKey();
 
-                                        farmRef.child(farmId)
-                                                .child("unitsAvailable")
-                                                .setValue(String.valueOf(hoursLeft) + " hours, " + String.valueOf(minutes) + " minutes left !")
-                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
-
-                                                        if (task.isSuccessful()){
-
-
-
-                                                        }
-
-                                                    }
-                                                });
-
-                                    }
+                                    farmRef.child(farmId)
+                                            .child("unitsAvailable")
+                                            .setValue(hoursLeft + " hour(s), " + minutes + " minute(s) left!");
 
                                 }
 
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
+                            }
 
-                                }
-                            });
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
 
-                } else
+                            }
+                        });
 
-                if (output == 0){
+            } else
 
-                    retry(farmType);
+            if (output == 0){
 
-                } else
+                retry(farmType);
 
-                if (output == 2){
+            } else
 
-                    retry(farmType);
+            if (output == 2){
 
-                }
+                retry(farmType);
 
             }
+
         }).execute();
 
     }
 
-    /*private void repeatUpdate(final String farmType) {
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                updateCountDown(farmType, mTimeLeftInMillis);
-            }
-        }, 60000);
-
-    }*/
-
     private void retry(final String farmType) {
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                updateCountDown(farmType, mTimeLeftInMillis);
-            }
-        }, 600000);
+        new Handler().postDelayed(() -> updateCountDown(farmType, mTimeLeftInMillis), 60000);
 
     }
 

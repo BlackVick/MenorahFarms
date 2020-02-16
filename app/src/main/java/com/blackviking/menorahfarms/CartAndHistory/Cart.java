@@ -3,41 +3,29 @@ package com.blackviking.menorahfarms.CartAndHistory;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.blackviking.menorahfarms.AdminDetails.PendingSponsorshipDetail;
 import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
-import com.blackviking.menorahfarms.Common.Permissions;
-import com.blackviking.menorahfarms.FarmDetails;
-import com.blackviking.menorahfarms.HomeActivities.Account;
-import com.blackviking.menorahfarms.HomeActivities.FarmShop;
 import com.blackviking.menorahfarms.Models.CartModel;
 import com.blackviking.menorahfarms.Models.FarmModel;
-import com.blackviking.menorahfarms.Models.MenorahDetailsModel;
+import com.blackviking.menorahfarms.Models.SponsorshipDetailsModel;
 import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.Notification.APIService;
 import com.blackviking.menorahfarms.Notification.DataMessage;
@@ -48,10 +36,6 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.flutterwave.raveandroid.RaveConstants;
 import com.flutterwave.raveandroid.RavePayActivity;
 import com.flutterwave.raveandroid.RavePayManager;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -59,17 +43,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
-import com.theartofdev.edmodo.cropper.CropImage;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -77,14 +54,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import dmax.dialog.SpotsDialog;
-import id.zelory.compressor.Compressor;
 import io.paperdb.Paper;
 import retrofit2.Call;
 import retrofit2.Response;
 
 public class Cart extends AppCompatActivity {
 
+    //widget
     private ImageView backButton;
     private LinearLayout emptyLayout;
     private RecyclerView cartRecycler;
@@ -92,27 +68,32 @@ public class Cart extends AppCompatActivity {
     private LinearLayoutManager layoutManager;
     private RelativeLayout noInternetLayout;
 
+    //firebase
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private DatabaseReference cartRef, userRef, farmRef, sponsorshipRef, payHistoryRef, termsRef, runningCycleRef,
-            notificationRef;
+            notificationRef, sponsorshipDetailsRef, sponsorshipNotificationRef;
+
+    //values
     private String currentuid;
     private String paymentReference;
 
-    private String currentFarmType = "", currentFarmRoi = "", currentUnitPrice = "", currentDuration = "", currentFarmId = "", currentCartKey = "";
+    //data values
+    private String currentFarmType = "", currentFarmRoi = "", currentUnitPrice = "",
+            currentDuration = "", currentFarmId = "", currentCartKey = "";
     private String todayString = "", futureString = "";
     private long totalPrice = 0, currentTotalPayout = 0;
     private int currentUnits = 0;
-    private String publicKey = "FLWPUBK-bb6cf62f9e07f4b7f1028699eaa58873-X";
-    private String encryptionKey = "0b17c443fa8aba1186a42910";
-    private APIService mService;
-
-    private android.app.AlertDialog loadingDialog, mDialog;
-    private boolean isLoading = false;
     private UserModel paperUser;
 
+    //notification
+    private APIService mService;
+
+    //loading
+    private android.app.AlertDialog loadingDialog;
+    private boolean isLoading = false;
+
     //random farm manager
-    private static final Random random = new Random();
     private static final String[] CHARS = {"01", "02"};
 
     @Override
@@ -122,14 +103,16 @@ public class Cart extends AppCompatActivity {
 
 
         /*---   FIREBASE   ---*/
-        cartRef = db.getReference("Carts");
-        userRef = db.getReference("Users");
-        farmRef = db.getReference("Farms");
-        sponsorshipRef = db.getReference("SponsoredFarms");
-        payHistoryRef = db.getReference("TransactionHistory");
-        termsRef = db.getReference("TermsAndConditions");
-        notificationRef = db.getReference("Notifications");
-        runningCycleRef = db.getReference("RunningCycles");
+        cartRef = db.getReference(Common.CART_NODE);
+        userRef = db.getReference(Common.USERS_NODE);
+        farmRef = db.getReference(Common.FARM_NODE);
+        sponsorshipRef = db.getReference(Common.SPONSORED_FARMS_NODE);
+        sponsorshipNotificationRef = db.getReference(Common.SPONSORED_FARMS_NOTIFICATION_NODE);
+        payHistoryRef = db.getReference(Common.TRANSACTION_NODE);
+        termsRef = db.getReference(Common.TERMS_AND_CONDITIONS_NODE);
+        notificationRef = db.getReference(Common.NOTIFICATIONS_NODE);
+        runningCycleRef = db.getReference(Common.RUNNING_CYCLE_NODE);
+        sponsorshipDetailsRef = db.getReference(Common.SPONSORSHIP_DETAILS_NODE);
         if (mAuth.getCurrentUser() != null)
             currentuid = mAuth.getCurrentUser().getUid();
 
@@ -143,9 +126,9 @@ public class Cart extends AppCompatActivity {
 
 
         /*---   WIDGETS   ---*/
-        backButton = (ImageView)findViewById(R.id.backButton);
-        emptyLayout = (LinearLayout)findViewById(R.id.emptyLayout);
-        cartRecycler = (RecyclerView)findViewById(R.id.cartRecycler);
+        backButton = findViewById(R.id.backButton);
+        emptyLayout = findViewById(R.id.emptyLayout);
+        cartRecycler = findViewById(R.id.cartRecycler);
         noInternetLayout = findViewById(R.id.noInternetLayout);
 
 
@@ -153,76 +136,68 @@ public class Cart extends AppCompatActivity {
         showLoadingDialog("Loading cart items . . .");
 
 
-        //execute network check async task
-        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
-            @Override
-            public void processFinish(Integer output) {
+        //run network check
+        new CheckInternet(this, output -> {
 
-                //check all cases
-                if (output == 1){
+            //check all cases
+            if (output == 1){
 
-                    /*---   CHECK IF USER CART EMPTY   ---*/
-                    cartRef.child(currentuid)
-                            .addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
+                /*---   CHECK IF USER CART EMPTY   ---*/
+                cartRef.child(currentuid)
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                    if (dataSnapshot.exists()){
+                                if (dataSnapshot.exists()){
 
-                                        cartRecycler.setVisibility(View.VISIBLE);
-                                        emptyLayout.setVisibility(View.GONE);
-                                        noInternetLayout.setVisibility(View.GONE);
-                                        loadCart();
+                                    cartRecycler.setVisibility(View.VISIBLE);
+                                    emptyLayout.setVisibility(View.GONE);
+                                    noInternetLayout.setVisibility(View.GONE);
+                                    loadCart();
 
-                                    } else {
+                                } else {
 
-                                        loadingDialog.dismiss();
-                                        cartRecycler.setVisibility(View.GONE);
-                                        emptyLayout.setVisibility(View.VISIBLE);
-                                        noInternetLayout.setVisibility(View.GONE);
-
-                                    }
+                                    loadingDialog.dismiss();
+                                    cartRecycler.setVisibility(View.GONE);
+                                    emptyLayout.setVisibility(View.VISIBLE);
+                                    noInternetLayout.setVisibility(View.GONE);
 
                                 }
 
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
+                            }
 
-                                }
-                            });
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
 
-                } else
+                            }
+                        });
 
-                if (output == 0){
+            } else
 
-                    //set layout
-                    loadingDialog.dismiss();
-                    noInternetLayout.setVisibility(View.VISIBLE);
-                    cartRecycler.setVisibility(View.GONE);
-                    emptyLayout.setVisibility(View.GONE);
+            if (output == 0){
 
-                } else
+                //set layout
+                loadingDialog.dismiss();
+                noInternetLayout.setVisibility(View.VISIBLE);
+                cartRecycler.setVisibility(View.GONE);
+                emptyLayout.setVisibility(View.GONE);
 
-                if (output == 2){
+            } else
 
-                    //set layout
-                    loadingDialog.dismiss();
-                    noInternetLayout.setVisibility(View.VISIBLE);
-                    cartRecycler.setVisibility(View.GONE);
-                    emptyLayout.setVisibility(View.GONE);
+            if (output == 2){
 
-                }
+                //set layout
+                loadingDialog.dismiss();
+                noInternetLayout.setVisibility(View.VISIBLE);
+                cartRecycler.setVisibility(View.GONE);
+                emptyLayout.setVisibility(View.GONE);
 
             }
+
         }).execute();
 
 
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        backButton.setOnClickListener(v -> finish());
 
     }
 
@@ -247,7 +222,7 @@ public class Cart extends AppCompatActivity {
                 viewHolder.cartItemUnits.setText("X " + model.getUnits());
 
                 farmRef.child(model.getFarmId())
-                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                        .addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -256,7 +231,7 @@ public class Cart extends AppCompatActivity {
                                 if (currentFarm != null){
 
                                     final String theFarmType = currentFarm.getFarmType();
-                                    String theFarmLocation = currentFarm.getFarmLocation();
+                                    final String theFarmLocation = currentFarm.getFarmLocation();
                                     final String theFarmROI = currentFarm.getFarmRoi();
                                     final String theFarmUnitPrice = currentFarm.getPricePerUnit();
                                     final String theFarmSponsorDuration = currentFarm.getSponsorDuration();
@@ -265,12 +240,14 @@ public class Cart extends AppCompatActivity {
 
                                     long priceToLong = Long.parseLong(theFarmUnitPrice);
 
+                                    //farm details
                                     viewHolder.cartItemType.setText(theFarmType);
                                     viewHolder.cartItemLocation.setText(theFarmLocation);
                                     viewHolder.cartItemROI.setText("Return on investment: " + theFarmROI + "%");
                                     viewHolder.cartItemDuration.setText("Duration: " + theFarmSponsorDuration + " Months");
                                     viewHolder.cartItemPrice.setText(Common.convertToPrice(Cart.this, priceToLong));
 
+                                    //farm image
                                     if (!theFarmImage.equalsIgnoreCase("")){
 
                                         Picasso.get()
@@ -299,202 +276,177 @@ public class Cart extends AppCompatActivity {
 
                                     }
 
+                                    //remove cart item
+                                    viewHolder.removeFromCart.setOnClickListener(v -> openDeleteDialog(adapter.getRef(viewHolder.getAdapterPosition()).getKey()));
 
-                                    viewHolder.removeFromCart.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            openDeleteDialog(adapter.getRef(viewHolder.getAdapterPosition()).getKey());
-                                        }
-                                    });
+                                    //checkout
+                                    viewHolder.checkout.setOnClickListener(v -> {
 
+                                        if (Common.checkKYC(Cart.this).equalsIgnoreCase("Profile Complete")) {
 
-                                    viewHolder.checkout.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
+                                            //run network check
+                                            new CheckInternet(Cart.this, output -> {
 
-                                            if (Common.checkKYC(Cart.this).equalsIgnoreCase("Profile Complete")) {
+                                                //check all cases
+                                                if (output == 1) {
 
-                                                //execute network check async task
-                                                CheckInternet asyncTask = (CheckInternet) new CheckInternet(Cart.this, new CheckInternet.AsyncResponse() {
-                                                    @Override
-                                                    public void processFinish(Integer output) {
+                                                    //check for user sponsorship limit
+                                                    sponsorshipRef.child(currentuid)
+                                                            .orderByChild("farmId")
+                                                            .equalTo(model.getFarmId())
+                                                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                @Override
+                                                                public void onDataChange(DataSnapshot dataSnapshot1) {
 
-                                                        //check all cases
-                                                        if (output == 1) {
+                                                                    int theCount = 0;
 
-                                                            //check
-                                                            sponsorshipRef.child(currentuid)
-                                                                    .orderByChild("farmId")
-                                                                    .equalTo(model.getFarmId())
-                                                                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                        @Override
-                                                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                                                    for (DataSnapshot snap : dataSnapshot1.getChildren()){
 
-                                                                            int theCount = 0;
+                                                                        int newCount = Integer.parseInt(snap.child("sponsoredUnits").getValue().toString());
 
-                                                                            for (DataSnapshot snap : dataSnapshot.getChildren()){
+                                                                        theCount = theCount + newCount;
 
-                                                                                int newCount = Integer.parseInt(snap.child("sponsoredUnits").getValue().toString());
+                                                                    }
 
-                                                                                theCount = theCount + newCount;
+                                                                    if (currentFarm.getPackagedType().equalsIgnoreCase("Worker")){
 
-                                                                            }
+                                                                        int spaceRemaining = 100 - theCount;
 
-                                                                            if (currentFarm.getPackagedType().equalsIgnoreCase("Worker")){
+                                                                        if (theCount < 100 && model.getUnits() <= spaceRemaining){
 
-                                                                                int spaceRemaining = 100 - theCount;
+                                                                            final AlertDialog alertDialog = new AlertDialog.Builder(Cart.this, R.style.DialogTheme).create();
+                                                                            LayoutInflater inflater = Cart.this.getLayoutInflater();
+                                                                            View viewOptions = inflater.inflate(R.layout.terms_layout, null);
 
-                                                                                if (theCount < 100 && model.getUnits() <= spaceRemaining){
+                                                                            final TextView termsText = viewOptions.findViewById(R.id.termsText);
+                                                                            final Button cancel = viewOptions.findViewById(R.id.cancelCheckout);
+                                                                            final Button proceed = viewOptions.findViewById(R.id.proceedCheckout);
 
-                                                                                    final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(Cart.this, R.style.DialogTheme).create();
-                                                                                    LayoutInflater inflater = Cart.this.getLayoutInflater();
-                                                                                    View viewOptions = inflater.inflate(R.layout.terms_layout, null);
+                                                                            alertDialog.setView(viewOptions);
 
-                                                                                    final TextView termsText = (TextView) viewOptions.findViewById(R.id.termsText);
-                                                                                    final Button cancel = (Button) viewOptions.findViewById(R.id.cancelCheckout);
-                                                                                    final Button proceed = (Button) viewOptions.findViewById(R.id.proceedCheckout);
+                                                                            alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+                                                                            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-                                                                                    alertDialog.setView(viewOptions);
+                                                                            //get term from server
+                                                                            termsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                                @Override
+                                                                                public void onDataChange(DataSnapshot dataSnapshot1) {
 
-                                                                                    alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
-                                                                                    alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                                                                    String theTerms = dataSnapshot1.child("terms").getValue().toString();
 
-                                                                                    termsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                                        @Override
-                                                                                        public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                                                                            String theTerms = dataSnapshot.child("terms").getValue().toString();
-
-                                                                                            termsText.setText(theTerms);
-
-                                                                                        }
-
-                                                                                        @Override
-                                                                                        public void onCancelled(DatabaseError databaseError) {
-
-                                                                                        }
-                                                                                    });
-
-                                                                                    proceed.setOnClickListener(new View.OnClickListener() {
-                                                                                        @Override
-                                                                                        public void onClick(View v) {
-                                                                                            alertDialog.dismiss();
-                                                                                            //transferCheckout(theFarmState, adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
-                                                                                            checkoutAndPay(theFarmState, adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
-                                                                                            //testPay(adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
-                                                                                        }
-                                                                                    });
-
-                                                                                    cancel.setOnClickListener(new View.OnClickListener() {
-                                                                                        @Override
-                                                                                        public void onClick(View v) {
-                                                                                            alertDialog.cancel();
-                                                                                        }
-                                                                                    });
-
-                                                                                    alertDialog.show();
-
-                                                                                } else {
-
-                                                                                    showErrorDialog("You can not exceed sponsorship limit for this package");
+                                                                                    termsText.setText(theTerms);
 
                                                                                 }
 
-                                                                            } else
+                                                                                @Override
+                                                                                public void onCancelled(DatabaseError databaseError) {
 
-                                                                            if (currentFarm.getPackagedType().equalsIgnoreCase("Student")){
+                                                                                }
+                                                                            });
 
-                                                                                int spaceRemaining = 10 - theCount;
+                                                                            //proceed to checkout
+                                                                            proceed.setOnClickListener(v1 -> {
+                                                                                alertDialog.dismiss();
+                                                                                checkoutAndPay(adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
+                                                                            });
 
-                                                                                if (theCount < 10 && model.getUnits() <= spaceRemaining){
+                                                                            //cancel checkout
+                                                                            cancel.setOnClickListener(v1 -> alertDialog.cancel());
 
-                                                                                    final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(Cart.this, R.style.DialogTheme).create();
-                                                                                    LayoutInflater inflater = Cart.this.getLayoutInflater();
-                                                                                    View viewOptions = inflater.inflate(R.layout.terms_layout, null);
+                                                                            alertDialog.show();
 
-                                                                                    final TextView termsText = (TextView) viewOptions.findViewById(R.id.termsText);
-                                                                                    final Button cancel = (Button) viewOptions.findViewById(R.id.cancelCheckout);
-                                                                                    final Button proceed = (Button) viewOptions.findViewById(R.id.proceedCheckout);
+                                                                        } else {
 
-                                                                                    alertDialog.setView(viewOptions);
+                                                                            Toast.makeText(Cart.this, "Limit exceeded!", Toast.LENGTH_LONG).show();
 
-                                                                                    alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
-                                                                                    alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                                                        }
 
-                                                                                    termsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                                        @Override
-                                                                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                                                    } else
 
-                                                                                            String theTerms = dataSnapshot.child("terms").getValue().toString();
+                                                                    if (currentFarm.getPackagedType().equalsIgnoreCase("Student")){
 
-                                                                                            termsText.setText(theTerms);
+                                                                        int spaceRemaining = 10 - theCount;
 
-                                                                                        }
+                                                                        if (theCount < 10 && model.getUnits() <= spaceRemaining){
 
-                                                                                        @Override
-                                                                                        public void onCancelled(DatabaseError databaseError) {
+                                                                            final AlertDialog alertDialog = new AlertDialog.Builder(Cart.this, R.style.DialogTheme).create();
+                                                                            LayoutInflater inflater = Cart.this.getLayoutInflater();
+                                                                            View viewOptions = inflater.inflate(R.layout.terms_layout, null);
 
-                                                                                        }
-                                                                                    });
+                                                                            final TextView termsText = viewOptions.findViewById(R.id.termsText);
+                                                                            final Button cancel = viewOptions.findViewById(R.id.cancelCheckout);
+                                                                            final Button proceed = viewOptions.findViewById(R.id.proceedCheckout);
 
-                                                                                    proceed.setOnClickListener(new View.OnClickListener() {
-                                                                                        @Override
-                                                                                        public void onClick(View v) {
-                                                                                            alertDialog.dismiss();
-                                                                                            //transferCheckout(theFarmState, adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
-                                                                                            checkoutAndPay(theFarmState, adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
-                                                                                            //testPay(adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
-                                                                                        }
-                                                                                    });
+                                                                            alertDialog.setView(viewOptions);
 
-                                                                                    cancel.setOnClickListener(new View.OnClickListener() {
-                                                                                        @Override
-                                                                                        public void onClick(View v) {
-                                                                                            alertDialog.cancel();
-                                                                                        }
-                                                                                    });
+                                                                            alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+                                                                            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-                                                                                    alertDialog.show();
+                                                                            //get term and condition for the sponsorship
+                                                                            termsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                                @Override
+                                                                                public void onDataChange(DataSnapshot dataSnapshot1) {
 
-                                                                                } else {
+                                                                                    String theTerms = dataSnapshot1.child("terms").getValue().toString();
 
-                                                                                    showErrorDialog("You can not exceed sponsorship limit for this package");
+                                                                                    termsText.setText(theTerms);
 
                                                                                 }
 
-                                                                            }
+                                                                                @Override
+                                                                                public void onCancelled(DatabaseError databaseError) {
 
+                                                                                }
+                                                                            });
 
+                                                                            //proceed to checkout
+                                                                            proceed.setOnClickListener(v1 -> {
+                                                                                alertDialog.dismiss();
+                                                                                checkoutAndPay(adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
+                                                                            });
+
+                                                                            //cancel checkout
+                                                                            cancel.setOnClickListener(v1 -> alertDialog.cancel());
+
+                                                                            alertDialog.show();
+
+                                                                        } else {
+
+                                                                            Toast.makeText(Cart.this, "Limit exceeded!", Toast.LENGTH_LONG).show();
 
                                                                         }
 
-                                                                        @Override
-                                                                        public void onCancelled(DatabaseError databaseError) {
+                                                                    }
 
-                                                                        }
-                                                                    });
 
-                                                        } else if (output == 0) {
 
-                                                            Toast.makeText(Cart.this, "No internet access", Toast.LENGTH_SHORT).show();
+                                                                }
 
-                                                        } else if (output == 2) {
+                                                                @Override
+                                                                public void onCancelled(DatabaseError databaseError) {
 
-                                                            Toast.makeText(Cart.this, "No network access", Toast.LENGTH_SHORT).show();
+                                                                }
+                                                            });
 
-                                                        }
+                                                } else if (output == 0) {
 
-                                                    }
-                                                }).execute();
+                                                    Toast.makeText(Cart.this, "No internet access", Toast.LENGTH_SHORT).show();
 
-                                            } else {
+                                                } else if (output == 2) {
 
-                                                showErrorDialog(Common.checkKYC(Cart.this));
+                                                    Toast.makeText(Cart.this, "No network access", Toast.LENGTH_SHORT).show();
 
-                                            }
+                                                }
 
+                                            }).execute();
+
+                                        } else {
+
+                                            Toast.makeText(Cart.this, Common.checkKYC(Cart.this), Toast.LENGTH_LONG).show();
 
                                         }
+
+
                                     });
 
                                 }
@@ -516,123 +468,155 @@ public class Cart extends AppCompatActivity {
 
 
     //FlutterWave Payment Gateway
-    private void checkoutAndPay(final String theFarmState, final String theCartKey, final String theFarmType, final String theFarmROI, final String theFarmUnitPrice, final String theFarmSponsorDuration, final long totalPayout, final int units, final String farmId) {
+    private void checkoutAndPay(final String theCartKey, final String theFarmType, final String theFarmROI, final String theFarmUnitPrice, final String theFarmSponsorDuration, final long totalPayout, final int units, final String farmId) {
 
-        //execute network check async task
-        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
-            @Override
-            public void processFinish(Integer output) {
+        //run network check
+        new CheckInternet(this, output -> {
 
-                //check all cases
-                if (output == 1){
+            //check all cases
+            if (output == 1){
 
-                    //get user
-                    final UserModel user1 = Paper.book().read(Common.PAPER_USER);
+                //get user
+                final UserModel user1 = Paper.book().read(Common.PAPER_USER);
 
-                    /*---   GLOBAL SET   ---*/
-                    currentFarmType = theFarmType;
-                    currentFarmRoi = theFarmROI;
-                    currentUnitPrice = theFarmUnitPrice;
-                    currentDuration = theFarmSponsorDuration;
-                    currentFarmId = farmId;
-                    currentTotalPayout = totalPayout;
-                    currentUnits = units;
-                    currentCartKey = theCartKey;
+                /*---   GLOBAL SET   ---*/
+                currentFarmType = theFarmType;
+                currentFarmRoi = theFarmROI;
+                currentUnitPrice = theFarmUnitPrice;
+                currentDuration = theFarmSponsorDuration;
+                currentFarmId = farmId;
+                currentTotalPayout = totalPayout;
+                currentUnits = units;
+                currentCartKey = theCartKey;
 
 
-                    char firstInit = user1.getFirstName().charAt(0);
-                    char lastInit = user1.getLastName().charAt(0);
+                //create initials from name
+                char firstInit = user1.getFirstName().charAt(0);
+                char lastInit = user1.getLastName().charAt(0);
+                String initials = String.valueOf(firstInit) + String.valueOf(lastInit);
 
-                    String initials = String.valueOf(firstInit) + String.valueOf(lastInit);
+                //get reference
+                paymentReference = initials + "-MF-" + System.currentTimeMillis();
 
-                    paymentReference = initials + "-MF-" + System.currentTimeMillis();
-
-                    /*---   PRICE TO PAY   ---*/
-                    int thePrice = Integer.parseInt(theFarmUnitPrice);
-                    totalPrice = thePrice * units;
-
-
-                    /*---   DURATION   ---*/
-                    int theDuration = Integer.parseInt(theFarmSponsorDuration);
-                    int theDays = 30 * theDuration;
-
-                    Date todayDate = Calendar.getInstance().getTime();
-                    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-                    todayString = formatter.format(todayDate);
-
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(todayDate);
-                    cal.add(Calendar.DATE, theDays);
-                    Date futureDate = cal.getTime();
-                    SimpleDateFormat formatterFuture = new SimpleDateFormat("dd-MM-yyyy");
-                    futureString = formatterFuture.format(futureDate);
+                //get price
+                int thePrice = Integer.parseInt(theFarmUnitPrice);
+                totalPrice = thePrice * units;
 
 
-                    farmRef.child(farmId)
-                            .addListenerForSingleValueEvent(
-                                    new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                //duration
+                int theDuration = Integer.parseInt(theFarmSponsorDuration);
+                int theDays = 30 * theDuration;
 
-                                            FarmModel laFarm = dataSnapshot.getValue(FarmModel.class);
+                //get today date
+                Date todayDate = Calendar.getInstance().getTime();
+                SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+                todayString = formatter.format(todayDate);
 
-                                            if (laFarm != null){
+                //get end date
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(todayDate);
+                cal.add(Calendar.DATE, theDays);
+                Date futureDate = cal.getTime();
+                SimpleDateFormat formatterFuture = new SimpleDateFormat("dd-MM-yyyy");
+                futureString = formatterFuture.format(futureDate);
 
-                                                if (laFarm.getFarmState().equalsIgnoreCase("Now Selling")){
 
-                                                    /*---   PAYMENT   ---*/
-                                                    new RavePayManager(Cart.this).setAmount(totalPrice)
-                                                            .setCountry("NG")
-                                                            .setCurrency("NGN")
-                                                            .setEmail(user1.getEmail())
-                                                            .setfName(user1.getFirstName())
-                                                            .setlName(user1.getLastName())
-                                                            .setNarration("Sponsorship Payment For " + String.valueOf(units) + " Units Of " + theFarmType + " Farm, On This Day " + todayString + ".")
-                                                            .setPublicKey(publicKey)
-                                                            .setEncryptionKey(encryptionKey)
-                                                            .setTxRef(paymentReference)
-                                                            .acceptAccountPayments(false)
-                                                            .acceptCardPayments(true)
-                                                            .onStagingEnv(false)
-                                                            .isPreAuth(true)
-                                                            .shouldDisplayFee(true)
-                                                            .showStagingLabel(false)
-                                                            .withTheme(R.style.FlutterPayTheme)
-                                                            .initialize();
+                //get farm state
+                farmRef.child(farmId)
+                        .addListenerForSingleValueEvent(
+                                new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                                } else {
+                                        FarmModel laFarm = dataSnapshot.getValue(FarmModel.class);
 
-                                                    //loading
-                                                    showErrorDialog("Farm is sold out.");
+                                        if (laFarm != null){
 
-                                                }
+                                            if (laFarm.getFarmState().equalsIgnoreCase("Now Selling")){
+
+                                                sponsorshipDetailsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                                        SponsorshipDetailsModel theDetails = dataSnapshot.getValue(SponsorshipDetailsModel.class);
+
+                                                        if (theDetails != null){
+
+                                                            if (theDetails.getSponsored_farm().equalsIgnoreCase(laFarm.getFarmNotiId())){
+
+                                                                if (units <= theDetails.getUnits_available()){
+
+                                                                    //initiate flutterwave payment
+                                                                    new RavePayManager(Cart.this).setAmount(totalPrice)
+                                                                            .setCountry("NG")
+                                                                            .setCurrency("NGN")
+                                                                            .setEmail(user1.getEmail())
+                                                                            .setfName(user1.getFirstName())
+                                                                            .setlName(user1.getLastName())
+                                                                            .setNarration("Sponsorship Payment For " + units + " Units Of " + theFarmType + " Farm, On This Day " + todayString + ".")
+                                                                            .setPublicKey(Common.flutterWavePublicKey)
+                                                                            .setEncryptionKey(Common.flutterWaveEncryptionKey)
+                                                                            .setTxRef(paymentReference)
+                                                                            .acceptAccountPayments(false)
+                                                                            .acceptCardPayments(true)
+                                                                            .onStagingEnv(false)
+                                                                            .isPreAuth(true)
+                                                                            .shouldDisplayFee(true)
+                                                                            .showStagingLabel(false)
+                                                                            .withTheme(R.style.FlutterPayTheme)
+                                                                            .initialize();
+
+                                                                } else {
+
+                                                                    //show error
+                                                                    Toast.makeText(Cart.this, "Remaining units can't serve your request.", Toast.LENGTH_LONG).show();
+
+                                                                }
+
+                                                            }
+
+                                                        }
+
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                    }
+                                                });
+
+                                            } else {
+
+                                                //loading
+                                                Toast.makeText(Cart.this, "Farm is sold out!", Toast.LENGTH_LONG).show();
 
                                             }
 
                                         }
 
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) {
-
-                                        }
                                     }
-                            );
 
-                } else
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
 
-                if (output == 0){
+                                    }
+                                }
+                        );
 
-                    Toast.makeText(Cart.this, "No internet access", Toast.LENGTH_SHORT).show();
+            } else
 
-                } else
+            if (output == 0){
 
-                if (output == 2){
+                Toast.makeText(Cart.this, "No internet access", Toast.LENGTH_SHORT).show();
 
-                    Toast.makeText(Cart.this, "No network connection", Toast.LENGTH_SHORT).show();
+            } else
 
-                }
+            if (output == 2){
+
+                Toast.makeText(Cart.this, "No network connection", Toast.LENGTH_SHORT).show();
 
             }
+
         }).execute();
 
     }
@@ -647,33 +631,30 @@ public class Cart extends AppCompatActivity {
                 //show loading dialog
                 showLoadingDialog("Authorizing payment . . .");
 
-                //execute network check async task
-                CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
-                    @Override
-                    public void processFinish(Integer output) {
+                //run network check
+                new CheckInternet(this, output -> {
 
-                        //check all cases
-                        if (output == 1){
+                    //check all cases
+                    if (output == 1){
 
-                            pushToDb();
+                        pushToDb();
 
-                        } else
+                    } else
 
-                        if (output == 0){
+                    if (output == 0){
 
-                            loadingDialog.dismiss();
-                            showErrorDialog("No internet access");
+                        loadingDialog.dismiss();
+                        Toast.makeText(this, "No Internet", Toast.LENGTH_SHORT).show();
 
-                        } else
+                    } else
 
-                        if (output == 2){
+                    if (output == 2){
 
-                            loadingDialog.dismiss();
-                            showErrorDialog("You are not connected to any network");
-
-                        }
+                        loadingDialog.dismiss();
+                        Toast.makeText(this, "Not connected to any network", Toast.LENGTH_LONG).show();
 
                     }
+
                 }).execute();
 
             } else if (resultCode == RavePayActivity.RESULT_ERROR) {
@@ -692,206 +673,8 @@ public class Cart extends AppCompatActivity {
 
 
 
-
-//    //Transfer Payment Gateway
-//    private void transferCheckout(final String theFarmState, final String key, final String theFarmType, final String theFarmROI, final String theFarmUnitPrice, final String theFarmSponsorDuration, final long totalPayout, final int units, final String farmId) {
-//
-//        final android.app.AlertDialog alertDialog2 = new android.app.AlertDialog.Builder(Cart.this, R.style.DialogTheme).create();
-//        LayoutInflater inflater = Cart.this.getLayoutInflater();
-//        View viewOptions = inflater.inflate(R.layout.add_payment_proof_layout, null);
-//
-//        menorahBank = viewOptions.findViewById(R.id.menorahBank);
-//        menorahAccountName = viewOptions.findViewById(R.id.menorahAccountName);
-//        menorahAccountNumber = viewOptions.findViewById(R.id.menorahAccountNumber);
-//        actionText = viewOptions.findViewById(R.id.actionText);
-//        finishCheckout = viewOptions.findViewById(R.id.finishCheckout);
-//        checkoutProgress = viewOptions.findViewById(R.id.checkoutProgress);
-//
-//        alertDialog2.setView(viewOptions);
-//
-//        alertDialog2.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
-//        alertDialog2.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-//
-//
-//        //fill bank info
-//        //execute network check async task
-//        CheckInternet asyncTask = (CheckInternet) new CheckInternet(Cart.this, new CheckInternet.AsyncResponse() {
-//            @Override
-//            public void processFinish(Integer output) {
-//
-//                //check all cases
-//                if (output == 1) {
-//
-//                    menorahBankRef.addListenerForSingleValueEvent(
-//                            new ValueEventListener() {
-//                                @Override
-//                                public void onDataChange(DataSnapshot dataSnapshot) {
-//
-//                                    MenorahDetailsModel theDets = dataSnapshot.getValue(MenorahDetailsModel.class);
-//
-//                                    if (theDets != null){
-//
-//                                        menorahAccountName.setText(theDets.getAccount_name());
-//                                        menorahAccountNumber.setText(theDets.getAccount_number());
-//                                        menorahBank.setText(theDets.getBank());
-//
-//                                    }
-//
-//                                }
-//
-//                                @Override
-//                                public void onCancelled(DatabaseError databaseError) {
-//
-//                                }
-//                            }
-//                    );
-//
-//                } else if (output == 0) {
-//
-//                    Toast.makeText(Cart.this, "No internet access", Toast.LENGTH_SHORT).show();
-//
-//                } else if (output == 2) {
-//
-//                    Toast.makeText(Cart.this, "No network access", Toast.LENGTH_SHORT).show();
-//
-//                }
-//
-//            }
-//        }).execute();
-//
-//
-//        //upload btn
-//        finishCheckout.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                if (imageUri == null && actionText.getText().toString().equalsIgnoreCase("UPLOAD EVIDENCE OF PAYMENT")) {
-//
-//                    if (checkPermissionsArray(Permissions.PERMISSIONS)){
-//
-//                        Intent pickPhoto = new Intent(Intent.ACTION_PICK,
-//                                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//                        startActivityForResult(pickPhoto, GALLERY_REQUEST_CODE);
-//
-//
-//                    } else {
-//
-//                        verifyPermissions(Permissions.PERMISSIONS);
-//
-//                    }
-//
-//                } else if (imageUri != null && originalImageUrl != null
-//                            && !originalImageUrl.equals("") && actionText.getText().toString().equalsIgnoreCase("FINISH")){
-//
-//                    finishTransferCheckout(alertDialog2, theFarmState, key, theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, totalPayout, units, farmId);
-//
-//                }
-//
-//            }
-//        });
-//
-//        alertDialog2.show();
-//
-//    }
-//
-//    private void finishTransferCheckout(final android.app.AlertDialog alertDialog2, final String theFarmState, final String key, final String theFarmType, final String theFarmROI, final String theFarmUnitPrice, final String theFarmSponsorDuration, final long totalPayout, final int units, final String farmId) {
-//
-//        //loading
-//        actionText.setVisibility(View.GONE);
-//        checkoutProgress.setVisibility(View.VISIBLE);
-//
-//        //execute network check async task
-//        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
-//            @Override
-//            public void processFinish(Integer output) {
-//
-//                //check all cases
-//                if (output == 1){
-//
-//                    final UserModel user1 = Paper.book().read(Common.PAPER_USER);
-//
-//                    /*---   GLOBAL SET   ---*/
-//                    currentFarmType = theFarmType;
-//                    currentFarmRoi = theFarmROI;
-//                    currentUnitPrice = theFarmUnitPrice;
-//                    currentDuration = theFarmSponsorDuration;
-//                    currentFarmId = farmId;
-//                    currentTotalPayout = totalPayout;
-//                    currentUnits = units;
-//                    currentCartKey = key;
-//
-//
-//                    char firstInit = user1.getFirstName().charAt(0);
-//                    char lastInit = user1.getLastName().charAt(0);
-//
-//                    String initials = String.valueOf(firstInit) + String.valueOf(lastInit);
-//
-//                    paymentReference = initials + "-MF-" + System.currentTimeMillis();
-//
-//                    /*---   PRICE TO PAY   ---*/
-//                    int thePrice = Integer.parseInt(theFarmUnitPrice);
-//                    totalPrice = thePrice * units;
-//
-//
-//                    /*---   DURATION   ---*/
-//                    int theDuration = Integer.parseInt(theFarmSponsorDuration);
-//                    int theDays = 30 * theDuration;
-//
-//                    Date todayDate = Calendar.getInstance().getTime();
-//                    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-//                    todayString = formatter.format(todayDate);
-//
-//                    Calendar cal = Calendar.getInstance();
-//                    cal.setTime(todayDate);
-//                    cal.add(Calendar.DATE, theDays);
-//                    Date futureDate = cal.getTime();
-//                    SimpleDateFormat formatterFuture = new SimpleDateFormat("dd-MM-yyyy");
-//                    futureString = formatterFuture.format(futureDate);
-//
-//
-//                    if (theFarmState.equalsIgnoreCase("Now Selling")){
-//
-//                        pushToDb(alertDialog2);
-//
-//                    } else {
-//
-//                        //loading
-//                        actionText.setVisibility(View.VISIBLE);
-//                        checkoutProgress.setVisibility(View.GONE);
-//                        showErrorDialog("Sorry, this farm is sold out.");
-//
-//                    }
-//
-//
-//                } else
-//
-//                if (output == 0){
-//
-//                    //loading
-//                    actionText.setVisibility(View.VISIBLE);
-//                    checkoutProgress.setVisibility(View.GONE);
-//                    Toast.makeText(Cart.this, "No internet access", Toast.LENGTH_SHORT).show();
-//
-//                } else
-//
-//                if (output == 2){
-//
-//                    //loading
-//                    actionText.setVisibility(View.VISIBLE);
-//                    checkoutProgress.setVisibility(View.GONE);
-//                    Toast.makeText(Cart.this, "No network connection", Toast.LENGTH_SHORT).show();
-//
-//                }
-//
-//            }
-//        }).execute();
-//
-//    }
-
-
-
     //Test Gateway
-    private void testPay(String theFarmState, String theCartKey, final String theFarmType, String theFarmROI, String theFarmUnitPrice, String theFarmSponsorDuration, long totalPayout, final int units, String farmId) {
+    private void testPay(String theCartKey, final String theFarmType, String theFarmROI, String theFarmUnitPrice, String theFarmSponsorDuration, long totalPayout, final int units, String farmId) {
 
         /*---   GLOBAL SET   ---*/
         currentFarmType = theFarmType;
@@ -939,46 +722,9 @@ public class Cart extends AppCompatActivity {
 
 
 
-//    //Permissions
-//    private void verifyPermissions(String[] permissions) {
-//
-//        ActivityCompat.requestPermissions(
-//                this,
-//                permissions,
-//                VERIFY_PERMISSIONS_REQUEST
-//        );
-//    }
-//
-//    private boolean checkPermissionsArray(String[] permissions) {
-//
-//        for (int i = 0; i < permissions.length; i++){
-//
-//            String check = permissions[i];
-//            if (!checkPermissions(check)){
-//                return false;
-//            }
-//
-//        }
-//        return true;
-//    }
-//
-//    private boolean checkPermissions(String permission) {
-//
-//        int permissionRequest = ActivityCompat.checkSelfPermission(this, permission);
-//
-//        if (permissionRequest != PackageManager.PERMISSION_GRANTED){
-//
-//            return false;
-//        } else {
-//
-//            return true;
-//        }
-//    }
-
-
 
     //add to database
-    private void pushToDb(/*final android.app.AlertDialog alertDialog2*/) {
+    private void pushToDb() {
 
         //get user
         final UserModel user2 = Paper.book().read(Common.PAPER_USER);
@@ -988,8 +734,29 @@ public class Cart extends AppCompatActivity {
             userRef.child(currentuid).child("accountManager").setValue(CHARS[new Random().nextInt(CHARS.length)]);
         }
 
+        //do calculations for details
+        sponsorshipDetailsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
+                SponsorshipDetailsModel spnsDets = dataSnapshot.getValue(SponsorshipDetailsModel.class);
 
+                int uLeft = spnsDets.getUnits_available() - currentUnits;
+                int uSold = spnsDets.getUnits_sold() + currentUnits;
+
+                //update to db
+                Map<String, Object> updMap = new HashMap<>();
+                updMap.put("units_available", uLeft);
+                updMap.put("units_sold", uSold);
+                sponsorshipDetailsRef.updateChildren(updMap);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         //user personal map
         Map<String, Object> sponsorshipMap = new HashMap<>();
@@ -1007,7 +774,7 @@ public class Cart extends AppCompatActivity {
         sponsorshipMap.put("farmId", currentFarmId);
         sponsorshipMap.put("status", "sponsoring");
 
-        //pending sponsorship map
+        //running cycle map
         Map<String, Object> runningCycleMap = new HashMap<>();
         runningCycleMap.put("sponsorReturn", String.valueOf(currentTotalPayout));
         runningCycleMap.put("cycleEndDate", futureString);
@@ -1023,7 +790,7 @@ public class Cart extends AppCompatActivity {
         runningCycleMap.put("farmId", currentFarmId);
         runningCycleMap.put("userId", currentuid);
 
-        //admin
+        //transactional log
         final Map<String, Object> logMap = new HashMap<>();
         logMap.put("userName", user2.getFirstName() + " " + user2.getLastName());
         logMap.put("userEmail", user2.getEmail());
@@ -1032,6 +799,7 @@ public class Cart extends AppCompatActivity {
         logMap.put("farmSponsored", currentFarmId);
         logMap.put("paymentProof", "");
 
+        //create general key from fb
         DatabaseReference pushRef = sponsorshipRef.push();
         String pushId = pushRef.getKey();
 
@@ -1042,42 +810,30 @@ public class Cart extends AppCompatActivity {
         sponsorshipRef.child(currentuid)
                 .child(pushId)
                 .setValue(sponsorshipMap)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
+                .addOnCompleteListener(task -> {
 
-                        if (task.isSuccessful()){
+                    if (task.isSuccessful()){
 
-                            cartRef.child(currentuid).child(currentCartKey).removeValue();
-                            sendApprovalNotification();
+                        //remove from cart
+                        cartRef.child(currentuid).child(currentCartKey).removeValue();
 
-                            payHistoryRef.child(currentuid)
-                                    .push()
-                                    .setValue(logMap)
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
+                        //send notification to user
+                        sendApprovalNotification();
 
-                                            if (task.isSuccessful()){
+                        //add transaction log
+                        payHistoryRef.child(currentuid)
+                                .push()
+                                .setValue(logMap);
 
-                                                loadingDialog.dismiss();
+                        //dismiss loading
+                        loadingDialog.dismiss();
 
-                                            } else {
+                    } else {
 
-                                                showErrorDialog("Unknown error occurred, please contact admin immediately");
-
-                                            }
-
-                                        }
-                                    });
-
-                        } else {
-
-                            showErrorDialog("Unknown error occurred, please contact admin immediately");
-
-                        }
+                        Toast.makeText(this, "Unknown error occurred, please contact admin immediately", Toast.LENGTH_LONG).show();
 
                     }
+
                 });
 
     }
@@ -1093,9 +849,16 @@ public class Cart extends AppCompatActivity {
 
                         if (theFarm != null){
 
+                            //add to running cycles
                             runningCycleRef.child(theFarm.getFarmNotiId())
                                     .child(pushId)
                                     .setValue(runningCycleMap);
+
+                            //add to notification group
+                            sponsorshipNotificationRef.child(theFarm.getFarmNotiId())
+                                    .child(currentuid)
+                                    .child("timestamp")
+                                    .setValue(ServerValue.TIMESTAMP);
 
                         }
 
@@ -1125,39 +888,36 @@ public class Cart extends AppCompatActivity {
         notificationRef.child(currentuid)
                 .push()
                 .setValue(notificationMap)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
+                .addOnCompleteListener(task -> {
 
-                        if (task.isSuccessful()){
+                    if (task.isSuccessful()){
 
-                            Map<String, String> dataSend = new HashMap<>();
-                            dataSend.put("title", "Sponsorship Start");
-                            dataSend.put("message", "Your sponsorship has been approved. You can monitor your sponsored farm from the Sponsored Farms page through your dashboard.");
-                            DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(currentuid).toString(), dataSend);
+                        Map<String, String> dataSend = new HashMap<>();
+                        dataSend.put("title", "Sponsorship Start");
+                        dataSend.put("message", "Your sponsorship has been approved. You can monitor your sponsored farm from the Sponsored Farms page through your dashboard.");
+                        DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(currentuid).toString(), dataSend);
 
-                            mService.sendNotification(dataMessage)
-                                    .enqueue(new retrofit2.Callback<MyResponse>() {
-                                        @Override
-                                        public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                        mService.sendNotification(dataMessage)
+                                .enqueue(new retrofit2.Callback<MyResponse>() {
+                                    @Override
+                                    public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
 
-                                        }
+                                    }
 
-                                        @Override
-                                        public void onFailure(Call<MyResponse> call, Throwable t) {
-                                        }
-                                    });
+                                    @Override
+                                    public void onFailure(Call<MyResponse> call, Throwable t) {
+                                    }
+                                });
 
-                            //notification to admin
-                            sendAlertToAdmin();
+                        //notification to admin
+                        sendAlertToAdmin();
 
-                        } else {
+                    } else {
 
-                            Toast.makeText(Cart.this, "Error occurred while sending notification", Toast.LENGTH_SHORT).show();
-
-                        }
+                        Toast.makeText(Cart.this, "Error occurred while sending notification", Toast.LENGTH_SHORT).show();
 
                     }
+
                 });
 
     }
@@ -1214,56 +974,47 @@ public class Cart extends AppCompatActivity {
                 .setTitle("Delete Update !")
                 .setIcon(R.drawable.ic_remove_from_cart)
                 .setMessage("Are You Sure You Want To Remove This Item From Your Cart?")
-                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                .setPositiveButton("YES", (dialog, which) -> {
 
-                        //execute network check async task
-                        CheckInternet asyncTask = (CheckInternet) new CheckInternet(Cart.this, new CheckInternet.AsyncResponse(){
-                            @Override
-                            public void processFinish(Integer output) {
+                    //run network check
+                    new CheckInternet(Cart.this, output -> {
 
-                                //check all cases
-                                if (output == 1){
+                        //check all cases
+                        if (output == 1){
 
-                                    cartRef.child(currentuid)
-                                            .child(key)
-                                            .removeValue()
-                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
+                            cartRef.child(currentuid)
+                                    .child(key)
+                                    .removeValue()
+                                    .addOnCompleteListener(task -> {
 
-                                                    if (task.isSuccessful()){
+                                        if (task.isSuccessful()){
 
-                                                        Toast.makeText(Cart.this, "Item Removed From cart !", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(Cart.this, "Item Removed From cart !", Toast.LENGTH_SHORT).show();
 
-                                                    } else {
+                                        } else {
 
-                                                        Toast.makeText(Cart.this, "Error occurred", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(Cart.this, "Error occurred", Toast.LENGTH_SHORT).show();
 
-                                                    }
+                                        }
 
-                                                }
-                                            });
+                                    });
 
-                                } else
+                        } else
 
-                                if (output == 0){
+                        if (output == 0){
 
-                                    Toast.makeText(Cart.this, "Error occurred", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Cart.this, "Error occurred", Toast.LENGTH_SHORT).show();
 
-                                } else
+                        } else
 
-                                if (output == 2){
+                        if (output == 2){
 
-                                    Toast.makeText(Cart.this, "Error occurred", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Cart.this, "Error occurred", Toast.LENGTH_SHORT).show();
 
-                                }
+                        }
 
-                            }
-                        }).execute();
+                    }).execute();
 
-                    }
                 })
                 .setNegativeButton("NO", new DialogInterface.OnClickListener() {
                     @Override
@@ -1279,44 +1030,6 @@ public class Cart extends AppCompatActivity {
 
     }
 
-    @Override
-    public void onBackPressed() {
-        if (isLoading){
-            loadingDialog.dismiss();
-        }
-        finish();
-    }
-
-    /*---   WARNING DIALOG   ---*/
-    public void showErrorDialog(String theWarning){
-
-        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this).create();
-        LayoutInflater inflater = this.getLayoutInflater();
-        View viewOptions = inflater.inflate(R.layout.dialog_layout,null);
-
-        final TextView message = (TextView) viewOptions.findViewById(R.id.dialogMessage);
-        final Button okButton = (Button) viewOptions.findViewById(R.id.dialogButton);
-
-        alertDialog.setView(viewOptions);
-
-        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
-        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-
-        message.setText(theWarning);
-
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-            }
-        });
-
-        alertDialog.show();
-
-    }
-
-    /*---   LOADING DIALOG   ---*/
     public void showLoadingDialog(String theMessage){
 
         //loading
@@ -1353,5 +1066,13 @@ public class Cart extends AppCompatActivity {
 
         loadingDialog.show();
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isLoading){
+            loadingDialog.dismiss();
+        }
+        finish();
     }
 }

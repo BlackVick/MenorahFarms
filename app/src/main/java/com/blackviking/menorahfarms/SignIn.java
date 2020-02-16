@@ -3,8 +3,8 @@ package com.blackviking.menorahfarms;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.method.PasswordTransformationMethod;
@@ -30,8 +30,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -73,18 +71,18 @@ public class SignIn extends AppCompatActivity {
         setContentView(R.layout.activity_sign_in);
 
         /*---   FIREBASE   ---*/
-        userRef = db.getReference("Users");
-        authed = db.getReference("AuthedUsers");
+        userRef = db.getReference(Common.USERS_NODE);
+        authed = db.getReference(Common.AUTHED_USERS_NODE);
 
 
         /*---   WIDGETS   ---*/
-        loginEmail = (MaterialEditText)findViewById(R.id.loginEmail);
-        loginPassword = (MaterialEditText)findViewById(R.id.loginPassword);
-        loginButton = (Button)findViewById(R.id.loginButton);
-        googleSignIn = (ImageView)findViewById(R.id.googleSignIn);
-        showPassword = (ImageView)findViewById(R.id.showPassword);
-        registerLink = (TextView)findViewById(R.id.registerLink);
-        recoverPassword = (TextView)findViewById(R.id.recoverPassword);
+        loginEmail = findViewById(R.id.loginEmail);
+        loginPassword = findViewById(R.id.loginPassword);
+        loginButton = findViewById(R.id.loginButton);
+        googleSignIn = findViewById(R.id.googleSignIn);
+        showPassword = findViewById(R.id.showPassword);
+        registerLink = findViewById(R.id.registerLink);
+        recoverPassword = findViewById(R.id.recoverPassword);
 
         /*---   GOOGLE INIT   ---*/
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -93,189 +91,161 @@ public class SignIn extends AppCompatActivity {
                 .build();
 
         mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
-                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        Toast.makeText(SignIn.this, "Unable to connect to google network", Toast.LENGTH_LONG).show();
-                    }
-                })
+                .enableAutoManage(this, connectionResult -> Toast.makeText(SignIn.this, "Unable to connect to google network", Toast.LENGTH_LONG).show())
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
-        googleSignIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        googleSignIn.setOnClickListener(v -> {
 
-                //show dialog
-                mDialog = new SpotsDialog(SignIn.this, "Please Wait . . .");
-                mDialog.setCancelable(false);
-                mDialog.setCanceledOnTouchOutside(false);
-                mDialog.show();
+            //show dialog
+            mDialog = new SpotsDialog(SignIn.this, "Please Wait . . .");
+            mDialog.setCancelable(false);
+            mDialog.setCanceledOnTouchOutside(false);
+            mDialog.show();
 
-                //execute network check async task
-                CheckInternet asyncTask = (CheckInternet) new CheckInternet(SignIn.this, new CheckInternet.AsyncResponse(){
-                    @Override
-                    public void processFinish(Integer output) {
+            //execute network check async task
+            new CheckInternet(SignIn.this, output -> {
 
-                        //check all cases
-                        if (output == 1){
+                //check all cases
+                if (output == 1){
 
-                            signInWithGoogle();
+                    signInWithGoogle();
 
-                        } else
+                } else
 
-                        if (output == 0){
+                if (output == 0){
 
-                            //no internet
-                            mDialog.dismiss();
-                            showErrorDialog("No internet access");
+                    //no internet
+                    mDialog.dismiss();
+                    Toast.makeText(SignIn.this, "No internet access", Toast.LENGTH_SHORT).show();
 
-                        } else
+                } else
 
-                        if (output == 2){
+                if (output == 2){
 
-                            //no internet
-                            mDialog.dismiss();
-                            showErrorDialog("Not connected to any network");
+                    //no internet
+                    mDialog.dismiss();
+                    Toast.makeText(SignIn.this, "Not connected to any network", Toast.LENGTH_SHORT).show();
 
-                        }
+                }
 
-                    }
-                }).execute();
+            }).execute();
 
-            }
         });
 
 
 
         /*---   EMAIL SIGN IN   ---*/
         /*---   SIGN IN   ---*/
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        loginButton.setOnClickListener(v -> {
 
-                //show dialog
-                mDialog = new SpotsDialog(SignIn.this, "Please Wait . . .");
-                mDialog.setCancelable(false);
-                mDialog.setCanceledOnTouchOutside(false);
-                mDialog.show();
+            //show dialog
+            mDialog = new SpotsDialog(SignIn.this, "Please Wait . . .");
+            mDialog.setCancelable(false);
+            mDialog.setCanceledOnTouchOutside(false);
+            mDialog.show();
 
-                //execute network check async task
-                CheckInternet asyncTask = (CheckInternet) new CheckInternet(SignIn.this, new CheckInternet.AsyncResponse(){
-                    @Override
-                    public void processFinish(Integer output) {
+            //execute network check async task
+            new CheckInternet(SignIn.this, output -> {
 
-                        //check all cases
-                        if (output == 1){
+                //check all cases
+                if (output == 1){
 
-                            signInUserWithEmail();
-                            loginPassword.onEditorAction(EditorInfo.IME_ACTION_DONE);
+                    signInUserWithEmail();
+                    loginPassword.onEditorAction(EditorInfo.IME_ACTION_DONE);
 
-                        } else
+                } else
 
-                        if (output == 0){
+                if (output == 0){
 
-                            //no internet
-                            mDialog.dismiss();
-                            showErrorDialog("No internet access");
+                    //no internet
+                    mDialog.dismiss();
+                    Toast.makeText(SignIn.this, "No internet access", Toast.LENGTH_SHORT).show();
 
-                        } else
+                } else
 
-                        if (output == 2){
+                if (output == 2){
 
-                            //no internet
-                            mDialog.dismiss();
-                            showErrorDialog("Not connected to any network");
+                    //no internet
+                    mDialog.dismiss();
+                    Toast.makeText(SignIn.this, "Not connected to any network", Toast.LENGTH_SHORT).show();
 
-                        }
+                }
 
-                    }
-                }).execute();
+            }).execute();
 
-            }
         });
 
 
 
         /*---   RESET PASSWORD   ---*/
-        recoverPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        recoverPassword.setOnClickListener(v -> {
 
-                //show dialog
-                mDialog = new SpotsDialog(SignIn.this, "Please Wait . . .");
-                mDialog.setCancelable(false);
-                mDialog.setCanceledOnTouchOutside(false);
-                mDialog.show();
+            //show dialog
+            mDialog = new SpotsDialog(SignIn.this, "Please Wait . . .");
+            mDialog.setCancelable(false);
+            mDialog.setCanceledOnTouchOutside(false);
+            mDialog.show();
 
-                //execute network check async task
-                CheckInternet asyncTask = (CheckInternet) new CheckInternet(SignIn.this, new CheckInternet.AsyncResponse(){
-                    @Override
-                    public void processFinish(Integer output) {
+            //run network check
+            new CheckInternet(SignIn.this, output -> {
 
-                        //check all cases
-                        if (output == 1){
+                //check all cases
+                if (output == 1){
 
-                            resetThePassword();
+                    resetThePassword();
 
-                        } else
+                } else
 
-                        if (output == 0){
+                if (output == 0){
 
-                            //no internet
-                            mDialog.dismiss();
-                            showErrorDialog("No internet access");
+                    //no internet
+                    mDialog.dismiss();
+                    Toast.makeText(SignIn.this, "No internet access", Toast.LENGTH_SHORT).show();
 
-                        } else
+                } else
 
-                        if (output == 2){
+                if (output == 2){
 
-                            //no internet
-                            mDialog.dismiss();
-                            showErrorDialog("Not connected to any network");
+                    //no internet
+                    mDialog.dismiss();
+                    Toast.makeText(SignIn.this, "Not connected to any network", Toast.LENGTH_LONG).show();
 
-                        }
+                }
 
-                    }
-                }).execute();
+            }).execute();
 
-            }
         });
 
 
 
         /*---   SIGN UP   ---*/
-        registerLink.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent registerIntent = new Intent(SignIn.this, SignUp.class);
-                startActivity(registerIntent);
-            }
+        registerLink.setOnClickListener(v -> {
+            Intent registerIntent = new Intent(SignIn.this, SignUp.class);
+            startActivity(registerIntent);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         });
 
 
 
         /*---   PASSWORD VISIBILITY   ---*/
-        showPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        showPassword.setOnClickListener(v -> {
 
-                if (!isPasswordVisible){
+            if (!isPasswordVisible){
 
-                    isPasswordVisible = true;
-                    loginPassword.setTransformationMethod(null);
-                    showPassword.setImageResource(R.drawable.ic_invisible_password);
+                isPasswordVisible = true;
+                loginPassword.setTransformationMethod(null);
+                showPassword.setImageResource(R.drawable.ic_invisible_password);
 
-                } else {
+            } else {
 
-                    isPasswordVisible = false;
-                    showPassword.setImageResource(R.drawable.ic_visible_password);
-                    loginPassword.setTransformationMethod(new PasswordTransformationMethod());
-
-                }
-
+                isPasswordVisible = false;
+                showPassword.setImageResource(R.drawable.ic_visible_password);
+                loginPassword.setTransformationMethod(new PasswordTransformationMethod());
 
             }
+
+
         });
     }
 
@@ -320,18 +290,15 @@ public class SignIn extends AppCompatActivity {
     private void signInWithEmail(String theEmail, String thePassword) {
 
         mAuth.signInWithEmailAndPassword(theEmail, thePassword).addOnCompleteListener(
-                new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()){
+                task -> {
+                    if (task.isSuccessful()){
 
-                            handleSignInResponse();
+                        handleSignInResponse();
 
-                        } else {
+                    } else {
 
-                            showErrorDialog("Email does not exist or has been used in a different sign in method.");
+                        Toast.makeText(this, "Email does not exist or has been used in a different sign in method.", Toast.LENGTH_LONG).show();
 
-                        }
                     }
                 }
         );
@@ -346,8 +313,7 @@ public class SignIn extends AppCompatActivity {
 
         } else {
 
-           showErrorDialog("Process Failed");
-            mAuth.getCurrentUser().delete();
+            Toast.makeText(this, "Process Failed", Toast.LENGTH_SHORT).show();
             mAuth.signOut();
             mDialog.dismiss();
 
@@ -368,20 +334,17 @@ public class SignIn extends AppCompatActivity {
         } else {
 
             mAuth.sendPasswordResetEmail(theResetMail)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()){
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()){
 
-                                showErrorDialog("Reset instructions have been sent to your mail !");
-                                mDialog.dismiss();
+                            Toast.makeText(this, "Reset instructions have been sent to your mail!", Toast.LENGTH_LONG).show();
+                            mDialog.dismiss();
 
-                            } else {
+                        } else {
 
-                                showErrorDialog("Password reset failed !");
-                                mDialog.dismiss();
+                            Toast.makeText(this, "Password reset failed !", Toast.LENGTH_SHORT).show();
+                            mDialog.dismiss();
 
-                            }
                         }
                     });
 
@@ -397,69 +360,73 @@ public class SignIn extends AppCompatActivity {
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
 
-                            final FirebaseUser user = mAuth.getCurrentUser();
+                        final FirebaseUser user = mAuth.getCurrentUser();
 
-                            authed.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
+                        authed.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                    if (dataSnapshot.child(user.getUid()).exists()){
+                                if (dataSnapshot.child(user.getUid()).exists()){
 
-                                        updateUI(user);
+                                    updateUI(user);
 
-                                    } else {
+                                } else {
 
-                                        authed.child(user.getUid())
-                                                .child("userEmail")
-                                                .setValue(user.getEmail())
-                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
+                                    authed.child(user.getUid())
+                                            .child("userEmail")
+                                            .setValue(user.getEmail())
+                                            .addOnCompleteListener(task1 -> {
 
-                                                        if (task.isSuccessful()){
+                                                if (task1.isSuccessful()){
 
-                                                            registerGoogleUser(user);
+                                                    registerGoogleUser(user);
 
-                                                        } else {
+                                                } else {
 
-                                                            showErrorDialog("Registration unsuccessful. Please try again later.");
-                                                            mDialog.dismiss();
-                                                            if (mAuth.getCurrentUser() != null){
+                                                    //show error
+                                                    Toast.makeText(SignIn.this, "Registration unsuccessful. Please try again later.", Toast.LENGTH_SHORT).show();
 
-                                                                mAuth.getCurrentUser().delete();
-                                                                mAuth.signOut();
+                                                    //dismiss dialog
+                                                    mDialog.dismiss();
 
-                                                            }
+                                                    //remove auth
+                                                    if (mAuth.getCurrentUser() != null){
 
-                                                        }
+                                                        mAuth.getCurrentUser().delete();
+                                                        mAuth.signOut();
 
                                                     }
-                                                });
 
-                                    }
+                                                }
 
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
+                                            });
 
                                 }
-                            });
 
-                        } else {
+                            }
 
-                            mDialog.dismiss();
-                            mAuth.signOut();
-                            showErrorDialog("Sign in failed. Please try again later.");
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
 
-                        }
+                            }
+                        });
+
+                    } else {
+
+                        //dismiss dialog
+                        mDialog.dismiss();
+
+                        //remove auth
+                        mAuth.signOut();
+
+                        //show error
+                        Toast.makeText(SignIn.this, "Sign in failed. Please try again later.", Toast.LENGTH_SHORT).show();
 
                     }
+
                 });
     }
 
@@ -505,29 +472,31 @@ public class SignIn extends AppCompatActivity {
 
         userRef.child(currentUid)
                 .setValue(newUserMap)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
+                .addOnCompleteListener(task -> {
 
-                        if (task.isSuccessful()){
+                    if (task.isSuccessful()){
 
-                            updateUIRegister(user);
+                        updateUIRegister(user);
 
-                        } else {
+                    } else {
 
-                            showErrorDialog("Something happened. Please try again later.");
-                            mDialog.dismiss();
-                            if (mAuth.getCurrentUser() != null) {
+                        //show error
+                        Toast.makeText(SignIn.this, "Something happened. Please try again later.", Toast.LENGTH_LONG).show();
 
-                                mAuth.getCurrentUser().delete();
-                                authed.child(currentUid).removeValue();
-                                mAuth.signOut();
+                        //dismiss dialog
+                        mDialog.dismiss();
 
-                            }
+                        //undo auth and remove from db
+                        if (mAuth.getCurrentUser() != null) {
+
+                            mAuth.getCurrentUser().delete();
+                            authed.child(currentUid).removeValue();
+                            mAuth.signOut();
 
                         }
 
                     }
+
                 });
 
     }
@@ -562,6 +531,7 @@ public class SignIn extends AppCompatActivity {
             mDialog.dismiss();
             Intent finishRegIntent = new Intent(SignIn.this, Registration.class);
             startActivity(finishRegIntent);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             finish();
 
         }
@@ -572,16 +542,17 @@ public class SignIn extends AppCompatActivity {
 
         if (user != null){
 
-
+            //current uid
             String currentUid = user.getUid();
 
+            //get user profile from db
             userRef.child(currentUid)
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
 
+                            //save user profile offline
                             UserModel theUser = dataSnapshot.getValue(UserModel.class);
-
                             ((ApplicationClass)(getApplicationContext())).setUser(theUser);
 
                         }
@@ -592,47 +563,23 @@ public class SignIn extends AppCompatActivity {
                         }
                     });
 
+            //dismiss dialog
             mDialog.dismiss();
 
+            //save user id offline
             Paper.book().write(Common.USER_ID, currentUid);
 
+            //subscribe to notifications
             FirebaseMessaging.getInstance().subscribeToTopic(currentUid);
             FirebaseMessaging.getInstance().subscribeToTopic(Common.GENERAL_NOTIFY);
 
             Intent goToHome = new Intent(SignIn.this, Dashboard.class);
             goToHome.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(goToHome);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             finish();
         }
 
     }
 
-    /*---   WARNING DIALOG   ---*/
-    public void showErrorDialog(String theWarning){
-
-        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this).create();
-        LayoutInflater inflater = this.getLayoutInflater();
-        View viewOptions = inflater.inflate(R.layout.dialog_layout,null);
-
-        final TextView message = (TextView) viewOptions.findViewById(R.id.dialogMessage);
-        final Button okButton = (Button) viewOptions.findViewById(R.id.dialogButton);
-
-        alertDialog.setView(viewOptions);
-
-        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
-        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-
-        message.setText(theWarning);
-
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-            }
-        });
-
-        alertDialog.show();
-
-    }
 }

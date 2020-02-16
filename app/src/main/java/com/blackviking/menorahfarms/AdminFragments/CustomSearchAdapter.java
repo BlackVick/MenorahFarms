@@ -2,16 +2,15 @@ package com.blackviking.menorahfarms.AdminFragments;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.blackviking.menorahfarms.Common.Common;
-import com.blackviking.menorahfarms.Interface.ItemClickListener;
 import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.Models.RunningCycleModel;

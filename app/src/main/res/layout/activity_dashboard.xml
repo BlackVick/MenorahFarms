@@ -257,7 +257,7 @@
                             <ImageView
                                 android:layout_width="70dp"
                                 android:layout_height="wrap_content"
-                                android:src="@drawable/dash_sponsored_farms"
+                                android:src="@drawable/ic_sponsored_new"
                                 android:padding="17dp"
                                 android:adjustViewBounds="true"
                                 android:layout_centerInParent="true"
@@ -301,7 +301,7 @@
                             <ImageView
                                 android:layout_width="70dp"
                                 android:layout_height="wrap_content"
-                                android:src="@drawable/dash_followed_farms"
+                                android:src="@drawable/ic_follow_new"
                                 android:padding="15dp"
                                 android:adjustViewBounds="true"
                                 android:layout_centerInParent="true"
@@ -345,7 +345,7 @@
                             <ImageView
                                 android:layout_width="70dp"
                                 android:layout_height="wrap_content"
-                                android:src="@drawable/dash_farm_updates"
+                                android:src="@drawable/ic_update_new"
                                 android:padding="18dp"
                                 android:adjustViewBounds="true"
                                 android:layout_centerInParent="true"
@@ -400,7 +400,7 @@
                             <ImageView
                                 android:layout_width="70dp"
                                 android:layout_height="wrap_content"
-                                android:src="@drawable/dash_all_farms"
+                                android:src="@drawable/ic_farms_new"
                                 android:padding="18dp"
                                 android:adjustViewBounds="true"
                                 android:layout_centerInParent="true"
@@ -444,7 +444,7 @@
                             <ImageView
                                 android:layout_width="70dp"
                                 android:layout_height="wrap_content"
-                                android:src="@drawable/dash_project_manager"
+                                android:src="@drawable/ic_farm_manager_new"
                                 android:padding="18dp"
                                 android:adjustViewBounds="true"
                                 android:layout_centerInParent="true"
@@ -488,7 +488,7 @@
                             <ImageView
                                 android:layout_width="70dp"
                                 android:layout_height="wrap_content"
-                                android:src="@drawable/dash_notifications"
+                                android:src="@drawable/ic_notification_new"
                                 android:padding="18dp"
                                 android:adjustViewBounds="true"
                                 android:layout_centerInParent="true"
@@ -544,7 +544,7 @@
                             <ImageView
                                 android:layout_width="70dp"
                                 android:layout_height="wrap_content"
-                                android:src="@drawable/dash_about"
+                                android:src="@drawable/ic_faq_new"
                                 android:padding="18dp"
                                 android:adjustViewBounds="true"
                                 android:layout_centerInParent="true"
@@ -589,7 +589,7 @@
                             <ImageView
                                 android:layout_width="70dp"
                                 android:layout_height="wrap_content"
-                                android:src="@drawable/dash_admin"
+                                android:src="@drawable/ic_admin_new"
                                 android:padding="18dp"
                                 android:adjustViewBounds="true"
                                 android:layout_centerInParent="true"

@@ -10,7 +10,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/directionLayout">
+        android:id="@+id/directionLayout"
+        android:visibility="visible">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -94,7 +95,7 @@
                         android:layout_marginEnd="10dp"
                         android:textSize="15sp"
                         android:layout_height="50dp"
-                        android:background="@color/offWhite"/>
+                        android:background="@drawable/edittext_ring"/>
 
                     <EditText
                         android:layout_width="match_parent"
@@ -106,7 +107,7 @@
                         android:textColor="@color/black"
                         android:textSize="15sp"
                         android:padding="15dp"
-                        android:background="@color/offWhite"
+                        android:background="@drawable/edittext_ring"
                         android:drawableStart="@drawable/ic_notifications"
                         android:drawablePadding="6dp"
                         android:hint="Title"
@@ -124,9 +125,10 @@
                         android:textColor="@color/black"
                         android:textSize="13sp"
                         android:padding="15dp"
-                        android:background="@color/offWhite"
+                        android:background="@drawable/edittext_ring"
                         android:drawableStart="@drawable/ic_notifications"
                         android:drawablePadding="6dp"
+                        android:inputType="textCapSentences|textMultiLine"
                         android:hint="Message"
                         android:textColorHint="@color/grey"
                         android:id="@+id/followedMessage"
@@ -136,8 +138,8 @@
                     <Button
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
-                        android:layout_marginStart="25dp"
-                        android:layout_marginEnd="25dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
                         android:layout_marginTop="50dp"
                         android:background="@drawable/new_login_button"
                         android:text="SEND NOTIFICATION"
@@ -170,7 +172,7 @@
                         android:layout_marginEnd="10dp"
                         android:textSize="15sp"
                         android:layout_height="50dp"
-                        android:background="@color/offWhite"/>
+                        android:background="@drawable/edittext_ring"/>
 
                     <EditText
                         android:layout_width="match_parent"
@@ -182,7 +184,7 @@
                         android:textColor="@color/black"
                         android:textSize="15sp"
                         android:padding="15dp"
-                        android:background="@color/offWhite"
+                        android:background="@drawable/edittext_ring"
                         android:drawableStart="@drawable/ic_notifications"
                         android:drawablePadding="6dp"
                         android:hint="Title"
@@ -200,7 +202,8 @@
                         android:textColor="@color/black"
                         android:textSize="13sp"
                         android:padding="15dp"
-                        android:background="@color/offWhite"
+                        android:background="@drawable/edittext_ring"
+                        android:inputType="textMultiLine|textCapSentences"
                         android:drawableStart="@drawable/ic_notifications"
                         android:drawablePadding="6dp"
                         android:hint="Message"
@@ -212,8 +215,8 @@
                     <Button
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="25dp"
-                        android:layout_marginEnd="25dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
                         android:layout_marginTop="50dp"
                         android:background="@drawable/new_login_button"
                         android:text="SEND NOTIFICATION"
@@ -231,14 +234,14 @@
 
     </ScrollView>
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_margin="8dp"
         android:src="@drawable/ic_broadcast_to_all"
-        app:backgroundTint="@color/offWhite"
+        app:backgroundTint="@color/colorAccent"
         android:id="@+id/broadcastToAllFab"/>
 
 </RelativeLayout>

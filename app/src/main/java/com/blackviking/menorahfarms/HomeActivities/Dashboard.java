@@ -4,17 +4,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.AsyncTask;
-import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,12 +28,8 @@ import com.blackviking.menorahfarms.DashboardMenu.FarmUpdates;
 import com.blackviking.menorahfarms.DashboardMenu.FollowedFarms;
 import com.blackviking.menorahfarms.DashboardMenu.Notifications;
 import com.blackviking.menorahfarms.DashboardMenu.SponsoredFarms;
-import com.blackviking.menorahfarms.Models.FarmModel;
-import com.blackviking.menorahfarms.Models.RunningCycleModel;
 import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
-import com.blackviking.menorahfarms.Services.CheckForSponsorship;
-import com.blackviking.menorahfarms.Services.SponsorshipMonitor;
 import com.blackviking.menorahfarms.SignIn;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -52,9 +46,6 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.paperdb.Paper;
 
@@ -70,11 +61,10 @@ public class Dashboard extends AppCompatActivity {
     private RelativeLayout sponsoredFarmsLayout, farmsToWatchLayout, farmUpdatesLayout, allFarmsLayout, projectManagerLayout, notificationLayout, faqLayout, adminLayout;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference userRef, sponsoredRef, farmRef, cartRef;
+    private DatabaseReference userRef, sponsoredRef, cartRef;
     private String currentUid;
-    private boolean isMonitorRunning;
     private UserModel paperUser;
-    private android.app.AlertDialog alertDialog, alertDialogError;
+    private android.app.AlertDialog alertDialog;
     private boolean isLoading = false;
 
     //google
@@ -88,39 +78,38 @@ public class Dashboard extends AppCompatActivity {
 
 
         /*---   FIREBASE   ---*/
-        userRef = db.getReference("Users");
-        sponsoredRef = db.getReference("SponsoredFarms");
-        farmRef = db.getReference("Farms");
-        cartRef = db.getReference("Carts");
+        userRef = db.getReference(Common.USERS_NODE);
+        sponsoredRef = db.getReference(Common.SPONSORED_FARMS_NODE);
+        cartRef = db.getReference(Common.CART_NODE);
         if (mAuth.getCurrentUser() != null)
             currentUid = mAuth.getCurrentUser().getUid();
 
 
 
         /*---   WIDGETS   ---*/
-        dashboardSwitch = (LinearLayout)findViewById(R.id.dashboardLayout);
-        farmstoreSwitch = (LinearLayout)findViewById(R.id.farmShopLayout);
-        accountSwitch = (LinearLayout)findViewById(R.id.accountLayout);
-        dashboardText = (TextView)findViewById(R.id.dashboardText);
-        farmstoreText = (TextView)findViewById(R.id.farmShopText);
-        accountText = (TextView)findViewById(R.id.accountText);
+        dashboardSwitch = findViewById(R.id.dashboardLayout);
+        farmstoreSwitch = findViewById(R.id.farmShopLayout);
+        accountSwitch = findViewById(R.id.accountLayout);
+        dashboardText = findViewById(R.id.dashboardText);
+        farmstoreText = findViewById(R.id.farmShopText);
+        accountText = findViewById(R.id.accountText);
 
 
-        sponsorCycle = (TextView)findViewById(R.id.userSponsorCycle);
-        welcome = (TextView)findViewById(R.id.userWelcome);
-        totalReturnsText = (TextView)findViewById(R.id.totalReturns);
-        nextEndOfCycleDate = (TextView)findViewById(R.id.nextEndOfCycleDate);
-        cartButton = (ImageView)findViewById(R.id.userCart);
-        userAvatar = (CircleImageView)findViewById(R.id.userAvatar);
-        goToFarmstoreButton = (RelativeLayout)findViewById(R.id.goToFarmstoreButton);
-        sponsoredFarmsLayout = (RelativeLayout)findViewById(R.id.sponsoredFarmsLayout);
-        farmsToWatchLayout = (RelativeLayout)findViewById(R.id.farmsToWatchLayout);
-        farmUpdatesLayout = (RelativeLayout)findViewById(R.id.farmUpdatesLayout);
-        allFarmsLayout = (RelativeLayout)findViewById(R.id.allFarmsLayout);
-        projectManagerLayout = (RelativeLayout)findViewById(R.id.projectManagerLayout);
-        notificationLayout = (RelativeLayout)findViewById(R.id.notificationLayout);
-        faqLayout = (RelativeLayout)findViewById(R.id.faqLayout);
-        adminLayout = (RelativeLayout)findViewById(R.id.adminLayout);
+        sponsorCycle = findViewById(R.id.userSponsorCycle);
+        welcome = findViewById(R.id.userWelcome);
+        totalReturnsText = findViewById(R.id.totalReturns);
+        nextEndOfCycleDate = findViewById(R.id.nextEndOfCycleDate);
+        cartButton = findViewById(R.id.userCart);
+        userAvatar = findViewById(R.id.userAvatar);
+        goToFarmstoreButton = findViewById(R.id.goToFarmstoreButton);
+        sponsoredFarmsLayout = findViewById(R.id.sponsoredFarmsLayout);
+        farmsToWatchLayout = findViewById(R.id.farmsToWatchLayout);
+        farmUpdatesLayout = findViewById(R.id.farmUpdatesLayout);
+        allFarmsLayout = findViewById(R.id.allFarmsLayout);
+        projectManagerLayout = findViewById(R.id.projectManagerLayout);
+        notificationLayout = findViewById(R.id.notificationLayout);
+        faqLayout = findViewById(R.id.faqLayout);
+        adminLayout = findViewById(R.id.adminLayout);
         cartItemCount = findViewById(R.id.cartItemCount);
 
 
@@ -138,266 +127,214 @@ public class Dashboard extends AppCompatActivity {
                 .build();
 
         mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
-                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        Toast.makeText(Dashboard.this, "Unknown Error Occurred", Toast.LENGTH_SHORT).show();
-                    }
-                })
+                .enableAutoManage(this, connectionResult -> Toast.makeText(Dashboard.this, "Unknown Error Occurred", Toast.LENGTH_SHORT).show())
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
-        farmstoreSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        //open farm shop
+        farmstoreSwitch.setOnClickListener(v -> {
 
-                Intent farmstoreIntent = new Intent(Dashboard.this, FarmShop.class);
-                startActivity(farmstoreIntent);
-                finish();
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+            Intent farmstoreIntent = new Intent(Dashboard.this, FarmShop.class);
+            startActivity(farmstoreIntent);
+            finish();
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
 
-            }
-        });
-        accountSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent accountIntent = new Intent(Dashboard.this, Account.class);
-                startActivity(accountIntent);
-                finish();
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-
-            }
         });
 
+        //open account
+        accountSwitch.setOnClickListener(v -> {
 
-        /*---   CURRENT USER   ---*/
-        //singletonUser = ((ApplicationClass)(getApplicationContext())).getUser();
-        paperUser = Paper.book().read(Common.PAPER_USER);
+            Intent accountIntent = new Intent(Dashboard.this, Account.class);
+            startActivity(accountIntent);
+            finish();
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
+        });
+
+        //cart
+        cartButton.setOnClickListener(v -> {
+
+            Intent cartIntent = new Intent(Dashboard.this, Cart.class);
+            startActivity(cartIntent);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
+        });
+
+        //farmshop
+        goToFarmstoreButton.setOnClickListener(v -> {
+
+            Intent farmShopIntent = new Intent(Dashboard.this, FarmShop.class);
+            startActivity(farmShopIntent);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
+        });
+
+        //sponsored farms
+        sponsoredFarmsLayout.setOnClickListener(v -> {
+
+            Intent sponsoredFarmsIntent = new Intent(Dashboard.this, SponsoredFarms.class);
+            startActivity(sponsoredFarmsIntent);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
+        });
+
+        //followed farms
+        farmsToWatchLayout.setOnClickListener(v -> {
+
+            Intent followedFarmsIntent = new Intent(Dashboard.this, FollowedFarms.class);
+            startActivity(followedFarmsIntent);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
+        });
+
+        //farm updates
+        farmUpdatesLayout.setOnClickListener(v -> {
+
+            Intent farmUpdatesIntent = new Intent(Dashboard.this, FarmUpdates.class);
+            startActivity(farmUpdatesIntent);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
+        });
+
+        //farm shop again
+        allFarmsLayout.setOnClickListener(v -> {
+
+            Intent farmShopIntent = new Intent(Dashboard.this, FarmShop.class);
+            startActivity(farmShopIntent);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
+        });
+
+        //project manager
+        projectManagerLayout.setOnClickListener(v -> {
+
+            Intent projectManagerIntent = new Intent(Dashboard.this, AccountManager.class);
+            startActivity(projectManagerIntent);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
+        });
+
+        //notifications
+        notificationLayout.setOnClickListener(v -> {
+
+            Intent notificationIntent = new Intent(Dashboard.this, Notifications.class);
+            startActivity(notificationIntent);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
+        });
+
+        //faqs
+        faqLayout.setOnClickListener(v -> {
+
+            Intent faqIntent = new Intent(Dashboard.this, Faq.class);
+            startActivity(faqIntent);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
+        });
+
 
         //show loading dialog
         showLoadingDialog("Fetching details . . .");
 
-        //execute network check async task
-        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
-            @Override
-            public void processFinish(Integer output) {
 
-                //check all cases
-                if (output == 1){
+        //load user
+        loadUser(currentUid);
 
-                    //always update latest from server
-                    userRef.child(currentUid)
-                            .addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
+    }
 
-                                    UserModel theUser = dataSnapshot.getValue(UserModel.class);
+    private void loadUser(String currentUid) {
+
+        //local user profile
+        paperUser = Paper.book().read(Common.PAPER_USER);
+
+        //run network check
+        new CheckInternet(this, output -> {
+
+            //check all cases
+            if (output == 1){
+
+                //always update latest from server
+                userRef.child(currentUid)
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                UserModel theUser = dataSnapshot.getValue(UserModel.class);
+
+                                if (theUser != null) {
+
                                     ((ApplicationClass) (getApplicationContext())).setUser(theUser);
 
-                                    paperUser = Paper.book().read(Common.PAPER_USER);
+                                    //update current local profile
+                                    paperUser = theUser;
+
+                                    //set user profile
+                                    setUser(paperUser);
+
+                                    //set other details
+                                    setOtherDetails();
+
+                                    //dismiss dialog
+                                    alertDialog.dismiss();
 
                                 }
 
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
+                            }
 
-                                }
-                            });
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
 
+                            }
+                        });
 
-                    if (paperUser == null) {
+            } else
 
-                        userRef.child(currentUid)
-                                .addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
+            if (output == 0){
 
-                                        UserModel theUser = dataSnapshot.getValue(UserModel.class);
-                                        ((ApplicationClass) (getApplicationContext())).setUser(theUser);
+                if (paperUser != null) {
+                    //close loading dialog
+                    alertDialog.dismiss();
 
-                                        paperUser = Paper.book().read(Common.PAPER_USER);
-                                        setUser(paperUser);
-                                        setOtherDetails();
+                    setUser(paperUser);
+                    Toast.makeText(Dashboard.this, "No internet", Toast.LENGTH_SHORT).show();
 
-                                    }
+                } else {
 
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
+                    alertDialog.dismiss();
+                    Toast.makeText(this, "Details could not be retrieved, please try again later.", Toast.LENGTH_LONG).show();
 
-                                    }
-                                });
+                }
 
-                    } else {
+            } else
 
-                        setUser(paperUser);
-                        setOtherDetails();
+            if (output == 2){
 
-                    }
+                if (paperUser != null) {
 
-                } else
+                    //close loading dialog
+                    alertDialog.dismiss();
 
-                if (output == 0){
+                    setUser(paperUser);
+                    Toast.makeText(Dashboard.this, "Please connect to a network", Toast.LENGTH_SHORT).show();
 
-                    if (paperUser != null) {
+                } else {
 
-                        setUser(paperUser);
-                        Toast.makeText(Dashboard.this, "No internet", Toast.LENGTH_SHORT).show();
-
-                    } else {
-
-                        alertDialog.dismiss();
-                        showErrorDialog("Details could not be retrieved, please try again later.");
-
-                    }
-
-                } else
-
-                if (output == 2){
-
-                    if (paperUser != null) {
-
-                        setUser(paperUser);
-                        Toast.makeText(Dashboard.this, "Please connect to a network", Toast.LENGTH_SHORT).show();
-
-                    } else {
-
-                        alertDialog.dismiss();
-                        showErrorDialog("Details could not be retrieved, please try again later.");
-
-                    }
+                    alertDialog.dismiss();
+                    Toast.makeText(this, "Details could not be retrieved, please try again later.", Toast.LENGTH_LONG).show();
 
                 }
 
             }
+
         }).execute();
-
-
-        //check sponsorship monitor
-        if (Paper.book().read(Common.isSponsorshipMonitorRunning) == null)
-            Paper.book().write(Common.isSponsorshipMonitorRunning, false);
-        isMonitorRunning = Paper.book().read(Common.isSponsorshipMonitorRunning);
-
-        if (!isMonitorRunning) {
-
-            Intent checkSponsorship = new Intent(Dashboard.this, CheckForSponsorship.class);
-            startService(checkSponsorship);
-
-        }
-
-
-
-        /*---   CART   ---*/
-        cartButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent cartIntent = new Intent(Dashboard.this, Cart.class);
-                startActivity(cartIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-
-            }
-        });
-
-
-        /*---   GO TO SHOP   ---*/
-        goToFarmstoreButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent farmShopIntent = new Intent(Dashboard.this, FarmShop.class);
-                startActivity(farmShopIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-
-            }
-        });
-
-
-        /*---   MAIN MENU   ---*/
-        sponsoredFarmsLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent sponsoredFarmsIntent = new Intent(Dashboard.this, SponsoredFarms.class);
-                startActivity(sponsoredFarmsIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-
-            }
-        });
-
-        farmsToWatchLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent followedFarmsIntent = new Intent(Dashboard.this, FollowedFarms.class);
-                startActivity(followedFarmsIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-
-            }
-        });
-
-        farmUpdatesLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent farmUpdatesIntent = new Intent(Dashboard.this, FarmUpdates.class);
-                startActivity(farmUpdatesIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-
-            }
-        });
-
-        allFarmsLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent farmShopIntent = new Intent(Dashboard.this, FarmShop.class);
-                startActivity(farmShopIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-
-            }
-        });
-
-        projectManagerLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent projectManagerIntent = new Intent(Dashboard.this, AccountManager.class);
-                startActivity(projectManagerIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-
-            }
-        });
-
-        notificationLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent notificationIntent = new Intent(Dashboard.this, Notifications.class);
-                startActivity(notificationIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-
-            }
-        });
-
-        faqLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent faqIntent = new Intent(Dashboard.this, Faq.class);
-                startActivity(faqIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-
-            }
-        });
 
     }
 
     private void setOtherDetails() {
 
-        /*---   SPONSORED CYCLE   ---*/
+        //sponsored farm count
         sponsoredRef.child(currentUid)
-                .addValueEventListener(
+                .addListenerForSingleValueEvent(
                         new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -406,7 +343,7 @@ public class Dashboard extends AppCompatActivity {
 
                                     long totalReturn = 0;
                                     int sponsorCount = (int) dataSnapshot.getChildrenCount();
-                                    sponsorCycle.setText("Running Cycles : " + String.valueOf(sponsorCount));
+                                    sponsorCycle.setText("Running Cycles : " + sponsorCount);
 
                                     for (DataSnapshot user : dataSnapshot.getChildren()){
 
@@ -434,10 +371,10 @@ public class Dashboard extends AppCompatActivity {
                         }
                 );
 
-        /*---   NEXT END OF CYCLE   ---*/
+        //next cycle end
         sponsoredRef.child(currentUid)
                 .limitToFirst(1)
-                .addValueEventListener(
+                .addListenerForSingleValueEvent(
                         new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -470,37 +407,10 @@ public class Dashboard extends AppCompatActivity {
                         }
                 );
 
-        //temp code
-        //get sold
-        /*DatabaseReference runningCycleRef = db.getReference("RunningCycles")
-                .child("FishFarm");
-        runningCycleRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                int count = 0;
-                for (DataSnapshot snap : dataSnapshot.getChildren()){
-
-                    RunningCycleModel theCycles = snap.getValue(RunningCycleModel.class);
-
-                    int unitSponsored = Integer.parseInt(theCycles.getSponsoredUnits());
-                    count = unitSponsored + count;
-
-                }
-
-                cartItemCount.setText(String.valueOf(count) + " / 600");
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });*/
-
-        //always cart item count
+        //cart item count
         cartRef.child(currentUid)
-                .addValueEventListener(new ValueEventListener() {
+                .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -519,9 +429,6 @@ public class Dashboard extends AppCompatActivity {
     }
 
     private void setUser(final UserModel paperUser) {
-
-        //close loading dialog
-        alertDialog.dismiss();
 
         //welcome message
         welcome.setText("Hi, " + paperUser.getFirstName());
@@ -558,27 +465,16 @@ public class Dashboard extends AppCompatActivity {
         //user type
         if (paperUser.getUserType().equalsIgnoreCase("Admin")){
 
+            //show admin portal
+            adminLayout.setEnabled(true);
             adminLayout.setVisibility(View.VISIBLE);
-            adminLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent adminIntent = new Intent(Dashboard.this, AdminDash.class);
-                    startActivity(adminIntent);
-                    overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-                }
+            adminLayout.setOnClickListener(v -> {
+                Intent adminIntent = new Intent(Dashboard.this, AdminDash.class);
+                startActivity(adminIntent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
             });
 
         } else if (paperUser.getUserType().equalsIgnoreCase("Banned")) {
-
-
-            //stop sponsorship service
-            if (Paper.book().read(Common.isSponsorshipMonitorRunning)){
-
-                Intent serviceIntent = new Intent(Dashboard.this, SponsorshipMonitor.class);
-                stopService(serviceIntent);
-
-            }
-
 
             if (paperUser.getSignUpMode().equalsIgnoreCase("Google")){
 
@@ -614,7 +510,6 @@ public class Dashboard extends AppCompatActivity {
                 finish();
 
             }
-
 
         } else {
 
@@ -664,33 +559,10 @@ public class Dashboard extends AppCompatActivity {
 
     }
 
-    /*---   WARNING DIALOG   ---*/
-    public void showErrorDialog(String theWarning){
-
-        alertDialogError = new android.app.AlertDialog.Builder(this).create();
-        LayoutInflater inflater = this.getLayoutInflater();
-        View viewOptions = inflater.inflate(R.layout.dialog_layout,null);
-
-        final TextView message = (TextView) viewOptions.findViewById(R.id.dialogMessage);
-        final Button okButton = (Button) viewOptions.findViewById(R.id.dialogButton);
-
-        alertDialogError.setView(viewOptions);
-
-        alertDialogError.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
-        alertDialogError.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-
-        message.setText(theWarning);
-
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialogError.dismiss();
-            }
-        });
-
-        alertDialogError.show();
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadUser(currentUid);
     }
 
     @Override

@@ -3,9 +3,9 @@ package com.blackviking.menorahfarms.AdminFragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +14,7 @@ import android.widget.RelativeLayout;
 
 import com.blackviking.menorahfarms.AdminDetails.DueSponsorshipDetail;
 import com.blackviking.menorahfarms.Common.CheckInternet;
+import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Interface.ItemClickListener;
 import com.blackviking.menorahfarms.Models.DueSponsorshipModel;
 import com.blackviking.menorahfarms.Models.SponsoredFarmModel;
@@ -54,72 +55,69 @@ public class DueSponsorships extends Fragment {
 
 
         /*---   FIREBASE   ---*/
-        dueSponsorshipRef = db.getReference("DueSponsorships");
-        sponsorshipRef = db.getReference("SponsoredFarms");
+        dueSponsorshipRef = db.getReference(Common.DUE_SPONSORSHIPS_NODE);
+        sponsorshipRef = db.getReference(Common.SPONSORED_FARMS_NODE);
 
 
         /*---   WIDGETS   ---*/
-        dueSponsorshipRecycler = (RecyclerView)v.findViewById(R.id.dueSponsorshipRecycler);
+        dueSponsorshipRecycler = v.findViewById(R.id.dueSponsorshipRecycler);
         noInternetLayout = v.findViewById(R.id.noInternetLayout);
         emptyLayout = v.findViewById(R.id.emptyLayout);
 
 
-        //execute network check async task
-        CheckInternet asyncTask = (CheckInternet) new CheckInternet(getContext(), new CheckInternet.AsyncResponse(){
-            @Override
-            public void processFinish(Integer output) {
+        //run network check
+        new CheckInternet(getContext(), output -> {
 
-                //check all cases
-                if (output == 1){
+            //check all cases
+            if (output == 1){
 
-                    dueSponsorshipRef.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
+                dueSponsorshipRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-                            if (dataSnapshot.exists()){
+                        if (dataSnapshot.exists()){
 
-                                noInternetLayout.setVisibility(View.GONE);
-                                emptyLayout.setVisibility(View.GONE);
-                                dueSponsorshipRecycler.setVisibility(View.VISIBLE);
-                                loadDueSponsorships();
+                            noInternetLayout.setVisibility(View.GONE);
+                            emptyLayout.setVisibility(View.GONE);
+                            dueSponsorshipRecycler.setVisibility(View.VISIBLE);
+                            loadDueSponsorships();
 
-                            } else {
+                        } else {
 
-                                noInternetLayout.setVisibility(View.GONE);
-                                emptyLayout.setVisibility(View.VISIBLE);
-                                dueSponsorshipRecycler.setVisibility(View.GONE);
-
-                            }
+                            noInternetLayout.setVisibility(View.GONE);
+                            emptyLayout.setVisibility(View.VISIBLE);
+                            dueSponsorshipRecycler.setVisibility(View.GONE);
 
                         }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
+                    }
 
-                        }
-                    });
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-                } else
+                    }
+                });
 
-                if (output == 0){
+            } else
 
-                    //set layout
-                    noInternetLayout.setVisibility(View.VISIBLE);
-                    emptyLayout.setVisibility(View.GONE);
-                    dueSponsorshipRecycler.setVisibility(View.GONE);
+            if (output == 0){
 
-                } else
+                //set layout
+                noInternetLayout.setVisibility(View.VISIBLE);
+                emptyLayout.setVisibility(View.GONE);
+                dueSponsorshipRecycler.setVisibility(View.GONE);
 
-                if (output == 2){
+            } else
 
-                    //set layout
-                    noInternetLayout.setVisibility(View.VISIBLE);
-                    emptyLayout.setVisibility(View.GONE);
-                    dueSponsorshipRecycler.setVisibility(View.GONE);
+            if (output == 2){
 
-                }
+                //set layout
+                noInternetLayout.setVisibility(View.VISIBLE);
+                emptyLayout.setVisibility(View.GONE);
+                dueSponsorshipRecycler.setVisibility(View.GONE);
 
             }
+
         }).execute();
 
         return v;

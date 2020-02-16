@@ -161,11 +161,6 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".AdminDetails.PendingSponsorshipDetail"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait"
-            android:theme="@style/ImageViewTheme" />
-        <activity
             android:name=".AdminDetails.FarmManagementDetail"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />

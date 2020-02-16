@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 29
@@ -10,7 +9,7 @@ android {
         versionCode 33
         versionName "1.33"
         multiDexEnabled true
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resConfigs "en", "US"
     }
     buildTypes {
@@ -34,12 +33,12 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     /*---   ANDROID SUPPORT LIBRARIES   ---*/
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-    implementation 'com.android.support:design:28.0.0'
-    implementation 'com.android.support:support-v4:28.0.0'
-    implementation 'com.android.support:recyclerview-v7:28.0.0'
-    implementation 'com.android.support:cardview-v7:28.0.0'
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
 
     /*---   EXTERNAL WIDGET LIBRARIES   ---*/
     implementation 'com.rengwuxian.materialedittext:library:2.1.4'
@@ -49,18 +48,19 @@ dependencies {
     implementation 'com.wrapp.floatlabelededittext:library:0.0.6'
 
     /*---   FIREBASE LIBRARIES   ---*/
-    implementation 'com.google.firebase:firebase-core:11.4.2'
-    implementation 'com.google.firebase:firebase-auth:11.4.2'
-    implementation 'com.google.firebase:firebase-storage:11.4.2'
-    implementation 'com.google.firebase:firebase-database:11.4.2'
-    implementation 'com.google.firebase:firebase-messaging:11.4.2'
+    implementation 'com.google.firebase:firebase-messaging:20.1.0'
+    implementation 'com.google.firebase:firebase-auth:19.2.0'
+    implementation 'com.google.firebase:firebase-analytics:17.2.2'
+    implementation 'com.google.firebase:firebase-firestore:21.4.0'
+    implementation 'com.google.firebase:firebase-storage:19.1.1'
+    implementation 'com.google.firebase:firebase-database:19.2.1'
+    implementation 'com.google.firebase:firebase-crashlytics:17.0.0-beta01'
     implementation 'com.firebaseui:firebase-ui-database:2.1.1'
     implementation 'com.firebaseui:firebase-ui-auth:2.1.1'
-    implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
+    implementation 'com.google.firebase:firebase-functions:19.0.2'
 
     /*---   DATABASE LIBRARIES   ---*/
     implementation 'io.paperdb:paperdb:2.1'
-    implementation 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
 
     /*---   IMAGE CONTROLLER LIBRARIES   ---*/
     implementation 'com.iceteck.silicompressorr:silicompressor:2.1'
@@ -71,14 +71,13 @@ dependencies {
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
 
     /*---   GOOGLE PLAY SERVICES LIBRARIES   ---*/
-    implementation 'com.google.android.gms:play-services-auth:11.4.2'
-    implementation 'com.google.android.gms:play-services-vision:11.4.2'
+    implementation 'com.google.android.gms:play-services-auth:17.0.0'
 
     /*--- DATA CONTROLLERS   ---*/
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.github.ralphpina:Android-Permissions-Manager:v2.0.1'
-    implementation 'com.android.support:multidex:1.0.3'
+    implementation 'androidx.multidex:multidex:2.0.0'
     implementation 'com.squareup.okhttp3:okhttp:3.4.2'
 
     /*---   DAY CALCULATION   ---*/
@@ -93,7 +92,8 @@ dependencies {
 
 
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
 }
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'

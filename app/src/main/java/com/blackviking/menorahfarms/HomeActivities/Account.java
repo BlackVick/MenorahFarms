@@ -1,5 +1,6 @@
 package com.blackviking.menorahfarms.HomeActivities;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,12 +12,12 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,18 +44,14 @@ import com.blackviking.menorahfarms.Common.ApplicationClass;
 import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Common.Permissions;
-import com.blackviking.menorahfarms.Models.FarmModel;
 import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
-import com.blackviking.menorahfarms.Services.SponsorshipMonitor;
 import com.blackviking.menorahfarms.SignIn;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -66,10 +63,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -82,7 +75,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -112,27 +104,30 @@ public class Account extends AppCompatActivity {
 
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference userRef, farmRef, cartRef;
+    private DatabaseReference userRef, cartRef;
     private String currentUid, loginType;
 
-    private android.app.AlertDialog mDialog;
-
+    //image upload
     private static final int VERIFY_PERMISSIONS_REQUEST = 757;
     private static final int CAMERA_REQUEST_CODE = 656;
     private static final int GALLERY_REQUEST_CODE = 665;
     private Uri imageUri;
     private FirebaseStorage storage = FirebaseStorage.getInstance();
     private StorageReference imageRef;
-    private String originalImageUrl, thumbDownloadUrl;
+    private String imageUrl;
+    private boolean isUploading = false;
+    private UploadTask uploadTask;
+    private ProgressBar imageProgress;
 
+    //values
     private String theUserMail, theFirstName, theLastName, theProfilePicture;
 
+    //profile completion
     private boolean isWarned;
-    private boolean isMonitorRunning;
 
-
+    //loading
     private UserModel paperUser;
-    private android.app.AlertDialog alertDialog, alertDialogError;
+    private android.app.AlertDialog alertDialog;
     private boolean isLoading = false;
 
 
@@ -146,50 +141,46 @@ public class Account extends AppCompatActivity {
 
 
         /*---   FIREBASE   ---*/
-        userRef = db.getReference("Users");
+        userRef = db.getReference(Common.USERS_NODE);
         imageRef = storage.getReference("ProfileImages");
-        farmRef = db.getReference("Farms");
-        cartRef = db.getReference("Carts");
+        cartRef = db.getReference(Common.CART_NODE);
         if (mAuth.getCurrentUser() != null)
             currentUid = mAuth.getCurrentUser().getUid();
 
 
-        //get paper user
-        paperUser = Paper.book().read(Common.PAPER_USER);
-
-
         /*---   WIDGETS   ---*/
-        dashboardSwitch = (LinearLayout)findViewById(R.id.dashboardLayout);
-        farmstoreSwitch = (LinearLayout)findViewById(R.id.farmShopLayout);
-        accountSwitch = (LinearLayout)findViewById(R.id.accountLayout);
-        dashboardText = (TextView)findViewById(R.id.dashboardText);
-        farmstoreText = (TextView)findViewById(R.id.farmShopText);
-        accountText = (TextView)findViewById(R.id.accountText);
+        dashboardSwitch = findViewById(R.id.dashboardLayout);
+        farmstoreSwitch = findViewById(R.id.farmShopLayout);
+        accountSwitch = findViewById(R.id.accountLayout);
+        dashboardText = findViewById(R.id.dashboardText);
+        farmstoreText = findViewById(R.id.farmShopText);
+        accountText = findViewById(R.id.accountText);
 
-        userName = (TextView)findViewById(R.id.userFullName);
-        userEmail = (TextView)findViewById(R.id.userEmail);
-        profileProgressText = (TextView)findViewById(R.id.profileProgressText);
-        cartButton = (ImageView)findViewById(R.id.cartButton);
-        resetPassword = (Button)findViewById(R.id.changePasswordButton);
+        userName = findViewById(R.id.userFullName);
+        userEmail = findViewById(R.id.userEmail);
+        profileProgressText = findViewById(R.id.profileProgressText);
+        cartButton = findViewById(R.id.cartButton);
+        resetPassword = findViewById(R.id.changePasswordButton);
         resetPassword.setEnabled(false);
-        userAvatar = (CircleImageView)findViewById(R.id.userAvatar);
-        profileProgress = (ProgressBar)findViewById(R.id.profileProgress);
+        userAvatar = findViewById(R.id.userAvatar);
+        profileProgress = findViewById(R.id.profileProgress);
 
-        personalDetailsLayout = (RelativeLayout)findViewById(R.id.personalDetailsLayout);
-        contactDetailsLayout = (RelativeLayout)findViewById(R.id.contactDetailsLayout);
-        bankDetailsLayout = (RelativeLayout)findViewById(R.id.bankDetailsLayout);
-        nextOfKinLayout = (RelativeLayout)findViewById(R.id.nextOfKinLayout);
-        socialMediaLayout = (RelativeLayout)findViewById(R.id.socialMediaLayout);
-        studentProfileLayout = (RelativeLayout)findViewById(R.id.studentProfileLayout);
-        historyLayout = (RelativeLayout)findViewById(R.id.historyLayout);
-        logOutLayout = (RelativeLayout)findViewById(R.id.logOutLayout);
+        personalDetailsLayout = findViewById(R.id.personalDetailsLayout);
+        contactDetailsLayout = findViewById(R.id.contactDetailsLayout);
+        bankDetailsLayout = findViewById(R.id.bankDetailsLayout);
+        nextOfKinLayout = findViewById(R.id.nextOfKinLayout);
+        socialMediaLayout = findViewById(R.id.socialMediaLayout);
+        studentProfileLayout = findViewById(R.id.studentProfileLayout);
+        historyLayout = findViewById(R.id.historyLayout);
+        logOutLayout = findViewById(R.id.logOutLayout);
 
-        verifiedLayout = (ScrollView)findViewById(R.id.verifiedLayout);
-        unverifiedLayout = (RelativeLayout)findViewById(R.id.unverifiedLayout);
-        reloadPage = (ImageView)findViewById(R.id.reloadPage);
-        resendActivationBtn = (Button)findViewById(R.id.resendActivationBtn);
+        verifiedLayout = findViewById(R.id.verifiedLayout);
+        unverifiedLayout = findViewById(R.id.unverifiedLayout);
+        reloadPage = findViewById(R.id.reloadPage);
+        resendActivationBtn = findViewById(R.id.resendActivationBtn);
 
         cartItemCount = findViewById(R.id.cartItemCount);
+        imageProgress = findViewById(R.id.imageProgress);
 
 
 
@@ -200,67 +191,9 @@ public class Account extends AppCompatActivity {
                 .build();
 
         mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
-                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        Toast.makeText(Account.this, "Unknown Error Occurred", Toast.LENGTH_SHORT).show();
-                    }
-                })
+                .enableAutoManage(this, connectionResult -> Toast.makeText(Account.this, "Unknown Error Occurred", Toast.LENGTH_SHORT).show())
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
-
-
-        //cart count
-        //execute network check async task
-        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
-            @Override
-            public void processFinish(Integer output) {
-
-                //check all cases
-                if (output == 1){
-
-                    //always cart item count
-                    cartRef.child(currentUid)
-                            .addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                    int count = (int) dataSnapshot.getChildrenCount();
-
-                                    cartItemCount.setText(String.valueOf(count));
-
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-
-                                }
-                            });
-
-                } else
-
-                if (output == 0){
-
-                    Toast.makeText(Account.this, "No internet access", Toast.LENGTH_SHORT).show();
-
-                } else
-
-                if (output == 2){
-
-                    Toast.makeText(Account.this, "No network detected", Toast.LENGTH_SHORT).show();
-
-                }
-
-            }
-        }).execute();
-
-
-
-        //check sponsorship monitor
-        if (Paper.book().read(Common.isSponsorshipMonitorRunning) == null)
-            Paper.book().write(Common.isSponsorshipMonitorRunning, false);
-        isMonitorRunning = Paper.book().read(Common.isSponsorshipMonitorRunning);
-
 
 
         /*---   BOTTOM NAV   ---*/
@@ -268,163 +201,130 @@ public class Account extends AppCompatActivity {
         farmstoreText.setTextColor(getResources().getColor(R.color.black));
         accountText.setTextColor(getResources().getColor(R.color.colorPrimary));
 
+        //dashboard
+        dashboardSwitch.setOnClickListener(v -> {
 
-        dashboardSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            if (isLoading){
+                alertDialog.dismiss();
+            }
 
-                if (isLoading){
-                    alertDialog.dismiss();
-                }
+            Intent dashboardIntent = new Intent(Account.this, Dashboard.class);
+            startActivity(dashboardIntent);
+            finish();
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
 
-                Intent dashboardIntent = new Intent(Account.this, Dashboard.class);
-                startActivity(dashboardIntent);
+        });
+
+        //farmshop
+        farmstoreSwitch.setOnClickListener(v -> {
+
+            if (isLoading){
+                alertDialog.dismiss();
+            }
+
+            Intent farmstoreIntent = new Intent(Account.this, FarmShop.class);
+            startActivity(farmstoreIntent);
+            finish();
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
+        });
+
+        //cart
+        cartButton.setOnClickListener(v -> {
+
+            Intent cartIntent = new Intent(Account.this, Cart.class);
+            startActivity(cartIntent);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
+        });
+
+        //personal details
+        personalDetailsLayout.setOnClickListener(v -> {
+            Intent personalIntent = new Intent(Account.this, PersonalDetails.class);
+            startActivity(personalIntent);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+        });
+
+        //contact
+        contactDetailsLayout.setOnClickListener(v -> {
+            Intent conTactIntent = new Intent(Account.this, ContactDetails.class);
+            startActivity(conTactIntent);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+        });
+
+        //financial
+        bankDetailsLayout.setOnClickListener(v -> {
+            Intent bankIntent = new Intent(Account.this, BankDetails.class);
+            startActivity(bankIntent);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+        });
+
+        //next of kin
+        nextOfKinLayout.setOnClickListener(v -> {
+            Intent nextOfKinIntent = new Intent(Account.this, NextOfKin.class);
+            startActivity(nextOfKinIntent);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+        });
+
+        //social media
+        socialMediaLayout.setOnClickListener(v -> {
+            Intent socialIntent = new Intent(Account.this, SocialMedia.class);
+            startActivity(socialIntent);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+        });
+
+        //student dets
+        studentProfileLayout.setOnClickListener(v -> {
+            Intent studentIntent = new Intent(Account.this, StudentDetails.class);
+            startActivity(studentIntent);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+        });
+
+        //history
+        historyLayout.setOnClickListener(v -> {
+            Intent historyIntent = new Intent(Account.this, SponsorshipHistory.class);
+            startActivity(historyIntent);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+        });
+
+        //logout
+        logOutLayout.setOnClickListener(v -> {
+
+            if (paperUser.getSignUpMode().equalsIgnoreCase("Google")){
+
+                //revoke access
+                Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient);
+
+                Paper.book().destroy();
+
+                mAuth.signOut();
+                ((ApplicationClass)(getApplicationContext())).resetUser();
+
+                FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
+                FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.GENERAL_NOTIFY);
+                Intent signoutIntent = new Intent(Account.this, SignIn.class);
+                signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(signoutIntent);
+
                 finish();
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
 
-            }
-        });
-        farmstoreSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            } else {
 
-                if (isLoading){
-                    alertDialog.dismiss();
-                }
+                Paper.book().destroy();
 
-                Intent farmstoreIntent = new Intent(Account.this, FarmShop.class);
-                startActivity(farmstoreIntent);
+                mAuth.signOut();
+                ((ApplicationClass)(getApplicationContext())).resetUser();
+
+                FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
+                FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.GENERAL_NOTIFY);
+                Intent signoutIntent = new Intent(Account.this, SignIn.class);
+                signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(signoutIntent);
+
                 finish();
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
 
             }
-        });
 
-
-        /*---   CART   ---*/
-        cartButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent cartIntent = new Intent(Account.this, Cart.class);
-                startActivity(cartIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-
-            }
-        });
-
-
-        personalDetailsLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent personalIntent = new Intent(Account.this, PersonalDetails.class);
-                startActivity(personalIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-            }
-        });
-
-        contactDetailsLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent conTactIntent = new Intent(Account.this, ContactDetails.class);
-                startActivity(conTactIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-            }
-        });
-
-        bankDetailsLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent bankIntent = new Intent(Account.this, BankDetails.class);
-                startActivity(bankIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-            }
-        });
-
-        nextOfKinLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent nextOfKinIntent = new Intent(Account.this, NextOfKin.class);
-                startActivity(nextOfKinIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-            }
-        });
-
-        socialMediaLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent socialIntent = new Intent(Account.this, SocialMedia.class);
-                startActivity(socialIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-            }
-        });
-
-        studentProfileLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent studentIntent = new Intent(Account.this, StudentDetails.class);
-                startActivity(studentIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-            }
-        });
-
-        historyLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent historyIntent = new Intent(Account.this, SponsorshipHistory.class);
-                startActivity(historyIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-            }
-        });
-
-        logOutLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                //stop sponsorship service
-                if (Paper.book().read(Common.isSponsorshipMonitorRunning)){
-
-                    Intent serviceIntent = new Intent(Account.this, SponsorshipMonitor.class);
-                    stopService(serviceIntent);
-
-                }
-
-                if (paperUser.getSignUpMode().equalsIgnoreCase("Google")){
-
-                    //revoke access
-                    Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient);
-
-                    Paper.book().destroy();
-
-                    mAuth.signOut();
-                    ((ApplicationClass)(getApplicationContext())).resetUser();
-
-                    FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
-                    FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.GENERAL_NOTIFY);
-                    Intent signoutIntent = new Intent(Account.this, SignIn.class);
-                    signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(signoutIntent);
-
-                    finish();
-
-                } else {
-
-                    Paper.book().destroy();
-
-                    mAuth.signOut();
-                    ((ApplicationClass)(getApplicationContext())).resetUser();
-
-                    FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
-                    FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.GENERAL_NOTIFY);
-                    Intent signoutIntent = new Intent(Account.this, SignIn.class);
-                    signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(signoutIntent);
-
-                    finish();
-
-                }
-
-            }
         });
 
         //check mail verification
@@ -438,85 +338,70 @@ public class Account extends AppCompatActivity {
             verifiedLayout.setVisibility(View.GONE);
             unverifiedLayout.setVisibility(View.VISIBLE);
 
-            resendActivationBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mAuth.getCurrentUser().sendEmailVerification();
-                }
-            });
+            resendActivationBtn.setOnClickListener(v -> mAuth.getCurrentUser().sendEmailVerification());
 
-            reloadPage.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    reloadThePage();
-                }
-            });
+            reloadPage.setOnClickListener(v -> reloadThePage());
 
         }
 
-        /*---   CURRENT USER   ---*/
-        setCurrentUser(paperUser);
+        //load user
+        setCurrentUser();
 
     }
 
     private void reloadThePage() {
 
         mAuth.getCurrentUser().reload().addOnCompleteListener(
-                new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
+                task -> {
 
-                        if (task.isSuccessful()){
+                    if (task.isSuccessful()){
 
-                            if (mAuth.getCurrentUser().isEmailVerified()){
+                        if (mAuth.getCurrentUser().isEmailVerified()){
 
-                                verifiedLayout.setVisibility(View.VISIBLE);
-                                unverifiedLayout.setVisibility(View.GONE);
+                            verifiedLayout.setVisibility(View.VISIBLE);
+                            unverifiedLayout.setVisibility(View.GONE);
 
-                            } else {
-
-                                verifiedLayout.setVisibility(View.GONE);
-                                unverifiedLayout.setVisibility(View.VISIBLE);
-
-                                resendActivationBtn.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        mAuth.getCurrentUser().sendEmailVerification();
-                                    }
-                                });
-
-                                reloadPage.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        reloadThePage();
-                                    }
-                                });
-
-                            }
 
                         } else {
 
-                            Toast.makeText(Account.this, "Error occurred", Toast.LENGTH_SHORT).show();
+                            verifiedLayout.setVisibility(View.GONE);
+                            unverifiedLayout.setVisibility(View.VISIBLE);
+
+                            //resend verification
+                            resendActivationBtn.setOnClickListener(v -> mAuth.getCurrentUser().sendEmailVerification());
+
+                            //reload page
+                            reloadPage.setOnClickListener(v -> reloadThePage());
 
                         }
 
+                    } else {
+
+                        Toast.makeText(Account.this, "Error occurred", Toast.LENGTH_SHORT).show();
+
                     }
+
                 }
         );
 
     }
 
-    private void setCurrentUser(UserModel paperUserr) {
+    private void setCurrentUser() {
 
-        theFirstName = paperUserr.getFirstName();
-        theLastName = paperUserr.getLastName();
-        theUserMail = paperUserr.getEmail();
-        theProfilePicture = paperUserr.getProfilePictureThumb();
-        loginType = paperUserr.getSignUpMode();
+        //get local user
+        paperUser = Paper.book().read(Common.PAPER_USER);
 
+        theFirstName = paperUser.getFirstName();
+        theLastName = paperUser.getLastName();
+        theUserMail = paperUser.getEmail();
+        theProfilePicture = paperUser.getProfilePictureThumb();
+        loginType = paperUser.getSignUpMode();
+
+        //set user details
         userName.setText(theFirstName + " " + theLastName);
         userEmail.setText(theUserMail);
 
+        //avatar
         if (!theProfilePicture.equalsIgnoreCase("")) {
 
             Picasso.get()
@@ -545,23 +430,23 @@ public class Account extends AppCompatActivity {
 
         }
 
-        userAvatar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        userAvatar.setOnClickListener(v -> {
 
-                /*---   PERMISSIONS HANDLER   ---*/
-                if (checkPermissionsArray(Permissions.PERMISSIONS)){
+            //check permissions
+            if (ContextCompat.checkSelfPermission(Account.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                    && ContextCompat.checkSelfPermission(Account.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+                    && ContextCompat.checkSelfPermission(Account.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
 
-                    showUploadDialog();
+                showUploadDialog();
 
-                } else {
+            } else {
 
-                    verifyPermissions(Permissions.PERMISSIONS);
+                ActivityCompat.requestPermissions(Account.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, VERIFY_PERMISSIONS_REQUEST);
 
-                }
             }
         });
 
+        //reset password check
         if (loginType.equalsIgnoreCase("Email")) {
 
             resetPassword.setVisibility(View.VISIBLE);
@@ -574,49 +459,59 @@ public class Account extends AppCompatActivity {
 
         }
 
+
+        //always cart item count
+        cartRef.child(currentUid)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        int count = (int) dataSnapshot.getChildrenCount();
+
+                        cartItemCount.setText(String.valueOf(count));
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
         //set profile progress bar
-        setProfileProgress(paperUserr);
+        setProfileProgress(paperUser);
 
     }
 
     private void showUploadDialog() {
-        final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog = new AlertDialog.Builder(this).create();
         LayoutInflater inflater = this.getLayoutInflater();
         View viewOptions = inflater.inflate(R.layout.image_source_choice,null);
 
-        final ImageView cameraPick = (ImageView) viewOptions.findViewById(R.id.cameraPick);
-        final ImageView galleryPick = (ImageView) viewOptions.findViewById(R.id.galleryPick);
+        final ImageView cameraPick = viewOptions.findViewById(R.id.cameraPick);
+        final ImageView galleryPick = viewOptions.findViewById(R.id.galleryPick);
 
+        //dialog parameters
         alertDialog.setView(viewOptions);
-
         alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
-
         alertDialog.getWindow().setGravity(Gravity.BOTTOM);
         alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-
         WindowManager.LayoutParams layoutParams = alertDialog.getWindow().getAttributes();
-        //layoutParams.x = 100; // left margin
         layoutParams.y = 100; // bottom margin
         alertDialog.getWindow().setAttributes(layoutParams);
 
         //open camera
-        cameraPick.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openCamera();
-                alertDialog.dismiss();
-            }
+        cameraPick.setOnClickListener(v -> {
+            openCamera();
+            alertDialog.dismiss();
         });
 
         //open gallery
-        galleryPick.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openGallery();
-                alertDialog.dismiss();
-            }
+        galleryPick.setOnClickListener(v -> {
+            openGallery();
+            alertDialog.dismiss();
         });
+
         alertDialog.show();
     }
 
@@ -643,49 +538,32 @@ public class Account extends AppCompatActivity {
 
     }
 
-    private void verifyPermissions(String[] permissions) {
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
-        ActivityCompat.requestPermissions(
-                this,
-                permissions,
-                VERIFY_PERMISSIONS_REQUEST
-        );
-    }
+        if (requestCode == VERIFY_PERMISSIONS_REQUEST) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-    private boolean checkPermissionsArray(String[] permissions) {
+                showUploadDialog();
 
-        for (int i = 0; i < permissions.length; i++){
+            } else {
 
-            String check = permissions[i];
-            if (!checkPermissions(check)){
-                return false;
+                Toast.makeText(this, "Storage permission denied", Toast.LENGTH_SHORT).show();
+
             }
-
         }
-        return true;
-    }
 
-    private boolean checkPermissions(String permission) {
-
-        int permissionRequest = ActivityCompat.checkSelfPermission(this, permission);
-
-        if (permissionRequest != PackageManager.PERMISSION_GRANTED){
-
-            return false;
-        } else {
-
-            return true;
-        }
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        //image upload fix
         if (requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK){
 
             CropImage.activity(imageUri)
-                    .setAspectRatio(1, 1)
+                    .setAspectRatio(1,1)
                     .start(Account.this);
 
 
@@ -703,103 +581,114 @@ public class Account extends AppCompatActivity {
 
         }
 
-
-
-
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             final CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
 
-                //show dialog
-                mDialog = new SpotsDialog(Account.this, "Upload In Progress . . .");
-                mDialog.setCancelable(false);
-                mDialog.setCanceledOnTouchOutside(false);
-                mDialog.show();
+                //show loading
+                imageProgress.setVisibility(View.VISIBLE);
+                userAvatar.setEnabled(false);
 
-                //execute network check async task
-                CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
-                    @Override
-                    public void processFinish(Integer output) {
+                //value
+                isUploading = true;
 
-                        //check all cases
-                        if (output == 1){
+                //perform network check
+                new CheckInternet(this, output -> {
 
-                            Uri resultUri = result.getUri();
+                    //check all cases
+                    if (output == 1){
 
-                            File thumb_filepath = new File(resultUri.getPath());
+                        //get data
+                        Uri resultUri = result.getUri();
 
-                            try {
-                                Bitmap thumb_bitmap = new Compressor(Account.this)
-                                        .setMaxWidth(500)
-                                        .setMaxHeight(500)
-                                        .setQuality(75)
-                                        .compressToBitmap(thumb_filepath);
+                        //get file path
+                        File thumb_filepath = new File(resultUri.getPath());
 
-                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                thumb_bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
-                                final byte[] thumb_byte = baos.toByteArray();
+                        try {
 
-                                final StorageReference imageThumbRef1 = imageRef.child("Thumbnails").child(currentUid + ".jpg");
+                            //converting to bitmap
+                            Bitmap thumb_bitmap = new Compressor(Account.this)
+                                    .setMaxWidth(500)
+                                    .setMaxHeight(500)
+                                    .setQuality(70)
+                                    .compressToBitmap(thumb_filepath);
 
-                                final UploadTask uploadTask = imageThumbRef1.putBytes(thumb_byte);
+                            //compress file size and set format
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            thumb_bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+                            final byte[] thumb_byte = baos.toByteArray();
 
-                                mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                                    @Override
-                                    public void onCancel(DialogInterface dialog) {
-                                        imageUri = null;
-                                        uploadTask.cancel();
-                                    }
-                                });
 
-                                uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumb_task) {
+                            //set file location and name in firebase
+                            final StorageReference imageThumbRef1 = imageRef.child(currentUid + ".jpg");
 
-                                        thumbDownloadUrl = thumb_task.getResult().getDownloadUrl().toString();
+                            //start upload
+                            uploadTask = imageThumbRef1.putBytes(thumb_byte);
 
-                                        if (thumb_task.isSuccessful()) {
+                            //get download link
+                            uploadTask.continueWithTask(task -> {
 
-                                            mDialog.dismiss();
-                                            updateImage(thumbDownloadUrl, thumbDownloadUrl);
+                                if (!task.isSuccessful()) {
 
-                                        } else {
-                                            Toast.makeText(Account.this, "Upload Failed. Please Try Again", Toast.LENGTH_SHORT).show();
-                                            mDialog.dismiss();
-                                            imageUri = null;
-                                            originalImageUrl = null;
-                                            thumbDownloadUrl = null;
-                                        }
-                                    }
-                                });
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                                    throw task.getException();
+                                }
 
-                        } else
+                                // Continue with the task to get the download URL
+                                return imageThumbRef1.getDownloadUrl();
 
-                        if (output == 0){
+                            }).addOnCompleteListener(task -> {
 
-                            //no internet
-                            mDialog.dismiss();
-                            imageUri = null;
-                            originalImageUrl = null;
-                            thumbDownloadUrl = null;
-                            Toast.makeText(Account.this, "No internet", Toast.LENGTH_SHORT).show();
+                                if (task.isSuccessful()) {
 
-                        } else
+                                    Uri downloadUri = task.getResult();
 
-                        if (output == 2){
+                                    //link
+                                    imageUrl = downloadUri.toString();
 
-                            //no network
-                            mDialog.dismiss();
-                            imageUri = null;
-                            originalImageUrl = null;
-                            thumbDownloadUrl = null;
-                            Toast.makeText(Account.this, "Not connected to a network", Toast.LENGTH_SHORT).show();
+                                    //update
+                                    updateImage(imageUrl);
 
+                                } else {
+
+                                    Toast.makeText(Account.this, "FAILED", Toast.LENGTH_SHORT).show();
+
+                                }
+                            });
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
 
+                    } else
+
+                    if (output == 0){
+
+                        //stop loading
+                        imageProgress.setVisibility(View.GONE);
+                        userAvatar.setEnabled(true);
+
+                        //value
+                        isUploading = false;
+
+                        //no internet
+                        Toast.makeText(Account.this, "No internet access", Toast.LENGTH_SHORT).show();
+
+                    } else
+
+                    if (output == 2){
+
+                        //stop loading
+                        imageProgress.setVisibility(View.GONE);
+                        userAvatar.setEnabled(true);
+
+                        //value
+                        isUploading = false;
+
+                        //no network
+                        Toast.makeText(Account.this, "Not connected to a network", Toast.LENGTH_SHORT).show();
+
                     }
+
                 }).execute();
 
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
@@ -809,40 +698,58 @@ public class Account extends AppCompatActivity {
 
     }
 
-    private void updateImage(String originalImageUrl, String thumbDownloadUrl) {
+    private void updateImage(String imageUrl) {
 
-        UserModel thePaperUser = Paper.book().read(Common.PAPER_USER);
+        //create image map
+        Map<String, Object> imageMap = new HashMap<>();
+        imageMap.put("profilePicture", imageUrl);
+        imageMap.put("profilePictureThumb", imageUrl);
 
-        final UserModel updateUser = new UserModel(
-                thePaperUser.getEmail(), thePaperUser.getFirstName(), thePaperUser.getLastName(),
-                originalImageUrl, thumbDownloadUrl, thePaperUser.getSignUpMode(),
-                thePaperUser.getFacebook(), thePaperUser.getInstagram(), thePaperUser.getTwitter(), thePaperUser.getLinkedIn(),
-                thePaperUser.getUserType(), thePaperUser.getUserPackage(), thePaperUser.getPhone(), thePaperUser.getBirthday(),
-                thePaperUser.getGender(), thePaperUser.getNationality(), thePaperUser.getAddress(), thePaperUser.getCity(),
-                thePaperUser.getState(), thePaperUser.getBank(), thePaperUser.getAccountName(), thePaperUser.getAccountNumber(),
-                thePaperUser.getKinName(), thePaperUser.getKinEmail(), thePaperUser.getKinRelationship(), thePaperUser.getKinPhone(),
-                thePaperUser.getKinAddress(), thePaperUser.getAccountManager()
-        );
-
+        //update to db
         userRef.child(currentUid)
-                .setValue(updateUser)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
+                .updateChildren(imageMap)
+                .addOnCompleteListener(task -> {
 
-                        if (task.isSuccessful()){
+                    if (task.isSuccessful()){
 
-                            ((ApplicationClass)(getApplicationContext())).setUser(updateUser);
-                            paperUser = Paper.book().read(Common.PAPER_USER);
-                            setCurrentUser(paperUser);
+                        //get user from server
+                        userRef.child(currentUid)
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                        } else {
+                                        UserModel updatedUser = dataSnapshot.getValue(UserModel.class);
 
-                            Toast.makeText(Account.this, "Update failed", Toast.LENGTH_SHORT).show();
+                                        if (updatedUser != null){
 
-                        }
+                                            //update local data
+                                            ((ApplicationClass)(getApplicationContext())).setUser(updatedUser);
+                                            paperUser = updatedUser;
+                                            setCurrentUser();
+
+                                            //stop loading
+                                            imageProgress.setVisibility(View.GONE);
+                                            userAvatar.setEnabled(true);
+
+                                            //value
+                                            isUploading = false;
+
+                                        }
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+
+                    } else {
+
+                        Toast.makeText(Account.this, "Update failed", Toast.LENGTH_SHORT).show();
 
                     }
+
                 });
     }
 
@@ -870,31 +777,31 @@ public class Account extends AppCompatActivity {
         return mediaFile;
     }
 
-    private void setProfileProgress(UserModel paperUserr) {
+    private void setProfileProgress(UserModel paperUser) {
 
-        String profileFirstName = paperUserr.getFirstName();
-        String profileLastName = paperUserr.getLastName();
-        String profileUserMail = paperUserr.getEmail();
-        String profilePix = paperUserr.getProfilePictureThumb();
-        String profileFacebook = paperUserr.getFacebook();
-        String profileInstagram = paperUserr.getInstagram();
-        String profileTwitter = paperUserr.getTwitter();
-        String profileLinkedIn = paperUserr.getLinkedIn();
-        String profilePhone = paperUserr.getPhone();
-        String profileBirthday = paperUserr.getBirthday();
-        String profileGender = paperUserr.getGender();
-        String profileNatinality = paperUserr.getNationality();
-        String profileAddress = paperUserr.getAddress();
-        String profileCity = paperUserr.getCity();
-        String profileState = paperUserr.getState();
-        String profileBank = paperUserr.getBank();
-        String profileAccountName = paperUserr.getAccountName();
-        String profileAccountNumber = paperUserr.getAccountNumber();
-        String profileKinName = paperUserr.getKinName();
-        String profileKinMail = paperUserr.getKinEmail();
-        String profileKinRelationship = paperUserr.getKinRelationship();
-        String profileKinPhone = paperUserr.getKinPhone();
-        String profileKinAddress = paperUserr.getKinAddress();
+        String profileFirstName = paperUser.getFirstName();
+        String profileLastName = paperUser.getLastName();
+        String profileUserMail = paperUser.getEmail();
+        String profilePix = paperUser.getProfilePictureThumb();
+        String profileFacebook = paperUser.getFacebook();
+        String profileInstagram = paperUser.getInstagram();
+        String profileTwitter = paperUser.getTwitter();
+        String profileLinkedIn = paperUser.getLinkedIn();
+        String profilePhone = paperUser.getPhone();
+        String profileBirthday = paperUser.getBirthday();
+        String profileGender = paperUser.getGender();
+        String profileNatinality = paperUser.getNationality();
+        String profileAddress = paperUser.getAddress();
+        String profileCity = paperUser.getCity();
+        String profileState = paperUser.getState();
+        String profileBank = paperUser.getBank();
+        String profileAccountName = paperUser.getAccountName();
+        String profileAccountNumber = paperUser.getAccountNumber();
+        String profileKinName = paperUser.getKinName();
+        String profileKinMail = paperUser.getKinEmail();
+        String profileKinRelationship = paperUser.getKinRelationship();
+        String profileKinPhone = paperUser.getKinPhone();
+        String profileKinAddress = paperUser.getKinAddress();
 
 
         String[] theArray = {profileFirstName, profileLastName, profileUserMail, profilePix,
@@ -928,6 +835,7 @@ public class Account extends AppCompatActivity {
         profileProgress.setProgressDrawable(draw);
         profileProgress.setProgress(calcResult);
 
+        //profile warning state
         if (Paper.book().read(Common.PROFILE_WARNING_COUNT) != null) {
 
             isWarned = Paper.book().read(Common.PROFILE_WARNING_COUNT);
@@ -936,7 +844,7 @@ public class Account extends AppCompatActivity {
 
                 if (calcResult < 75) {
 
-                    showErrorDialog("You are advised to complete your profile to enable you participate in farm sponsorships. \n\nThank you");
+                    Toast.makeText(this, "Complete profile to participate in farm sponsorships.", Toast.LENGTH_LONG).show();
                     Paper.book().write(Common.PROFILE_WARNING_COUNT, true);
 
                 }
@@ -951,53 +859,19 @@ public class Account extends AppCompatActivity {
 
     }
 
-    /*---   WARNING DIALOG   ---*/
-    public void showErrorDialog(String theWarning){
-
-        //loading
-        isLoading = true;
-
-        alertDialog = new android.app.AlertDialog.Builder(this).create();
-        LayoutInflater inflater = this.getLayoutInflater();
-        View viewOptions = inflater.inflate(R.layout.dialog_layout,null);
-
-        final TextView message = (TextView) viewOptions.findViewById(R.id.dialogMessage);
-        final Button okButton = (Button) viewOptions.findViewById(R.id.dialogButton);
-
-        alertDialog.setView(viewOptions);
-
-        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
-        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-
-        message.setText(theWarning);
-
-        alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                isLoading = false;
-            }
-        });
-        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                isLoading = false;
-            }
-        });
-
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-            }
-        });
-
-        alertDialog.show();
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setCurrentUser();
     }
 
     @Override
     public void onBackPressed() {
+        if (isUploading){
+
+            uploadTask.cancel();
+
+        }
         if (isLoading){
             alertDialog.dismiss();
         }

@@ -4,8 +4,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +28,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -41,8 +40,8 @@ public class FarmDetails extends AppCompatActivity {
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private DatabaseReference userRef, farmRef, followedRef, cartRef, followedFarmNotiRef, sponsorshipRef;
-    private String currentUid, userType, farmId, farmNotiId;
+    private DatabaseReference farmRef, followedRef, cartRef, followedFarmNotiRef, sponsorshipRef;
+    private String currentUid, farmId;
 
     private ImageView backButton, farmImage;
     private TextView farmType, unitsLeft, farmLocation, farmROI, unitPrice, totalROI, totalDuration, totalPay;
@@ -67,77 +66,68 @@ public class FarmDetails extends AppCompatActivity {
 
 
         /*---   FIREBASE   ---*/
-        userRef = db.getReference("Users");
-        farmRef = db.getReference("Farms");
-        sponsorshipRef = db.getReference("SponsoredFarms");
-        followedRef = db.getReference("FollowedFarms");
-        cartRef = db.getReference("Carts");
-        followedFarmNotiRef = db.getReference("FollowedFarmsNotification");
+        farmRef = db.getReference(Common.FARM_NODE);
+        sponsorshipRef = db.getReference(Common.SPONSORED_FARMS_NODE);
+        followedRef = db.getReference(Common.FOLLOWED_FARMS_NODE);
+        cartRef = db.getReference(Common.CART_NODE);
+        followedFarmNotiRef = db.getReference(Common.FOLLOWED_FARMS_NOTIFICATION_NODE);
         if (mAuth.getCurrentUser() != null)
             currentUid = mAuth.getCurrentUser().getUid();
 
 
         /*---   WIDGETS   ---*/
-        backButton = (ImageView)findViewById(R.id.backButton);
-        farmImage = (ImageView)findViewById(R.id.farmDetailImage);
-        farmType = (TextView)findViewById(R.id.farmDetailsType);
-        unitsLeft = (TextView)findViewById(R.id.farmDetailsUnitsLeft);
-        farmLocation = (TextView)findViewById(R.id.farmDetailLocation);
-        farmROI = (TextView)findViewById(R.id.farmDetailROI);
-        unitPrice = (TextView)findViewById(R.id.farmDetailUnitPrice);
-        totalROI = (TextView)findViewById(R.id.totalRoiAndPrice);
-        totalDuration = (TextView)findViewById(R.id.totalDuration);
-        totalPay = (TextView)findViewById(R.id.totalPayback);
-        farmDescription = (TextView)findViewById(R.id.farmDescription);
-        followFarmBtn = (RelativeLayout)findViewById(R.id.followFarmButton);
-        addToCartBtn = (RelativeLayout)findViewById(R.id.addToCartButton);
-        followedFarmButton = (RelativeLayout)findViewById(R.id.followedFarmButton);
-        decreaseUnitNumber = (ImageView)findViewById(R.id.decreaseUnitNumber);
-        increaseUnitNumber = (ImageView)findViewById(R.id.increaseUnitNumber);
-        unitNumber = (TextView)findViewById(R.id.unitNumber);
+        backButton = findViewById(R.id.backButton);
+        farmImage = findViewById(R.id.farmDetailImage);
+        farmType = findViewById(R.id.farmDetailsType);
+        unitsLeft = findViewById(R.id.farmDetailsUnitsLeft);
+        farmLocation = findViewById(R.id.farmDetailLocation);
+        farmROI = findViewById(R.id.farmDetailROI);
+        unitPrice = findViewById(R.id.farmDetailUnitPrice);
+        totalROI = findViewById(R.id.totalRoiAndPrice);
+        totalDuration = findViewById(R.id.totalDuration);
+        totalPay = findViewById(R.id.totalPayback);
+        farmDescription = findViewById(R.id.farmDescription);
+        followFarmBtn = findViewById(R.id.followFarmButton);
+        addToCartBtn = findViewById(R.id.addToCartButton);
+        followedFarmButton = findViewById(R.id.followedFarmButton);
+        decreaseUnitNumber = findViewById(R.id.decreaseUnitNumber);
+        increaseUnitNumber = findViewById(R.id.increaseUnitNumber);
+        unitNumber = findViewById(R.id.unitNumber);
         unitNumber.setText(String.valueOf(unitNumberText));
-        farmNumber = (LinearLayout)findViewById(R.id.farmNumber);
+        farmNumber = findViewById(R.id.farmNumber);
 
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        backButton.setOnClickListener(v -> finish());
 
 
         //show loading dialog
         showLoadingDialog("Loading farm details . . .");
 
         //execute network check async task
-        new CheckInternet(this, new CheckInternet.AsyncResponse(){
-            @Override
-            public void processFinish(Integer output) {
+        new CheckInternet(this, output -> {
 
-                //check all cases
-                if (output == 1){
+            //check all cases
+            if (output == 1){
 
-                    loadCurrentFarm();
+                loadCurrentFarm();
 
-                } else
+            } else
 
-                if (output == 0){
+            if (output == 0){
 
-                    //set layout
-                    alertDialog.dismiss();
-                    Toast.makeText(FarmDetails.this, "No internet connection", Toast.LENGTH_SHORT).show();
+                //set layout
+                alertDialog.dismiss();
+                Toast.makeText(FarmDetails.this, "No internet connection", Toast.LENGTH_SHORT).show();
 
-                } else
+            } else
 
-                if (output == 2){
+            if (output == 2){
 
-                    //set layout
-                    alertDialog.dismiss();
-                    Toast.makeText(FarmDetails.this, "No network detected", Toast.LENGTH_SHORT).show();
-
-                }
+                //set layout
+                alertDialog.dismiss();
+                Toast.makeText(FarmDetails.this, "No network detected", Toast.LENGTH_SHORT).show();
 
             }
+
         }).execute();
 
 
@@ -197,7 +187,6 @@ public class FarmDetails extends AppCompatActivity {
                                     String theFarmSponsorDuration = currentFarm.getSponsorDuration();
                                     final String theFarmImage = currentFarm.getFarmImageThumb();
                                     final String theFarmState = currentFarm.getFarmState();
-                                    farmNotiId = currentFarm.getFarmNotiId();
 
                                     if (!theFarmImage.equalsIgnoreCase("")){
 
@@ -260,184 +249,162 @@ public class FarmDetails extends AppCompatActivity {
                                     }
 
                                     /*---   UNIT NUMBERS   ---*/
-                                    increaseUnitNumber.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
+                                    increaseUnitNumber.setOnClickListener(v -> {
 
-                                            if (currentFarm.getPackagedType().equalsIgnoreCase("Student")){
+                                        if (currentFarm.getPackagedType().equalsIgnoreCase("Student")){
 
-                                                if (unitNumberText < 10) {
-                                                    unitNumberText++;
-                                                    unitNumber.setText(String.valueOf(unitNumberText));
-
-                                                    calculateChanges(unitNumberText, theFarmUnitPrice, theFarmROI);
-
-                                                } else {
-
-                                                    showErrorDialog("You can not exceed sponsorship limit for this package.");
-
-                                                }
-
-                                            }
-
-                                            if (currentFarm.getPackagedType().equalsIgnoreCase("Worker")){
-
-                                                if (unitNumberText < 100) {
-                                                    unitNumberText++;
-                                                    unitNumber.setText(String.valueOf(unitNumberText));
-
-                                                    calculateChanges(unitNumberText, theFarmUnitPrice, theFarmROI);
-
-                                                } else {
-
-                                                    showErrorDialog("You can not exceed sponsorship limit for this package");
-
-                                                }
-
-                                            }
-
-
-                                        }
-                                    });
-
-                                    decreaseUnitNumber.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-
-                                            if (unitNumberText == 1){
-
-
-
-                                            } else {
-
-                                                unitNumberText --;
+                                            if (unitNumberText < 10) {
+                                                unitNumberText++;
                                                 unitNumber.setText(String.valueOf(unitNumberText));
 
                                                 calculateChanges(unitNumberText, theFarmUnitPrice, theFarmROI);
 
+                                            } else {
+
+                                                Toast.makeText(FarmDetails.this, "Your sponsorship limit is 10", Toast.LENGTH_LONG).show();
+
                                             }
 
                                         }
+
+                                        if (currentFarm.getPackagedType().equalsIgnoreCase("Worker")){
+
+                                            if (unitNumberText < 100) {
+                                                unitNumberText++;
+                                                unitNumber.setText(String.valueOf(unitNumberText));
+
+                                                calculateChanges(unitNumberText, theFarmUnitPrice, theFarmROI);
+
+                                            } else {
+
+                                                Toast.makeText(FarmDetails.this, "Your sponsorship limit is 100", Toast.LENGTH_LONG).show();
+
+                                            }
+
+                                        }
+
+
+                                    });
+
+                                    decreaseUnitNumber.setOnClickListener(v -> {
+
+                                        if (unitNumberText == 1){
+
+
+
+                                        } else {
+
+                                            unitNumberText --;
+                                            unitNumber.setText(String.valueOf(unitNumberText));
+
+                                            calculateChanges(unitNumberText, theFarmUnitPrice, theFarmROI);
+
+                                        }
+
                                     });
 
                                     //follow check
                                     checkFollowedFarmFollowed();
 
 
-                                    farmDescription.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            Intent farmDescIntent = new Intent(FarmDetails.this, FarmDescription.class);
-                                            farmDescIntent.putExtra("FarmId", farmId);
-                                            startActivity(farmDescIntent);
-                                            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-                                        }
+                                    farmDescription.setOnClickListener(v -> {
+                                        Intent farmDescIntent = new Intent(FarmDetails.this, FarmDescription.class);
+                                        farmDescIntent.putExtra("FarmId", farmId);
+                                        startActivity(farmDescIntent);
+                                        overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
                                     });
 
 
-                                    followFarmBtn.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
+                                    followFarmBtn.setOnClickListener(v -> followFarm());
 
-                                            followFarm();
+                                    addToCartBtn.setOnClickListener(v -> {
 
-                                        }
-                                    });
+                                        //execute network check async task
+                                        new CheckInternet(FarmDetails.this, output -> {
 
-                                    addToCartBtn.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-
-                                            //execute network check async task
-                                            CheckInternet asyncTask = (CheckInternet) new CheckInternet(FarmDetails.this, new CheckInternet.AsyncResponse(){
-                                                @Override
-                                                public void processFinish(Integer output) {
-
-                                                    //check all cases
-                                                    if (output == 1){
+                                            //check all cases
+                                            if (output == 1){
 
 
-                                                        sponsorshipRef.child(currentUid)
-                                                                .orderByChild("farmId")
-                                                                .equalTo(farmId)
-                                                                .addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                    @Override
-                                                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                                sponsorshipRef.child(currentUid)
+                                                        .orderByChild("farmId")
+                                                        .equalTo(farmId)
+                                                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(DataSnapshot dataSnapshot1) {
 
-                                                                        int theCount = 0;
+                                                                int theCount = 0;
 
-                                                                        for (DataSnapshot snap : dataSnapshot.getChildren()){
+                                                                for (DataSnapshot snap : dataSnapshot1.getChildren()){
 
-                                                                            int newCount = Integer.parseInt(snap.child("sponsoredUnits").getValue().toString());
+                                                                    int newCount = Integer.parseInt(snap.child("sponsoredUnits").getValue().toString());
 
-                                                                            theCount = theCount + newCount;
+                                                                    theCount = theCount + newCount;
 
-                                                                        }
+                                                                }
 
-                                                                        if (currentFarm.getPackagedType().equalsIgnoreCase("Worker")){
+                                                                if (currentFarm.getPackagedType().equalsIgnoreCase("Worker")){
 
-                                                                            int spaceRemaining = 100 - theCount;
+                                                                    int spaceRemaining = 100 - theCount;
 
-                                                                            if (theCount < 100 && unitNumberText <= spaceRemaining){
+                                                                    if (theCount < 100 && unitNumberText <= spaceRemaining){
 
-                                                                                addToCart(unitNumberText, theFarmUnitPrice, theFarmROI);
+                                                                        addToCart(unitNumberText, theFarmUnitPrice, theFarmROI);
 
-                                                                            } else {
+                                                                    } else {
 
-                                                                                showErrorDialog("You can not exceed sponsorship limit of 100 for this package");
-
-                                                                            }
-
-                                                                        } else
-
-                                                                        if (currentFarm.getPackagedType().equalsIgnoreCase("Student")){
-
-                                                                            int spaceRemaining = 10 - theCount;
-
-                                                                            if (theCount < 10 && unitNumberText <= spaceRemaining){
-
-                                                                                addToCart(unitNumberText, theFarmUnitPrice, theFarmROI);
-
-                                                                            } else {
-
-                                                                                showErrorDialog("You can not exceed sponsorship limit of 10 for this package");
-
-                                                                            }
-
-                                                                        }
-
-
+                                                                        Toast.makeText(FarmDetails.this, "Your sponsorship limit is 100", Toast.LENGTH_LONG).show();
 
                                                                     }
 
-                                                                    @Override
-                                                                    public void onCancelled(DatabaseError databaseError) {
+                                                                } else
+
+                                                                if (currentFarm.getPackagedType().equalsIgnoreCase("Student")){
+
+                                                                    int spaceRemaining = 10 - theCount;
+
+                                                                    if (theCount < 10 && unitNumberText <= spaceRemaining){
+
+                                                                        addToCart(unitNumberText, theFarmUnitPrice, theFarmROI);
+
+                                                                    } else {
+
+                                                                        Toast.makeText(FarmDetails.this, "Your sponsorship limit is 10", Toast.LENGTH_LONG).show();
 
                                                                     }
-                                                                });
 
-                                                    } else
+                                                                }
 
-                                                    if (output == 0){
 
-                                                        //set layout
-                                                        alertDialog.dismiss();
-                                                        Toast.makeText(FarmDetails.this, "No internet connection", Toast.LENGTH_SHORT).show();
 
-                                                    } else
+                                                            }
 
-                                                    if (output == 2){
+                                                            @Override
+                                                            public void onCancelled(DatabaseError databaseError) {
 
-                                                        //set layout
-                                                        alertDialog.dismiss();
-                                                        Toast.makeText(FarmDetails.this, "No network detected", Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        });
 
-                                                    }
+                                            } else
 
-                                                }
-                                            }).execute();
+                                            if (output == 0){
 
-                                        }
+                                                //set layout
+                                                alertDialog.dismiss();
+                                                Toast.makeText(FarmDetails.this, "No internet connection", Toast.LENGTH_SHORT).show();
+
+                                            } else
+
+                                            if (output == 2){
+
+                                                //set layout
+                                                alertDialog.dismiss();
+                                                Toast.makeText(FarmDetails.this, "No network detected", Toast.LENGTH_SHORT).show();
+
+                                            }
+
+                                        }).execute();
+
                                     });
 
                                 }
@@ -483,21 +450,19 @@ public class FarmDetails extends AppCompatActivity {
                                 cartRef.child(currentUid)
                                         .push()
                                         .setValue(cartMap)
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                Toast.makeText(FarmDetails.this, "Added to cart", Toast.LENGTH_SHORT).show();
-                                            }
-                                        }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
+                                        .addOnCompleteListener(task -> {
 
-                                    }
-                                });
+                                            if (task.isSuccessful()){
+
+                                                Toast.makeText(FarmDetails.this, "Added to cart", Toast.LENGTH_SHORT).show();
+
+                                            }
+
+                                        });
 
                             } else {
 
-                                showErrorDialog("This farm has already been added to your cart.");
+                                Toast.makeText(FarmDetails.this, "Already in cart", Toast.LENGTH_SHORT).show();
 
                             }
 
@@ -511,7 +476,7 @@ public class FarmDetails extends AppCompatActivity {
 
         } else {
 
-            showErrorDialog(Common.checkKYC(FarmDetails.this));
+            Toast.makeText(this, Common.checkKYC(FarmDetails.this), Toast.LENGTH_SHORT).show();
 
         }
 
@@ -529,9 +494,9 @@ public class FarmDetails extends AppCompatActivity {
         followedRef.child(currentUid)
                 .child(farmId)
                 .setValue(followedMap)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
+                .addOnCompleteListener(task -> {
+
+                    if (task.isSuccessful()){
 
                         subscribeToNotification(farmId);
 
@@ -539,12 +504,8 @@ public class FarmDetails extends AppCompatActivity {
                         followedFarmButton.setVisibility(View.VISIBLE);
 
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
 
-            }
-        });
+                });
 
     }
 
@@ -637,32 +598,4 @@ public class FarmDetails extends AppCompatActivity {
 
     }
 
-    /*---   WARNING DIALOG   ---*/
-    public void showErrorDialog(String theWarning){
-
-        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this).create();
-        LayoutInflater inflater = this.getLayoutInflater();
-        View viewOptions = inflater.inflate(R.layout.dialog_layout,null);
-
-        final TextView message = (TextView) viewOptions.findViewById(R.id.dialogMessage);
-        final Button okButton = (Button) viewOptions.findViewById(R.id.dialogButton);
-
-        alertDialog.setView(viewOptions);
-
-        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
-        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-
-        message.setText(theWarning);
-
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-            }
-        });
-
-        alertDialog.show();
-
-    }
 }

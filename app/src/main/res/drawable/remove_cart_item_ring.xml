@@ -2,7 +2,7 @@
 <ripple
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:color="@color/offWhite"
+    android:color="@color/fadeRed"
     tools:targetApi="o">
 
     <item>
@@ -12,9 +12,9 @@
             <solid android:color="@color/transparent"/>
 
             <corners
-                android:radius="10dp"/>
+                android:radius="8dp"/>
 
-            <stroke android:width="0.6dp"
+            <stroke android:width="0.8dp"
                 android:color="@color/red"/>
 
         </shape>

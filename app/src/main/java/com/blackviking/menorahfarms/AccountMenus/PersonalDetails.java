@@ -3,8 +3,8 @@ package com.blackviking.menorahfarms.AccountMenus;
 import android.app.DatePickerDialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,16 +12,14 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.blackviking.menorahfarms.Common.ApplicationClass;
 import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
-import com.blackviking.menorahfarms.SignUp;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -60,7 +58,7 @@ public class PersonalDetails extends AppCompatActivity {
 
 
         /*---   FIREBASE   ---*/
-        userRef = db.getReference("Users");
+        userRef = db.getReference(Common.USERS_NODE);
         if (mAuth.getCurrentUser() != null)
             currentUid = mAuth.getCurrentUser().getUid();
 
@@ -68,98 +66,76 @@ public class PersonalDetails extends AppCompatActivity {
         paperUser = Paper.book().read(Common.PAPER_USER);
 
         /*---   WIDGETS   ---*/
-        profileName = (MaterialEditText)findViewById(R.id.profileName);
+        profileName = findViewById(R.id.profileName);
         profileName.setEnabled(false);
-        profileMail = (MaterialEditText)findViewById(R.id.profileEmail);
+        profileMail = findViewById(R.id.profileEmail);
         profileMail.setEnabled(false);
-        profileType = (MaterialEditText)findViewById(R.id.profileType);
+        profileType = findViewById(R.id.profileType);
         profileType.setEnabled(false);
-        profilePhone = (MaterialEditText)findViewById(R.id.profilePhone);
-        profileBirthday = (MaterialEditText)findViewById(R.id.profileBirthday);
-        changeProfileBirthday = (ImageView)findViewById(R.id.changeProfileBirthday);
-        backButton = (ImageView)findViewById(R.id.backButton);
-        profileGender = (MaterialEditText)findViewById(R.id.profileGender);
-        profileNationality = (MaterialEditText)findViewById(R.id.profileNationality);
-        updateProfile = (Button)findViewById(R.id.updateProfileButton);
+        profilePhone = findViewById(R.id.profilePhone);
+        profileBirthday = findViewById(R.id.profileBirthday);
+        changeProfileBirthday = findViewById(R.id.changeProfileBirthday);
+        backButton = findViewById(R.id.backButton);
+        profileGender = findViewById(R.id.profileGender);
+        profileNationality = findViewById(R.id.profileNationality);
+        updateProfile = findViewById(R.id.updateProfileButton);
 
 
         /*---   DATE PICKER   ---*/
-        final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
-
-            @Override
-            public void onDateSet(DatePicker view, int year, int monthOfYear,
-                                  int dayOfMonth) {
-                // TODO Auto-generated method stub
-                myCalendar.set(Calendar.YEAR, year);
-                myCalendar.set(Calendar.MONTH, monthOfYear);
-                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                updateLabel();
-            }
-
+        final DatePickerDialog.OnDateSetListener date = (view, year, monthOfYear, dayOfMonth) -> {
+            // TODO Auto-generated method stub
+            myCalendar.set(Calendar.YEAR, year);
+            myCalendar.set(Calendar.MONTH, monthOfYear);
+            myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            updateLabel();
         };
 
-        changeProfileBirthday.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new DatePickerDialog(PersonalDetails.this, date, myCalendar
-                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
-                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
-            }
-        });
+        changeProfileBirthday.setOnClickListener(v -> new DatePickerDialog(PersonalDetails.this, date, myCalendar
+                .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                myCalendar.get(Calendar.DAY_OF_MONTH)).show());
 
 
         //set current user info
         setUserInfo(paperUser);
 
 
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        backButton.setOnClickListener(v -> finish());
         
         /*---   UPDATE   ---*/
-        updateProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //show loading dialog
-                mDialog = new SpotsDialog(PersonalDetails.this, "Updating . . .");
-                mDialog.setCancelable(false);
-                mDialog.setCanceledOnTouchOutside(false);
-                mDialog.show();
+        updateProfile.setOnClickListener(v -> {
+            //show loading dialog
+            mDialog = new SpotsDialog(PersonalDetails.this, "Updating . . .");
+            mDialog.setCancelable(false);
+            mDialog.setCanceledOnTouchOutside(false);
+            mDialog.show();
 
-                //execute network check async task
-                CheckInternet asyncTask = (CheckInternet) new CheckInternet(PersonalDetails.this, new CheckInternet.AsyncResponse(){
-                    @Override
-                    public void processFinish(Integer output) {
+            //run network check
+            new CheckInternet(PersonalDetails.this, output -> {
 
-                        //check all cases
-                        if (output == 1){
+                //check all cases
+                if (output == 1){
 
-                            updateChanges();
+                    updateChanges();
 
-                        } else
+                } else
 
-                        if (output == 0){
+                if (output == 0){
 
-                            //no internet
-                            mDialog.dismiss();
-                            showErrorDialog("No internet access");
+                    //no internet
+                    mDialog.dismiss();
+                    Toast.makeText(this, "No internet access", Toast.LENGTH_SHORT).show();
 
-                        } else
+                } else
 
-                        if (output == 2){
+                if (output == 2){
 
-                            //no internet
-                            mDialog.dismiss();
-                            showErrorDialog("Not connected to any network");
+                    //no internet
+                    mDialog.dismiss();
+                    Toast.makeText(this, "Not connected to any network", Toast.LENGTH_SHORT).show();
 
-                        }
+                }
 
-                    }
-                }).execute();
-            }
+            }).execute();
         });
     }
 
@@ -177,44 +153,55 @@ public class PersonalDetails extends AppCompatActivity {
 
     private void updateChanges() {
 
-        UserModel thePaperUser = Paper.book().read(Common.PAPER_USER);
-
         String theNewPhone = profilePhone.getText().toString().trim();
         String theNewBirthday = profileBirthday.getText().toString().trim();
         String theNewGender = profileGender.getText().toString().trim();
         String theNewNationality = profileNationality.getText().toString().trim();
 
 
-        final UserModel updateUser = new UserModel(
-                thePaperUser.getEmail(), thePaperUser.getFirstName(), thePaperUser.getLastName(),
-                thePaperUser.getProfilePicture(), thePaperUser.getProfilePictureThumb(), thePaperUser.getSignUpMode(),
-                thePaperUser.getFacebook(), thePaperUser.getInstagram(), thePaperUser.getTwitter(), thePaperUser.getLinkedIn(),
-                thePaperUser.getUserType(), thePaperUser.getUserPackage(), theNewPhone, theNewBirthday,
-                theNewGender, theNewNationality, thePaperUser.getAddress(), thePaperUser.getCity(),
-                thePaperUser.getState(), thePaperUser.getBank(), thePaperUser.getAccountName(), thePaperUser.getAccountNumber(),
-                thePaperUser.getKinName(), thePaperUser.getKinEmail(), thePaperUser.getKinRelationship(), thePaperUser.getKinPhone(),
-                thePaperUser.getKinAddress(), thePaperUser.getAccountManager()
-        );
+        //create map
+        Map<String, Object> updateMap = new HashMap<>();
+        updateMap.put("phone", theNewPhone);
+        updateMap.put("birthday", theNewBirthday);
+        updateMap.put("gender", theNewGender);
+        updateMap.put("nationality", theNewNationality);
 
+        //push
         userRef.child(currentUid)
-                .setValue(updateUser)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
+                .updateChildren(updateMap)
+                .addOnCompleteListener(task -> {
 
-                        if (task.isSuccessful()){
+                    if (task.isSuccessful()){
 
-                            ((ApplicationClass)(getApplicationContext())).setUser(updateUser);
-                            mDialog.dismiss();
-                            finish();
+                        userRef.child(currentUid)
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                        } else {
+                                        UserModel updatedUser = dataSnapshot.getValue(UserModel.class);
 
-                            showErrorDialog("Error occurred, please try again later");
+                                        if (updatedUser != null){
 
-                        }
+                                            ((ApplicationClass)(getApplicationContext())).setUser(updatedUser);
+                                            mDialog.dismiss();
+                                            finish();
+
+                                        }
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+
+                    } else {
+
+                        Toast.makeText(this, "Error occurred, please try again later", Toast.LENGTH_LONG).show();
 
                     }
+
                 });
 
     }
@@ -228,36 +215,6 @@ public class PersonalDetails extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
         finish();
-    }
-
-    /*---   WARNING DIALOG   ---*/
-    public void showErrorDialog(String theWarning){
-
-        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this).create();
-        LayoutInflater inflater = this.getLayoutInflater();
-        View viewOptions = inflater.inflate(R.layout.dialog_layout,null);
-
-        final TextView message = (TextView) viewOptions.findViewById(R.id.dialogMessage);
-        final Button okButton = (Button) viewOptions.findViewById(R.id.dialogButton);
-
-        alertDialog.setView(viewOptions);
-
-        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
-        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-
-        message.setText(theWarning);
-
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-            }
-        });
-
-        alertDialog.show();
-
     }
 }

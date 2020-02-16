@@ -4,9 +4,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
+
+import com.blackviking.menorahfarms.Common.Common;
+import com.google.android.material.tabs.TabLayout;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,9 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.blackviking.menorahfarms.Common.ApplicationClass;
 import com.blackviking.menorahfarms.Common.CheckInternet;
-import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.FarmshopFragments.TabsPager;
 import com.blackviking.menorahfarms.R;
 import com.google.firebase.database.DataSnapshot;
@@ -49,20 +49,20 @@ public class FarmShop extends AppCompatActivity {
 
 
         //Firebase
-        farmRef = db.getReference("Farms");
+        farmRef = db.getReference(Common.FARM_NODE);
 
         /*---   WIDGETS   ---*/
-        dashboardSwitch = (LinearLayout)findViewById(R.id.dashboardLayout);
-        farmstoreSwitch = (LinearLayout)findViewById(R.id.farmShopLayout);
-        accountSwitch = (LinearLayout)findViewById(R.id.accountLayout);
-        dashboardText = (TextView)findViewById(R.id.dashboardText);
-        farmstoreText = (TextView)findViewById(R.id.farmShopText);
-        accountText = (TextView)findViewById(R.id.accountText);
+        dashboardSwitch = findViewById(R.id.dashboardLayout);
+        farmstoreSwitch = findViewById(R.id.farmShopLayout);
+        accountSwitch = findViewById(R.id.accountLayout);
+        dashboardText = findViewById(R.id.dashboardText);
+        farmstoreText = findViewById(R.id.farmShopText);
+        accountText = findViewById(R.id.accountText);
         noInternetLayout = findViewById(R.id.noInternetLayout);
 
 
-        tabLayout = (TabLayout)findViewById(R.id.farmshopTabs);
-        viewPager = (ViewPager)findViewById(R.id.farmshopViewPager);
+        tabLayout = findViewById(R.id.farmshopTabs);
+        viewPager = findViewById(R.id.farmshopViewPager);
 
 
         /*----------    TABS HANDLER   ----------*/
@@ -79,81 +79,71 @@ public class FarmShop extends AppCompatActivity {
         //show loading dialog
         showLoadingDialog("Loading all farms . . .");
 
-        //load farms into memory
-        //execute network check async task
-        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
-            @Override
-            public void processFinish(Integer output) {
+        //run network check
+        new CheckInternet(this, output -> {
 
-                //check all cases
-                if (output == 1){
+            //check all cases
+            if (output == 1){
 
-                    farmRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
+                farmRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-                            //dismiss dialog
-                            alertDialog.dismiss();
+                        //dismiss dialog
+                        alertDialog.dismiss();
 
-                            setFarms();
+                        setFarms();
 
-                        }
+                    }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-                            Toast.makeText(FarmShop.this, "cancelled", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(FarmShop.this, "cancelled", Toast.LENGTH_SHORT).show();
 
-                        }
-                    });
+                    }
+                });
 
-                } else
+            } else
 
-                if (output == 0){
+            if (output == 0){
 
-                    //set layout
-                    alertDialog.dismiss();
-                    noInternetLayout.setVisibility(View.VISIBLE);
-                    tabLayout.setVisibility(View.GONE);
-                    viewPager.setVisibility(View.GONE);
+                //set layout
+                alertDialog.dismiss();
+                noInternetLayout.setVisibility(View.VISIBLE);
+                tabLayout.setVisibility(View.GONE);
+                viewPager.setVisibility(View.GONE);
 
-                } else
+            } else
 
-                if (output == 2){
+            if (output == 2){
 
-                    //set layout
-                    alertDialog.dismiss();
-                    noInternetLayout.setVisibility(View.VISIBLE);
-                    tabLayout.setVisibility(View.GONE);
-                    viewPager.setVisibility(View.GONE);
-
-                }
+                //set layout
+                alertDialog.dismiss();
+                noInternetLayout.setVisibility(View.VISIBLE);
+                tabLayout.setVisibility(View.GONE);
+                viewPager.setVisibility(View.GONE);
 
             }
+
         }).execute();
 
 
-        dashboardSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        dashboardSwitch.setOnClickListener(v -> {
 
-                Intent dashboardIntent = new Intent(FarmShop.this, Dashboard.class);
-                startActivity(dashboardIntent);
-                finish();
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+            Intent dashboardIntent = new Intent(FarmShop.this, Dashboard.class);
+            startActivity(dashboardIntent);
+            finish();
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
 
-            }
         });
-        accountSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        accountSwitch.setOnClickListener(v -> {
 
-                Intent accountIntent = new Intent(FarmShop.this, Account.class);
-                startActivity(accountIntent);
-                finish();
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+            Intent accountIntent = new Intent(FarmShop.this, Account.class);
+            startActivity(accountIntent);
+            finish();
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
 
-            }
         });
 
     }

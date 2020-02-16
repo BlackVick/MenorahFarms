@@ -1,5 +1,6 @@
 package com.blackviking.menorahfarms.AccountMenus;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -11,10 +12,11 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -23,7 +25,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Spinner;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,12 +33,10 @@ import com.blackviking.menorahfarms.BuildConfig;
 import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Common.Permissions;
+import com.blackviking.menorahfarms.HomeActivities.Account;
 import com.blackviking.menorahfarms.Models.StudentModel;
-import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -78,6 +78,7 @@ public class StudentDetails extends AppCompatActivity {
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private DatabaseReference schoolRef;
     private String currentUid;
+    private ProgressBar imageProgress;
     private android.app.AlertDialog mDialog;
 
     private static final int VERIFY_PERMISSIONS_REQUEST = 757;
@@ -86,9 +87,13 @@ public class StudentDetails extends AppCompatActivity {
     private Uri imageUri;
     private FirebaseStorage storage = FirebaseStorage.getInstance();
     private StorageReference imageRef;
-    private String thumbDownloadUrl = "";
+    private String imageUrl;
+    private boolean isUploading = false;
+    private UploadTask uploadTask;
+
+    //loading
     private android.app.AlertDialog alertDialog;
-    private ProgressDialog progressDialog;
+    private boolean isLoading = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,180 +102,157 @@ public class StudentDetails extends AppCompatActivity {
 
 
         /*---   FIREBASE   ---*/
-        schoolRef = db.getReference("StudentDetails");
+        schoolRef = db.getReference(Common.STUDENT_DETAILS_NODE);
         imageRef = storage.getReference("StudentIdImages");
         if (mAuth.getCurrentUser() != null)
             currentUid = mAuth.getCurrentUser().getUid();
         
         
         /*---   WIDGET   ---*/
-        schoolName = (MaterialEditText)findViewById(R.id.studentSchoolName);
-        schoolDepartment = (MaterialEditText)findViewById(R.id.studentDepartment);
-        backButton = (ImageView)findViewById(R.id.backButton);
-        studentId = (ImageView)findViewById(R.id.studentIdCard);
-        updateProfile = (Button)findViewById(R.id.updateProfileButton);
+        schoolName = findViewById(R.id.studentSchoolName);
+        schoolDepartment = findViewById(R.id.studentDepartment);
+        backButton = findViewById(R.id.backButton);
+        studentId = findViewById(R.id.studentIdCard);
+        updateProfile = findViewById(R.id.updateProfileButton);
+        imageProgress = findViewById(R.id.imageProgress);
 
 
-        studentId.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showUploadDialog();
+        //back
+        backButton.setOnClickListener(v -> {
+            if (isLoading){
+                alertDialog.dismiss();
             }
+            if (isUploading){
+
+                uploadTask.cancel();
+
+            }
+            finish();
         });
 
 
-        /*---   CURRENT USER   ---*/
+        //id click
+        studentId.setOnClickListener(v -> {
+
+            //check permissions
+            if (ContextCompat.checkSelfPermission(StudentDetails.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                    && ContextCompat.checkSelfPermission(StudentDetails.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+                    && ContextCompat.checkSelfPermission(StudentDetails.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
+
+                showUploadDialog();
+
+            } else {
+
+                ActivityCompat.requestPermissions(StudentDetails.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, VERIFY_PERMISSIONS_REQUEST);
+
+            }
+
+        });
+
+
+        //load current
+        loadUserDetails(currentUid);
+
+    }
+
+    private void loadUserDetails(String currentUid) {
+
+        //show loading
         showLoadingDialog("Loading student details");
 
-        //execute network check async task
-        CheckInternet asyncTask = (CheckInternet) new CheckInternet(StudentDetails.this, new CheckInternet.AsyncResponse(){
-            @Override
-            public void processFinish(Integer output) {
+        //run network check
+        new CheckInternet(StudentDetails.this, output -> {
 
-                //check all cases
-                if (output == 1){
+            //check all cases
+            if (output == 1){
 
-                    schoolRef.child(currentUid)
-                            .addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
+                schoolRef.child(currentUid)
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                    if (dataSnapshot.exists()) {
+                                if (dataSnapshot.exists()) {
 
-                                        final StudentModel currentStudent = dataSnapshot.getValue(StudentModel.class);
+                                    final StudentModel currentStudent = dataSnapshot.getValue(StudentModel.class);
 
-                                        if (currentStudent != null){
+                                    if (currentStudent != null){
 
-                                            //clear loading dialog
-                                            alertDialog.dismiss();
+                                        //clear loading dialog
+                                        alertDialog.dismiss();
 
-                                            schoolName.setText(currentStudent.getSchoolName());
-                                            schoolDepartment.setText(currentStudent.getDepartment());
+                                        //set school name and details
+                                        schoolName.setText(currentStudent.getSchoolName());
+                                        schoolDepartment.setText(currentStudent.getDepartment());
 
-                                            if (!currentStudent.getStudentIdThumb().equalsIgnoreCase("")){
+                                        //id image
+                                        if (!currentStudent.getStudentIdThumb().equalsIgnoreCase("")){
 
-                                                Picasso.get()
-                                                        .load(currentStudent.getStudentIdThumb())
-                                                        .networkPolicy(NetworkPolicy.OFFLINE)
-                                                        .placeholder(R.drawable.menorah_placeholder)
-                                                        .into(studentId, new Callback() {
-                                                            @Override
-                                                            public void onSuccess() {
+                                            Picasso.get()
+                                                    .load(currentStudent.getStudentIdThumb())
+                                                    .networkPolicy(NetworkPolicy.OFFLINE)
+                                                    .placeholder(R.drawable.menorah_placeholder)
+                                                    .into(studentId, new Callback() {
+                                                        @Override
+                                                        public void onSuccess() {
 
-                                                            }
+                                                        }
 
-                                                            @Override
-                                                            public void onError(Exception e) {
-                                                                Picasso.get()
-                                                                        .load(currentStudent.getStudentIdThumb())
-                                                                        .placeholder(R.drawable.menorah_placeholder)
-                                                                        .into(studentId);
-                                                            }
-                                                        });
+                                                        @Override
+                                                        public void onError(Exception e) {
+                                                            Picasso.get()
+                                                                    .load(currentStudent.getStudentIdThumb())
+                                                                    .placeholder(R.drawable.menorah_placeholder)
+                                                                    .into(studentId);
+                                                        }
+                                                    });
 
-                                            }
+                                            //update
+                                            updateProfile.setOnClickListener(v -> updateChanges(currentStudent.getStudentIdThumb()));
 
                                         }
 
-                                    } else {
 
-                                        alertDialog.dismiss();
 
                                     }
 
+                                } else {
+
+                                    //dismiss dialog
+                                    alertDialog.dismiss();
+
+                                    //update
+                                    updateProfile.setOnClickListener(v -> updateChanges(""));
+
                                 }
 
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
+                            }
 
-                                }
-                            });
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
 
-                } else
+                            }
+                        });
 
-                if (output == 0){
+            } else
 
-                    //no internet
-                    alertDialog.dismiss();
-                    showErrorDialog("No internet access");
+            if (output == 0){
 
-                } else
+                //no internet
+                alertDialog.dismiss();
+                Toast.makeText(StudentDetails.this, "No internet access", Toast.LENGTH_SHORT).show();
 
-                if (output == 2){
+            } else
 
-                    //no internet
-                    alertDialog.dismiss();
-                    showErrorDialog("Not connected to any network");
+            if (output == 2){
 
-                }
+                //no internet
+                alertDialog.dismiss();
+                Toast.makeText(StudentDetails.this, "Not connected to any network", Toast.LENGTH_LONG).show();
 
             }
+
         }).execute();
 
-
-        /*---   PERMISSIONS HANDLER   ---*/
-        if (checkPermissionsArray(Permissions.PERMISSIONS)){
-
-
-        } else {
-
-            verifyPermissions(Permissions.PERMISSIONS);
-
-        }
-
-
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
-
-
-        /*---   UPDATE   ---*/
-        updateProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                mDialog = new SpotsDialog(StudentDetails.this, "Updating . . .");
-                mDialog.setCancelable(false);
-                mDialog.setCanceledOnTouchOutside(false);
-                mDialog.show();
-
-                //execute network check async task
-                CheckInternet asyncTask = (CheckInternet) new CheckInternet(StudentDetails.this, new CheckInternet.AsyncResponse(){
-                    @Override
-                    public void processFinish(Integer output) {
-
-                        //check all cases
-                        if (output == 1){
-
-                            updateChanges();
-
-                        } else
-
-                        if (output == 0){
-
-                            //no internet
-                            mDialog.dismiss();
-                            showErrorDialog("No internet access");
-
-                        } else
-
-                        if (output == 2){
-
-                            //no internet
-                            mDialog.dismiss();
-                            showErrorDialog("Not connected to any network");
-
-                        }
-
-                    }
-                }).execute();
-
-            }
-        });
     }
 
     private void showUploadDialog() {
@@ -339,39 +321,21 @@ public class StudentDetails extends AppCompatActivity {
 
     }
 
-    private void verifyPermissions(String[] permissions) {
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
-        ActivityCompat.requestPermissions(
-                this,
-                permissions,
-                VERIFY_PERMISSIONS_REQUEST
-        );
-    }
+        if (requestCode == VERIFY_PERMISSIONS_REQUEST) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-    private boolean checkPermissionsArray(String[] permissions) {
+                showUploadDialog();
 
-        for (int i = 0; i < permissions.length; i++){
+            } else {
 
-            String check = permissions[i];
-            if (!checkPermissions(check)){
-                return false;
+                Toast.makeText(this, "Storage permission denied", Toast.LENGTH_SHORT).show();
+
             }
-
         }
-        return true;
-    }
 
-    private boolean checkPermissions(String permission) {
-
-        int permissionRequest = ActivityCompat.checkSelfPermission(this, permission);
-
-        if (permissionRequest != PackageManager.PERMISSION_GRANTED){
-
-            return false;
-        } else {
-
-            return true;
-        }
     }
 
     @Override
@@ -397,98 +361,121 @@ public class StudentDetails extends AppCompatActivity {
 
         }
 
-
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             final CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
 
-                //show dialog
-                progressDialog = new ProgressDialog(StudentDetails.this);
-                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                progressDialog.setTitle("Upload In Progress. . .");
-                progressDialog.setProgress(0);
-                progressDialog.setCanceledOnTouchOutside(false);
-                progressDialog.setCancelable(false);
-                progressDialog.show();
+                //show loading
+                imageProgress.setVisibility(View.VISIBLE);
+                studentId.setEnabled(false);
 
-                //execute network check async task
-                CheckInternet asyncTask = (CheckInternet) new CheckInternet(StudentDetails.this, new CheckInternet.AsyncResponse(){
-                    @Override
-                    public void processFinish(Integer output) {
+                //value
+                isUploading = true;
 
-                        //check all cases
-                        if (output == 1){
+                //perform network check
+                new CheckInternet(this, output -> {
 
-                            Uri resultUri = result.getUri();
-                            String imgURI = resultUri.toString();
-                            setImage(imgURI, studentId);
+                    //check all cases
+                    if (output == 1){
 
-                            File thumb_filepath = new File(resultUri.getPath());
+                        //get data
+                        Uri resultUri = result.getUri();
 
-                            try {
-                                Bitmap thumb_bitmap = new Compressor(StudentDetails.this)
-                                        .setMaxWidth(500)
-                                        .setMaxHeight(500)
-                                        .setQuality(75)
-                                        .compressToBitmap(thumb_filepath);
+                        //get file path
+                        File thumb_filepath = new File(resultUri.getPath());
 
-                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                thumb_bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
-                                final byte[] thumb_byte = baos.toByteArray();
+                        try {
 
-                                final StorageReference imageThumbRef1 = imageRef.child("Thumbnails").child(currentUid + ".jpg");
+                            //converting to bitmap
+                            Bitmap thumb_bitmap = new Compressor(StudentDetails.this)
+                                    .setMaxWidth(500)
+                                    .setMaxHeight(500)
+                                    .setQuality(70)
+                                    .compressToBitmap(thumb_filepath);
 
-                                final UploadTask uploadTask = imageThumbRef1.putBytes(thumb_byte);
+                            //compress file size and set format
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            thumb_bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+                            final byte[] thumb_byte = baos.toByteArray();
 
-                                uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumb_task) {
 
-                                        thumbDownloadUrl = thumb_task.getResult().getDownloadUrl().toString();
+                            //set file location and name in firebase
+                            final StorageReference imageThumbRef1 = imageRef.child("Thumbnails").child(currentUid + ".jpg");
 
-                                        if (thumb_task.isSuccessful()) {
+                            //start upload
+                            uploadTask = imageThumbRef1.putBytes(thumb_byte);
 
-                                            progressDialog.dismiss();
+                            //get download link
+                            uploadTask.continueWithTask(task -> {
 
-                                        } else {
-                                            Toast.makeText(StudentDetails.this, "Upload Failed. Please Try Again", Toast.LENGTH_SHORT).show();
-                                            progressDialog.dismiss();
-                                            imageUri = null;
-                                        }
-                                    }
-                                }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                                    @Override
-                                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                                if (!task.isSuccessful()) {
 
-                                        int currentProgress = (int) (100*taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                                        progressDialog.setProgress(currentProgress);
+                                    throw task.getException();
+                                }
 
-                                    }
-                                });
+                                // Continue with the task to get the download URL
+                                return imageThumbRef1.getDownloadUrl();
 
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                            }).addOnCompleteListener(task -> {
 
-                        } else
+                                if (task.isSuccessful()) {
 
-                        if (output == 0){
+                                    Uri downloadUri = task.getResult();
 
-                            //no internet
-                            progressDialog.dismiss();
-                            showErrorDialog("No internet access");
+                                    //link
+                                    imageUrl = downloadUri.toString();
 
-                        } else
+                                    //stop loading
+                                    imageProgress.setVisibility(View.GONE);
+                                    studentId.setEnabled(true);
 
-                        if (output == 2){
+                                    //value
+                                    isUploading = false;
 
-                            //no internet
-                            progressDialog.dismiss();
-                            showErrorDialog("Not connected to any network");
+                                    //update
+                                    setImage(imageUrl, studentId);
 
+                                } else {
+
+                                    Toast.makeText(StudentDetails.this, "FAILED", Toast.LENGTH_SHORT).show();
+
+                                }
+                            });
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
 
+                    } else
+
+                    if (output == 0){
+
+                        //stop loading
+                        imageProgress.setVisibility(View.GONE);
+                        studentId.setEnabled(true);
+
+                        //value
+                        isUploading = false;
+
+                        //no internet
+                        Toast.makeText(StudentDetails.this, "No internet access", Toast.LENGTH_SHORT).show();
+
+                    } else
+
+                    if (output == 2){
+
+                        //stop loading
+                        imageProgress.setVisibility(View.GONE);
+                        studentId.setEnabled(true);
+
+                        //value
+                        isUploading = false;
+
+                        //no network
+                        Toast.makeText(StudentDetails.this, "Not connected to a network", Toast.LENGTH_SHORT).show();
+
                     }
+
                 }).execute();
 
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
@@ -530,16 +517,16 @@ public class StudentDetails extends AppCompatActivity {
 
     private File getOutputMediaFile(int type){
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "Campus Rush");
+                Environment.DIRECTORY_PICTURES), "Menorah Farms");
 
-        /**Create the storage directory if it does not exist*/
+        //Create the storage directory if it does not exist*/
         if (! mediaStorageDir.exists()){
             if (! mediaStorageDir.mkdirs()){
                 return null;
             }
         }
 
-        /**Create a media file name*/
+        //Create a media file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         File mediaFile;
         if (type == 1){
@@ -552,67 +539,111 @@ public class StudentDetails extends AppCompatActivity {
         return mediaFile;
     }
 
-    private void updateChanges() {
+    private void updateChanges(String currentImageUrl) {
 
+        //get strings
         String theNewSchoolName = schoolName.getText().toString().trim();
         String theNewDepartment = schoolDepartment.getText().toString().trim();
 
+        //image url link
+        if (TextUtils.isEmpty(imageUrl)){
+
+            imageUrl = currentImageUrl;
+
+        }
+
+
+        //run checks
         if (TextUtils.isEmpty(theNewSchoolName)){
 
-            mDialog.dismiss();
-            showErrorDialog("Please Provide School Name !");
+            //show error
+            schoolName.requestFocus();
+            schoolName.setError("Required");
 
-        } else if (TextUtils.isEmpty(theNewDepartment)) {
+        } else
 
-            mDialog.dismiss();
-            showErrorDialog("Please Department Name !");
+        if (TextUtils.isEmpty(theNewDepartment)) {
 
-        } else if (thumbDownloadUrl.equalsIgnoreCase("")) {
+            //show error
+            schoolDepartment.requestFocus();
+            schoolDepartment.setError("Required");
 
-            mDialog.dismiss();
-            showErrorDialog("Please Provide Valid ID Card Image");
+        } else
+
+        if (TextUtils.isEmpty(imageUrl)) {
+
+            //show error
+            Toast.makeText(this, "Please provide valid ID card image", Toast.LENGTH_LONG).show();
 
         } else {
 
-            final Map<String, Object> userMap = new HashMap<>();
-            userMap.put("schoolName", theNewSchoolName);
-            userMap.put("department", theNewDepartment);
-            userMap.put("studentId", thumbDownloadUrl);
-            userMap.put("studentIdThumb", thumbDownloadUrl);
-            userMap.put("approval", "pending");
+            //show loading
+            mDialog = new SpotsDialog(StudentDetails.this, "Updating . . .");
+            mDialog.setCancelable(false);
+            mDialog.setCanceledOnTouchOutside(false);
+            mDialog.show();
 
-            schoolRef.child(currentUid)
-                    .setValue(userMap)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
+            //run network check
+            new CheckInternet(StudentDetails.this, output -> {
 
-                            if (task.isSuccessful()){
+                //check all cases
+                if (output == 1){
 
-                                mDialog.dismiss();
-                                finish();
+                    final Map<String, Object> userMap = new HashMap<>();
+                    userMap.put("schoolName", theNewSchoolName);
+                    userMap.put("department", theNewDepartment);
+                    userMap.put("studentId", imageUrl);
+                    userMap.put("studentIdThumb", imageUrl);
+                    userMap.put("approval", "pending");
 
-                            } else {
+                    schoolRef.child(currentUid)
+                            .setValue(userMap)
+                            .addOnCompleteListener(task -> {
 
-                                showErrorDialog("Error occurred, please try again later");
+                                if (task.isSuccessful()){
 
-                            }
+                                    mDialog.dismiss();
+                                    finish();
 
-                        }
-                    });
+                                } else {
+
+                                    Toast.makeText(this, "UPDATE FAILED", Toast.LENGTH_SHORT).show();
+
+                                }
+
+                            });
+
+                } else
+
+                if (output == 0){
+
+                    //no internet
+                    mDialog.dismiss();
+                    Toast.makeText(StudentDetails.this, "No internet access", Toast.LENGTH_SHORT).show();
+
+                } else
+
+                if (output == 2){
+
+                    //no internet
+                    mDialog.dismiss();
+                    Toast.makeText(StudentDetails.this, "Not connected to any network", Toast.LENGTH_LONG).show();
+
+                }
+
+            }).execute();
 
         }
 
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        finish();
-    }
+
 
     /*---   LOADING DIALOG   ---*/
     public void showLoadingDialog(String theMessage){
+
+        //loading
+        isLoading = true;
 
         alertDialog = new android.app.AlertDialog.Builder(this).create();
         LayoutInflater inflater = this.getLayoutInflater();
@@ -628,44 +659,36 @@ public class StudentDetails extends AppCompatActivity {
 
         loadingText.setText(theMessage);
 
+        alertDialog.setCancelable(false);
         alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
-                finish();
+                isLoading = false;
             }
         });
-
-        alertDialog.show();
-
-    }
-
-    /*---   WARNING DIALOG   ---*/
-    public void showErrorDialog(String theWarning){
-
-        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this).create();
-        LayoutInflater inflater = this.getLayoutInflater();
-        View viewOptions = inflater.inflate(R.layout.dialog_layout,null);
-
-        final TextView message = (TextView) viewOptions.findViewById(R.id.dialogMessage);
-        final Button okButton = (Button) viewOptions.findViewById(R.id.dialogButton);
-
-        alertDialog.setView(viewOptions);
-
-        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
-        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-
-        message.setText(theWarning);
-
-        okButton.setOnClickListener(new View.OnClickListener() {
+        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
+            public void onDismiss(DialogInterface dialog) {
+                isLoading = false;
             }
         });
 
         alertDialog.show();
 
     }
+
+    @Override
+    public void onBackPressed() {
+        if (isLoading){
+            alertDialog.dismiss();
+        }
+        if (isUploading){
+
+            uploadTask.cancel();
+
+        }
+        finish();
+    }
+
 }

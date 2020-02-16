@@ -36,7 +36,7 @@
 
             <TextView
                 android:layout_width="0dp"
-                android:layout_weight="8.8"
+                android:layout_weight="7.6"
                 android:layout_height="match_parent"
                 android:text="Farm Manager"
                 android:textColor="@color/white"
@@ -46,6 +46,21 @@
                 android:paddingStart="30dp"
                 android:fontFamily="@font/proxima_nova_bold"/>
 
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_weight="1.2"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_edit_farm"
+                    android:layout_centerInParent="true"
+                    android:id="@+id/editButton"
+                    android:adjustViewBounds="true"/>
+
+            </RelativeLayout>
+
         </LinearLayout>
 
     </RelativeLayout>
@@ -53,7 +68,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="55.1dp"
+        android:layout_marginTop="55dp"
         android:scrollbars="none">
 
         <LinearLayout
@@ -61,12 +76,12 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:animateLayoutChanges="true"
-            android:padding="20dp">
+            android:padding="10dp">
 
             <com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="170dp"
-                app:corner_radius="15dp"
+                app:corner_radius="8dp"
                 android:elevation="6dp">
 
                 <ImageView
@@ -79,27 +94,17 @@
 
             </com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout>
 
-            <LinearLayout
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="10dp"
-                android:animateLayoutChanges="true"
-                android:weightSum="10">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="10"
-                    android:layout_height="wrap_content"
-                    android:text=""
-                    android:textStyle="bold"
-                    android:textSize="23sp"
-                    android:textColor="@color/black"
-                    android:id="@+id/farmManageDetailsType"
-                    android:gravity="center_vertical"
-                    android:fontFamily="@font/proxima_nova_bold"/>
-
-            </LinearLayout>
+                android:layout_marginTop="15dp"
+                android:text=""
+                android:textStyle="bold"
+                android:textSize="23sp"
+                android:textColor="@color/black"
+                android:id="@+id/farmManageDetailsType"
+                android:gravity="center_vertical"
+                android:fontFamily="@font/proxima_nova_bold"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -121,35 +126,152 @@
                 android:layout_marginTop="10dp"
                 android:fontFamily="@font/proxima_nova_regular"/>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text=""
-                android:textColor="@color/black"
-                android:textSize="18sp"
-                android:id="@+id/farmManageDetailStatus"
+                android:orientation="horizontal"
                 android:layout_marginTop="10dp"
-                android:fontFamily="@font/proxima_nova_regular"/>
+                android:weightSum="2">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="@color/packageName"
+                    android:layout_gravity="center"
+                    android:textSize="17sp"
+                    android:id="@+id/farmManageDetailStatus"
+                    android:fontFamily="@font/proxima_nova_regular"/>
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="35dp"
+                    android:layout_marginStart="20dp"
+                    android:background="@drawable/new_login_button"
+                    android:text="CHANGE STATUS"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:textSize="13sp"
+                    android:fontFamily="@font/proxima_nova_regular"
+                    android:id="@+id/changeFarmStatus"
+                    android:visibility="gone"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:weightSum="2">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Sponsorships"
+                    android:textColor="@color/black"
+                    android:layout_gravity="center"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/proxima_nova_regular"/>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_weight="0.1"
+                    android:layout_height="0.2dp"
+                    android:background="@color/fadeGreen"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="0.9"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="@color/black"
+                    android:layout_gravity="center"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/proxima_nova_regular"
+                    android:id="@+id/currentSponsorships"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:weightSum="2">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Sponsored Units"
+                    android:textColor="@color/black"
+                    android:layout_gravity="center"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/proxima_nova_regular"/>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_weight="0.1"
+                    android:layout_height="0.2dp"
+                    android:background="@color/fadeGreen"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="0.9"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="@color/black"
+                    android:layout_gravity="center"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:fontFamily="@font/proxima_nova_regular"
+                    android:id="@+id/currentSponsoredUnits"/>
+
+            </LinearLayout>
 
             <Button
                 android:layout_width="match_parent"
-                android:layout_height="35dp"
+                android:layout_height="40dp"
                 android:background="@drawable/new_login_button"
                 android:id="@+id/activateFarm"
                 android:text="ACTIVATE FARM"
                 android:textColor="@color/white"
-                android:layout_margin="15dp"
+                android:layout_marginTop="15dp"
                 android:visibility="gone"
                 android:fontFamily="@font/proxima_nova_bold"/>
 
             <Button
                 android:layout_width="match_parent"
-                android:layout_height="35dp"
+                android:layout_height="40dp"
+                android:background="@drawable/new_login_button"
+                android:id="@+id/endSponsorship"
+                android:text="End Sponsorship"
+                android:textColor="@color/white"
+                android:layout_marginTop="5dp"
+                android:visibility="gone"
+                android:fontFamily="@font/proxima_nova_bold"/>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
                 android:background="@drawable/new_login_button"
                 android:id="@+id/deactivateFarm"
                 android:text="DEACTIVATE FARM"
                 android:textColor="@color/white"
-                android:layout_margin="15dp"
+                android:layout_marginTop="5dp"
                 android:visibility="gone"
                 android:fontFamily="@font/proxima_nova_bold"/>
 
@@ -157,9 +279,9 @@
                 android:background="@drawable/farm_item_bacground"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:corner_radius="7dp"
+                app:corner_radius="8dp"
                 android:layout_marginTop="10dp"
-                android:padding="10dp"
+                android:padding="5dp"
                 android:id="@+id/activateFarmLayout"
                 android:visibility="gone">
 
@@ -172,39 +294,56 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="How many hours should farm remain activated?"
+                        android:text="Sponsorship Params"
+                        android:textSize="22sp"
                         android:textColor="@color/black"
-                        android:textSize="14sp"
-                        android:fontFamily="@font/proxima_nova_regular"/>
+                        android:textStyle="bold"
+                        android:fontFamily="@font/proxima_nova_bold"
+                        android:layout_margin="7dp"/>
 
-                    <RelativeLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp">
+                        android:orientation="horizontal"
+                        android:weightSum="10"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginStart="7dp"
+                        android:layout_marginEnd="7dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="5"
+                            android:layout_height="wrap_content"
+                            android:text="Gateway duration"
+                            android:textColor="@color/black"
+                            android:textSize="14sp"
+                            android:fontFamily="@font/proxima_nova_regular"
+                            android:layout_gravity="center"/>
 
                         <LinearLayout
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
+                            android:layout_weight="5"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="end"
                             android:orientation="vertical"
-                            android:layout_alignParentEnd="true"
                             android:padding="3dp">
 
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:text="Hour(s)"
-                                android:textSize="16sp"
+                                android:textSize="14sp"
                                 android:textColor="@color/black"
                                 android:layout_gravity="center"
                                 android:gravity="center"
+                                android:textStyle="bold"
                                 android:fontFamily="@font/proxima_nova_regular"/>
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal"
-                                android:layout_marginTop="8dp"
-                                android:layout_gravity="start"
+                                android:layout_gravity="center"
                                 android:id="@+id/farmNumber"
                                 android:background="@drawable/number_button_bacground">
 
@@ -230,7 +369,7 @@
                                         android:layout_width="match_parent"
                                         android:layout_height="match_parent"
                                         android:gravity="center"
-                                        android:text=""
+                                        android:text="0"
                                         android:textColor="@color/white"
                                         android:textSize="16sp"
                                         android:id="@+id/hourNumber"
@@ -255,16 +394,69 @@
 
                         </LinearLayout>
 
-                    </RelativeLayout>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="4dp"
+                        android:background="@drawable/view_back"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginStart="50dp"
+                        android:layout_marginEnd="50dp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="10"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginStart="7dp"
+                        android:layout_marginEnd="7dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="5"
+                            android:layout_height="wrap_content"
+                            android:text="Units Available"
+                            android:textColor="@color/black"
+                            android:textSize="14sp"
+                            android:fontFamily="@font/proxima_nova_regular"
+                            android:layout_gravity="center"/>
+
+                        <RelativeLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="5"
+                            android:layout_height="wrap_content">
+
+                            <EditText
+                                android:layout_width="100dp"
+                                android:layout_height="40dp"
+                                android:background="@drawable/edittext_ring"
+                                android:layout_centerInParent="true"
+                                android:hint="0000"
+                                android:gravity="center"
+                                android:textStyle="normal"
+                                android:textColor="@color/black"
+                                android:textSize="17sp"
+                                android:fontFamily="@font/proxima_nova_regular"
+                                android:id="@+id/unitsEdt"
+                                android:inputType="number"
+                                android:maxLength="4"/>
+
+                        </RelativeLayout>
+
+                    </LinearLayout>
 
                     <Button
                         android:layout_width="match_parent"
-                        android:layout_height="35dp"
+                        android:layout_height="40dp"
                         android:background="@drawable/new_login_button"
                         android:id="@+id/confirmActivation"
                         android:text="CONFIRM ACTIVATION"
                         android:textColor="@color/white"
-                        android:layout_margin="15dp"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginStart="7dp"
+                        android:layout_marginEnd="7dp"
                         android:fontFamily="@font/proxima_nova_bold"/>
 
                 </LinearLayout>

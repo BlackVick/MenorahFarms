@@ -1,16 +1,12 @@
 package com.blackviking.menorahfarms.CartAndHistory;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.blackviking.menorahfarms.AdminDetails.DueSponsorshipDetail;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Models.HistoryModel;
-import com.blackviking.menorahfarms.Models.SponsoredFarmModel;
 import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
 import com.google.firebase.database.DataSnapshot;
@@ -27,11 +23,11 @@ public class HistoryDetails extends AppCompatActivity {
     private TextView dueUserName, dueUserEmail, dueUserBank, dueFarmType, dueUnitPrice, dueUnits, dueRoi,
             dueTotalPaid, dueDuration, dueStartDate, dueEndDate, dueTotalReturn, dueRefNumber;
 
-    private String theDueUserName, theDueUserEmail, theDueUserBank, theDueFarmType, theDueUnitPrice, theDueUnits, theDueRoi,
-            theDueTotalPaid, theDueDuration, theDueStartDate, theDueEndDate, theDueTotalReturn, theDueRefNumber;
+    private String theUserName, theUserEmail, theUserBank, theFarmType, theDueUnitPrice, theDueUnits, theDueRoi,
+            theDueDuration, theDueStartDate, theDueEndDate, theDueTotalReturn, theDueRefNumber, theDueTotalPaid;
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference  userRef, adminHistoryRef, historyRef, sponsoredFarmsRef;
+    private DatabaseReference adminHistoryRef;
     private String userId, historyId;
     private HistoryModel currentSponsorship;
 
@@ -46,69 +42,42 @@ public class HistoryDetails extends AppCompatActivity {
 
 
         /*---   FIREBASE   ---*/
-        userRef = db.getReference("Users");
-        adminHistoryRef = db.getReference("AdminHistory");
-        historyRef = db.getReference("History");
-        sponsoredFarmsRef = db.getReference("SponsoredFarms");
+        adminHistoryRef = db.getReference(Common.ADMIN_HISTORY_NODE);
 
 
         /*---   WIDGETS   ---*/
-        backButton = (ImageView)findViewById(R.id.backButton);
-        dueUserName = (TextView)findViewById(R.id.historyUserName);
-        dueUserEmail = (TextView)findViewById(R.id.historyUserEmail);
-        dueUserBank = (TextView)findViewById(R.id.historyUserBank);
-        dueFarmType = (TextView)findViewById(R.id.historyFarmType);
-        dueUnitPrice = (TextView)findViewById(R.id.historyUnitPrice);
-        dueUnits = (TextView)findViewById(R.id.historyUnits);
-        dueRoi = (TextView)findViewById(R.id.historyRoi);
-        dueTotalPaid = (TextView)findViewById(R.id.historyTotalPaid);
-        dueDuration = (TextView)findViewById(R.id.historyDuration);
-        dueStartDate = (TextView)findViewById(R.id.historyStartDate);
-        dueEndDate = (TextView)findViewById(R.id.historyEndDate);
-        dueTotalReturn = (TextView)findViewById(R.id.historyTotalReturn);
-        dueRefNumber = (TextView)findViewById(R.id.historyRefNumber);
+        backButton = findViewById(R.id.backButton);
+        dueUserName = findViewById(R.id.historyUserName);
+        dueUserEmail = findViewById(R.id.historyUserEmail);
+        dueUserBank = findViewById(R.id.historyUserBank);
+        dueFarmType = findViewById(R.id.historyFarmType);
+        dueUnitPrice = findViewById(R.id.historyUnitPrice);
+        dueUnits = findViewById(R.id.historyUnits);
+        dueRoi = findViewById(R.id.historyRoi);
+        dueTotalPaid = findViewById(R.id.historyTotalPaid);
+        dueDuration = findViewById(R.id.historyDuration);
+        dueStartDate = findViewById(R.id.historyStartDate);
+        dueEndDate = findViewById(R.id.historyEndDate);
+        dueTotalReturn = findViewById(R.id.historyTotalReturn);
+        dueRefNumber = findViewById(R.id.historyRefNumber);
 
 
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        //back
+        backButton.setOnClickListener(v -> finish());
 
 
-        adminHistoryRef.child(historyId)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        HistoryModel currentHistory = dataSnapshot.getValue(HistoryModel.class);
-
-                        if (currentHistory != null){
-
-                            userId = currentHistory.getSponsorshipUser();
-
-                            loadAllDetails(userId);
-
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
+        //load history details
+        loadAllDetails();
 
     }
 
-    private void loadAllDetails(String userId) {
+    private void loadAllDetails() {
 
         UserModel currentUser = Paper.book().read(Common.PAPER_USER);
 
-        theDueUserName = currentUser.getFirstName() + " " + currentUser.getLastName();
-        theDueUserEmail = currentUser.getEmail();
-        theDueUserBank = currentUser.getBank() + ", " + currentUser.getAccountNumber();
+        theUserName = currentUser.getFirstName() + " " + currentUser.getLastName();
+        theUserEmail = currentUser.getEmail();
+        theUserBank = currentUser.getBank() + ", " + currentUser.getAccountNumber();
 
         adminHistoryRef.child(historyId)
                 .addListenerForSingleValueEvent(
@@ -118,7 +87,7 @@ public class HistoryDetails extends AppCompatActivity {
 
                                 currentSponsorship = dataSnapshot.getValue(HistoryModel.class);
 
-                                theDueFarmType = currentSponsorship.getSponsoredFarmType();
+                                theFarmType = currentSponsorship.getSponsoredFarmType();
                                 theDueUnitPrice = currentSponsorship.getUnitPrice();
                                 theDueUnits = currentSponsorship.getSponsoredUnits();
                                 theDueRoi = currentSponsorship.getSponsoredFarmRoi();
@@ -147,10 +116,10 @@ public class HistoryDetails extends AppCompatActivity {
         long unitPrice = Long.parseLong(theDueUnitPrice);
         long totalReturn = Long.parseLong(theDueTotalReturn);
 
-        dueUserName.setText(theDueUserName);
-        dueUserEmail.setText(theDueUserEmail);
-        dueUserBank.setText(theDueUserBank);
-        dueFarmType.setText(theDueFarmType);
+        dueUserName.setText(theUserName);
+        dueUserEmail.setText(theUserEmail);
+        dueUserBank.setText(theUserBank);
+        dueFarmType.setText(theFarmType);
         dueUnitPrice.setText(Common.convertToPrice(HistoryDetails.this, unitPrice));
         dueUnits.setText(theDueUnits);
         dueRoi.setText(theDueRoi + "%");
@@ -165,7 +134,6 @@ public class HistoryDetails extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
         finish();
     }
 }

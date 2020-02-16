@@ -1,23 +1,36 @@
 package com.blackviking.menorahfarms.AdminDetails;
 
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
-import com.blackviking.menorahfarms.HomeActivities.Dashboard;
 import com.blackviking.menorahfarms.Models.FarmModel;
+import com.blackviking.menorahfarms.Models.RunningCycleModel;
+import com.blackviking.menorahfarms.Models.SponsorshipDetailsModel;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.Services.AdminMonitorService;
-import com.blackviking.menorahfarms.Services.SponsorshipMonitor;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -25,12 +38,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.functions.FirebaseFunctionsException;
 import com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout;
 import com.squareup.picasso.Picasso;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,19 +50,32 @@ import io.paperdb.Paper;
 
 public class FarmManagementDetail extends AppCompatActivity {
 
-    private ImageView farmManageDetailImage, decreaseHourNumber, increaseHourNumber, backButton;
+    //widgets
+    private ImageView farmManageDetailImage, decreaseHourNumber, increaseHourNumber, backButton, editButton;
     private TextView farmManageDetailsType, farmManageDetailLocation, farmManageDetailROI,
                         hourNumber, farmManageDetailStatus;
-    private Button activateFarm, confirmActivation, deactivateFarm;
+    private Button activateFarm, endSponsorship, confirmActivation, deactivateFarm;
     private RoundKornerRelativeLayout activateFarmLayout;
+    private EditText unitsEdt;
+    private Button changeFarmStatus;
+    private TextView currentSponsorships, currentSponsoredUnits;
 
+    //firebase
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference farmRef, adminMonitorRef;
+    private DatabaseReference farmRef, runningCycleRef, sponsorshipDetailRef;
+    private FirebaseFunctions mFunctions = FirebaseFunctions.getInstance();
 
+    //values
     private String farmId;
     private int hourInt = 0;
-
     private boolean isMonitorRunning;
+
+    //loading
+    private AlertDialog alertDialog, endSponsorshipDialog;
+    private AlertDialog editFarmDialog;
+    private boolean isLoading = false;
+    private boolean isDisplayingDialog = false;
+    private boolean isEditing = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,8 +88,9 @@ public class FarmManagementDetail extends AppCompatActivity {
 
 
         //Firebase
-        farmRef = db.getReference("Farms");
-        adminMonitorRef = db.getReference("AdminMonitor");
+        farmRef = db.getReference(Common.FARM_NODE);
+        runningCycleRef = db.getReference(Common.RUNNING_CYCLE_NODE);
+        sponsorshipDetailRef = db.getReference(Common.SPONSORSHIP_DETAILS_NODE);
 
 
         //check service run
@@ -94,50 +120,56 @@ public class FarmManagementDetail extends AppCompatActivity {
         activateFarmLayout = findViewById(R.id.activateFarmLayout);
         backButton = findViewById(R.id.backButton);
         deactivateFarm = findViewById(R.id.deactivateFarm);
+        endSponsorship = findViewById(R.id.endSponsorship);
+        unitsEdt = findViewById(R.id.unitsEdt);
+        changeFarmStatus = findViewById(R.id.changeFarmStatus);
+        currentSponsorships = findViewById(R.id.currentSponsorships);
+        currentSponsoredUnits = findViewById(R.id.currentSponsoredUnits);
+        editButton = findViewById(R.id.editButton);
 
 
-        //execute network check async task
-        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
-            @Override
-            public void processFinish(Integer output) {
+        //run network check
+        new CheckInternet(this, output -> {
 
-                //check all cases
-                if (output == 1){
+            //check all cases
+            if (output == 1){
 
-                    loadFarmDetails(farmId);
+                loadFarmDetails(farmId);
 
-                } else
+            } else
 
-                if (output == 0){
+            if (output == 0){
 
-                    //set layout
-                    Toast.makeText(FarmManagementDetail.this, "No internet access", Toast.LENGTH_SHORT).show();
+                //set layout
+                Toast.makeText(FarmManagementDetail.this, "No internet access", Toast.LENGTH_SHORT).show();
 
-                } else
+            } else
 
-                if (output == 2){
+            if (output == 2){
 
-                    //set layout
-                    Toast.makeText(FarmManagementDetail.this, "No network connection detected", Toast.LENGTH_SHORT).show();
-                }
-
+                //set layout
+                Toast.makeText(FarmManagementDetail.this, "No network connection detected", Toast.LENGTH_SHORT).show();
             }
+
         }).execute();
 
 
         //back
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
+        backButton.setOnClickListener(v -> {
+
+            if (isEditing){
+
+                editFarmDialog.dismiss();
             }
+            finish();
+
         });
 
     }
 
-    private void loadFarmDetails(final String farmid) {
+    private void loadFarmDetails(final String farmId) {
 
-        farmRef.child(farmid)
+        farmRef.child(farmId)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -146,7 +178,7 @@ public class FarmManagementDetail extends AppCompatActivity {
 
                         if (currentFarm != null){
 
-                            setFarmDetails(currentFarm, farmid);
+                            setFarmDetails(currentFarm, farmId);
 
                         }
 
@@ -160,8 +192,115 @@ public class FarmManagementDetail extends AppCompatActivity {
 
     }
 
-    private void setFarmDetails(final FarmModel currentFarm, final String farmid) {
+    private void setFarmDetails(final FarmModel currentFarm, final String farmId) {
 
+        //check for sponsorships
+        runningCycleRef.orderByKey().equalTo(currentFarm.getFarmNotiId())
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                        if (!dataSnapshot.exists()){
+
+                            endSponsorship.setVisibility(View.GONE);
+
+                        } else {
+
+                            endSponsorship.setVisibility(View.VISIBLE);
+
+                            //set click event
+                            endSponsorship.setOnClickListener(v -> {
+
+                                //display dialog
+                                endSponsorshipDialog = new AlertDialog.Builder(FarmManagementDetail.this)
+                                        .setTitle("End Sponsorship!")
+                                        .setMessage("Are you sure you want to end " + currentFarm.getFarmName() + "'s sponsorship run?")
+                                        .setNegativeButton("NO", (dialog, which) -> dialog.dismiss())
+                                        .setPositiveButton("YES", (dialog, which) -> {
+                                            //show dialog
+                                            showLoadingDialog("Ending sponsorships . . .");
+
+                                            endSponsorship(currentFarm.getFarmNotiId())
+                                                    .addOnCompleteListener(task -> {
+
+                                                        if (!task.isSuccessful()) {
+
+                                                            Exception e = task.getException();
+                                                            if (e instanceof FirebaseFunctionsException) {
+                                                                FirebaseFunctionsException ffe = (FirebaseFunctionsException) e;
+                                                                FirebaseFunctionsException.Code code = ffe.getCode();
+                                                                Object details = ffe.getDetails();
+
+                                                            }
+
+                                                            //close dialog
+                                                            alertDialog.dismiss();
+
+                                                        } else {
+
+                                                            //close dialog
+                                                            alertDialog.dismiss();
+
+                                                            //close activity
+                                                            finish();
+
+                                                        }
+
+                                                    });
+                                        })
+                                        .setIcon(R.drawable.dash_sponsored_farms)
+                                        .setOnCancelListener(dialogInterface -> isDisplayingDialog = false)
+                                        .setOnDismissListener(dialogInterface -> isDisplayingDialog = false)
+                                        .show();
+
+                            });
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+        //check sponsorships
+        DatabaseReference newRunningCycleRef = db.getReference(Common.RUNNING_CYCLE_NODE)
+                .child(currentFarm.getFarmNotiId());
+        newRunningCycleRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                int sponsorships = 0;
+                int sponsoredUnits = 0;
+                for (DataSnapshot snap : dataSnapshot.getChildren()){
+
+
+                    //sponsorships
+                    sponsorships++;
+
+                    //sponsored units
+                    RunningCycleModel theCycles = snap.getValue(RunningCycleModel.class);
+
+                    int unitSponsored = Integer.parseInt(theCycles.getSponsoredUnits());
+                    sponsoredUnits = unitSponsored + sponsoredUnits;
+
+                }
+
+                //set texts
+                currentSponsorships.setText(String.valueOf(sponsorships));
+                currentSponsoredUnits.setText(String.valueOf(sponsoredUnits));
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        //farm image
         if (!currentFarm.getFarmImageThumb().equalsIgnoreCase("")){
 
             Picasso.get()
@@ -171,6 +310,7 @@ public class FarmManagementDetail extends AppCompatActivity {
 
         }
 
+        //farm details
         farmManageDetailsType.setText(currentFarm.getFarmType());
         farmManageDetailLocation.setText(currentFarm.getFarmLocation());
         farmManageDetailROI.setText("Returns " + currentFarm.getFarmRoi() + "% in " + currentFarm.getSponsorDuration() + " months");
@@ -183,205 +323,561 @@ public class FarmManagementDetail extends AppCompatActivity {
             activateFarmLayout.setVisibility(View.GONE);
             activateFarm.setVisibility(View.GONE);
             deactivateFarm.setVisibility(View.VISIBLE);
+            changeFarmStatus.setVisibility(View.GONE);
 
-            deactivateFarm.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    deactivateTheFarm(currentFarm);
-
-                }
-            });
+            deactivateFarm.setOnClickListener(v -> deactivateTheFarm(currentFarm));
 
         } else {
 
             activateFarmLayout.setVisibility(View.GONE);
             activateFarm.setVisibility(View.VISIBLE);
             deactivateFarm.setVisibility(View.GONE);
+            changeFarmStatus.setVisibility(View.VISIBLE);
 
-            activateFarm.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            //change farm status
+            changeFarmStatus.setOnClickListener(v -> {
 
-                    activateFarmLayout.setVisibility(View.VISIBLE);
-                    activateFarm.setVisibility(View.GONE);
-                    deactivateFarm.setVisibility(View.GONE);
+                PopupMenu popup = new PopupMenu(FarmManagementDetail.this, changeFarmStatus);
+                popup.inflate(R.menu.farm_status_menu);
+                popup.setOnMenuItemClickListener(item -> {
 
-                }
+                    switch (item.getItemId()) {
+
+                        case R.id.action_now_selling:
+
+                            updateStatus(currentFarm.getFarmNotiId(), "Now Selling");
+                            return true;
+
+                        case R.id.action_sold_out:
+
+                            updateStatus(currentFarm.getFarmNotiId(), "Sold Out");
+                            return true;
+
+                        case R.id.action_opening_soon:
+
+                            updateStatus(currentFarm.getFarmNotiId(), "Opening Soon");
+                            return true;
+
+                        default:
+                            return false;
+                    }
+                });
+
+                popup.show();
+
+            });
+
+            //activate farm
+            activateFarm.setOnClickListener(v -> {
+
+                activateFarmLayout.setVisibility(View.VISIBLE);
+                activateFarm.setVisibility(View.GONE);
+                deactivateFarm.setVisibility(View.GONE);
+
             });
 
 
             //increase hour(s)
             hourNumber.setText(String.valueOf(hourInt));
-            increaseHourNumber.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            increaseHourNumber.setOnClickListener(v -> {
 
-                    hourInt++;
-                    hourNumber.setText(String.valueOf(hourInt));
+                hourInt++;
+                hourNumber.setText(String.valueOf(hourInt));
 
-                }
             });
 
             //decrease hour(s)
-            decreaseHourNumber.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            decreaseHourNumber.setOnClickListener(v -> {
 
-                    if (hourInt == 0){
+                if (hourInt == 0){
 
 
 
-                    } else {
+                } else {
 
-                        hourInt --;
-                        hourNumber.setText(String.valueOf(hourInt));
-
-                    }
+                    hourInt --;
+                    hourNumber.setText(String.valueOf(hourInt));
 
                 }
+
             });
 
+            //edit farm
+            editButton.setOnClickListener(view -> showEditDialog(currentFarm));
 
             //confirm activation
-            confirmActivation.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            confirmActivation.setOnClickListener(v -> {
 
-                    if (hourInt > 0) {
-                        startTheCountdownService(farmid, hourInt, currentFarm);
-                    }
+                String theUnitsString = unitsEdt.getText().toString().trim();
+                int theUnitsInt = 0;
+
+                if (!theUnitsString.isEmpty()){
+
+                    theUnitsInt = Integer.parseInt(theUnitsString);
 
                 }
+
+
+                if (theUnitsString.isEmpty()){
+
+                    unitsEdt.requestFocus();
+                    unitsEdt.setError("Required");
+
+                } else
+
+                if (theUnitsInt < 1){
+
+                    unitsEdt.requestFocus();
+                    unitsEdt.setError("Invalid");
+
+                } else
+
+                if (hourInt < 1) {
+
+                    Toast.makeText(this, "Hour cannot be less than 1", Toast.LENGTH_LONG).show();
+
+                } else {
+
+                    startTheCountdownService(farmId, hourInt, currentFarm, theUnitsInt);
+
+                }
+
             });
 
         }
 
+    }
+
+    private void updateStatus(final String farmNotiId, final String newStatus) {
+
+        //show loading
+        showLoadingDialog("Updating farm status . . .");
+
+        //run network check
+        new CheckInternet(this, output -> {
+
+            //check all cases
+            if (output == 1){
+
+                //update status
+                farmRef.orderByChild("farmNotiId").equalTo(farmNotiId)
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                //check
+                                if (dataSnapshot.exists()){
+
+                                    for (DataSnapshot snap : dataSnapshot.getChildren()){
+
+                                        //get key
+                                        String farmIdKey = snap.getKey();
+
+                                        //update
+                                        farmRef.child(farmIdKey).child("farmState").setValue(newStatus);
+                                        farmRef.child(farmIdKey).child("unitsAvailable").setValue("0");
+
+
+                                    }
+
+                                    //stop loading
+                                    alertDialog.dismiss();
+
+                                } else {
+
+                                    //stop loading
+                                    alertDialog.dismiss();
+
+                                    //error
+                                    Toast.makeText(FarmManagementDetail.this, "Error occurred", Toast.LENGTH_SHORT).show();
+
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+
+            } else
+
+            if (output == 0){
+
+                //stop loading
+                alertDialog.dismiss();
+
+                //set layout
+                Toast.makeText(FarmManagementDetail.this, "No internet access", Toast.LENGTH_SHORT).show();
+
+            } else
+
+            if (output == 2){
+
+                //stop loading
+                alertDialog.dismiss();
+
+                //set layout
+                Toast.makeText(FarmManagementDetail.this, "No network connection detected", Toast.LENGTH_SHORT).show();
+            }
+
+        }).execute();
+
+    }
+
+    private Task<String> endSponsorship(final String farmNotiId) {
+
+        // Create the arguments to the callable function.
+        Map<String, Object> data = new HashMap<>();
+        data.put("farm", farmNotiId);
+
+        return mFunctions
+                .getHttpsCallable("endSponsorships")
+                .call(data)
+                .continueWith(task -> {
+                    // This continuation runs on either success or failure, but if the task
+                    // has failed then getResult() will throw an Exception which will be
+                    // propagated down.
+                    String result = (String) task.getResult().getData();
+                    Log.e("EndSponsExep", result);
+
+                    return result;
+                });
     }
 
     private void deactivateTheFarm(FarmModel currentFarm) {
 
-        final Map<String, Object> deactivateFarmMap = new HashMap<>();
-        deactivateFarmMap.put("farmState", "Sold Out");
-        deactivateFarmMap.put("unitsAvailable", "");
+        //run network check
+        new CheckInternet(this, output -> {
 
-        if (Paper.book().read(Common.isFarmServiceRunning)){
+            //check all cases
+            if (output == 1){
 
-            Intent serviceIntent = new Intent(FarmManagementDetail.this, AdminMonitorService.class);
-            stopService(serviceIntent);
-
-        }
-
-        farmRef.orderByChild("farmNotiId")
-                .equalTo(currentFarm.getFarmNotiId())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        for (DataSnapshot snap : dataSnapshot.getChildren()){
-
-                            String theFarmId = snap.getKey();
-
-                            farmRef.child(theFarmId)
-                                    .updateChildren(deactivateFarmMap)
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-
-                                            if (task.isSuccessful()){
-
-                                                activateFarmLayout.setVisibility(View.GONE);
-                                                activateFarm.setVisibility(View.VISIBLE);
-                                                deactivateFarm.setVisibility(View.GONE);
+                //update status
+                updateStatus(currentFarm.getFarmNotiId(), "Sold Out");
 
 
+                //end service
+                if (Paper.book().read(Common.isFarmServiceRunning)){
 
+                    Intent serviceIntent = new Intent(FarmManagementDetail.this, AdminMonitorService.class);
+                    stopService(serviceIntent);
 
-                                            } else {
+                }
 
-                                                Toast.makeText(FarmManagementDetail.this, "Could not complete action", Toast.LENGTH_SHORT).show();
+                //buttons visibilities
+                activateFarmLayout.setVisibility(View.GONE);
+                activateFarm.setVisibility(View.VISIBLE);
+                deactivateFarm.setVisibility(View.GONE);
+                changeFarmStatus.setVisibility(View.VISIBLE);
 
-                                            }
+            } else
 
-                                        }
-                                    });
+            if (output == 0){
 
-                        }
+                //set layout
+                Toast.makeText(FarmManagementDetail.this, "No internet access", Toast.LENGTH_SHORT).show();
 
-                    }
+            } else
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+            if (output == 2){
 
-                    }
-                });
+                //set layout
+                Toast.makeText(FarmManagementDetail.this, "No network connection detected", Toast.LENGTH_SHORT).show();
+            }
+
+        }).execute();
 
     }
 
-    private void startTheCountdownService(final String farmid, final int hourInt, final FarmModel currentFarm) {
+    private void startTheCountdownService(final String farmId, final int hourInt, final FarmModel currentFarm, final int unitsPlanned) {
 
-        //check start time
-        /*final Date currentTime = Calendar.getInstance().getTime();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy  hh:mm");
-        String currentTimeString = formatter.format(currentTime);
+        //run network check
+        new CheckInternet(this, output -> {
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY) + hourInt);
-        final Date endTime = calendar.getTime();
-        String endTimeString = formatter.format(endTime);
-*/
-        final Map<String, Object> activateFarmMap = new HashMap<>();
-        activateFarmMap.put("farmState", "Now Selling");
-        activateFarmMap.put("unitsAvailable", "");
+            //check all cases
+            if (output == 1){
 
-        farmRef.orderByChild("farmNotiId")
-                .equalTo(currentFarm.getFarmNotiId())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+                //update sponsorship details
+                SponsorshipDetailsModel theModel = new SponsorshipDetailsModel(currentFarm.getFarmNotiId(), 0, unitsPlanned, unitsPlanned);
+                sponsorshipDetailRef.setValue(theModel)
+                        .addOnCompleteListener(task -> {
 
-                        for (DataSnapshot snap : dataSnapshot.getChildren()){
+                            if (task.isSuccessful()){
 
-                            String theFarmId = snap.getKey();
+                                //update status
+                                updateStatus(currentFarm.getFarmNotiId(), "Now Selling");
 
-                            farmRef.child(theFarmId)
-                                    .updateChildren(activateFarmMap)
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
+                                //buttons visibilities
+                                activateFarmLayout.setVisibility(View.GONE);
+                                activateFarm.setVisibility(View.GONE);
+                                deactivateFarm.setVisibility(View.VISIBLE);
+                                changeFarmStatus.setVisibility(View.GONE);
 
-                                            if (task.isSuccessful()){
+                                //start service
+                                Intent adminMonitorIntent = new Intent(FarmManagementDetail.this, AdminMonitorService.class);
+                                adminMonitorIntent.putExtra("DurationHours", String.valueOf(hourInt));
+                                adminMonitorIntent.putExtra("FarmType", currentFarm.getFarmNotiId());
+                                adminMonitorIntent.putExtra("FarmId", farmId);
+                                ContextCompat.startForegroundService(FarmManagementDetail.this, adminMonitorIntent);
 
-                                                activateFarmLayout.setVisibility(View.GONE);
-                                                activateFarm.setVisibility(View.GONE);
-                                                deactivateFarm.setVisibility(View.VISIBLE);
+                            } else {
+
+                                //show error
+                                Toast.makeText(this, "Activation unsuccessful!", Toast.LENGTH_LONG).show();
+
+                            }
+
+                        });
+
+            } else
+
+            if (output == 0){
+
+                //set layout
+                Toast.makeText(FarmManagementDetail.this, "No internet access", Toast.LENGTH_SHORT).show();
+
+            } else
+
+            if (output == 2){
+
+                //set layout
+                Toast.makeText(FarmManagementDetail.this, "No network connection detected", Toast.LENGTH_SHORT).show();
+            }
+
+        }).execute();
+
+    }
+
+    private void showEditDialog(final FarmModel currentFarm) {
+
+        //value
+        isEditing = true;
+
+        //show dialog
+        editFarmDialog = new AlertDialog.Builder(FarmManagementDetail.this, R.style.DialogTheme).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.edit_farm_details,null);
+
+        //widgets
+        final EditText roiEdt = viewOptions.findViewById(R.id.roiEdt);
+        final EditText durationEdt = viewOptions.findViewById(R.id.durationEdt);
+        final RelativeLayout cancelButton = viewOptions.findViewById(R.id.cancelButton);
+        final RelativeLayout setButton = viewOptions.findViewById(R.id.setButton);
+        final TextView setText = viewOptions.findViewById(R.id.setText);
+        final ProgressBar setProgress = viewOptions.findViewById(R.id.setProgress);
 
 
-                                            } else {
+        //set dialog properties
+        editFarmDialog.setView(viewOptions);
+        editFarmDialog.getWindow().getAttributes().windowAnimations = R.style.SlideDialogAnimation;
+        editFarmDialog.getWindow().setGravity(Gravity.BOTTOM);
+        editFarmDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        WindowManager.LayoutParams layoutParams = editFarmDialog.getWindow().getAttributes();
+        editFarmDialog.getWindow().setAttributes(layoutParams);
 
-                                                Toast.makeText(FarmManagementDetail.this, "Could not complete action", Toast.LENGTH_SHORT).show();
 
-                                            }
+        //set values
+        roiEdt.setText(currentFarm.getFarmRoi());
+        durationEdt.setText(currentFarm.getSponsorDuration());
+
+
+        //cancel
+        cancelButton.setOnClickListener(v -> editFarmDialog.dismiss());
+
+
+        //set update
+        setButton.setOnClickListener(v -> {
+
+
+            //lock dialog
+            editFarmDialog.setCancelable(false);
+            editFarmDialog.setCanceledOnTouchOutside(false);
+
+
+            //string value
+            final String theRoi = roiEdt.getText().toString().trim();
+            final String theDuration = durationEdt.getText().toString().trim();
+
+
+            //check params
+
+            if (theRoi.isEmpty()){
+
+                roiEdt.requestFocus();
+                roiEdt.setError("Required");
+
+                //unlock dialog
+                editFarmDialog.setCancelable(true);
+                editFarmDialog.setCanceledOnTouchOutside(true);
+
+            } else
+
+            if (theDuration.isEmpty()){
+
+                durationEdt.requestFocus();
+                durationEdt.setError("Required");
+
+                //unlock dialog
+                editFarmDialog.setCancelable(true);
+                editFarmDialog.setCanceledOnTouchOutside(true);
+
+            } else {
+
+                //loading
+                setButton.setEnabled(false);
+                cancelButton.setEnabled(false);
+                setText.setVisibility(View.GONE);
+                setProgress.setVisibility(View.VISIBLE);
+
+
+                //execute network check
+                new CheckInternet(FarmManagementDetail.this, output -> {
+
+                    //check all cases
+                    if (output == 1) {
+
+                        final Map<String, Object> farmUpdateMap = new HashMap<>();
+                        farmUpdateMap.put("farmRoi", theRoi);
+                        farmUpdateMap.put("sponsorDuration", theDuration);
+
+                        //get farm
+                        farmRef.orderByChild("farmNotiId").equalTo(currentFarm.getFarmNotiId())
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                        for (DataSnapshot snap : dataSnapshot.getChildren()){
+
+                                            //get key
+                                            String theKey = snap.getKey();
+
+                                            //push update to firebase
+                                            farmRef.child(theKey)
+                                                    .updateChildren(farmUpdateMap);
 
                                         }
-                                    });
 
-                        }
+                                        //finish
+                                        Toast.makeText(FarmManagementDetail.this, "SUCCESS", Toast.LENGTH_SHORT).show();
 
-                        Intent adminMonitorIntent = new Intent(FarmManagementDetail.this, AdminMonitorService.class);
-                        adminMonitorIntent.putExtra("DurationHours", String.valueOf(hourInt));
-                        adminMonitorIntent.putExtra("FarmType", currentFarm.getFarmNotiId());
-                        adminMonitorIntent.putExtra("FarmId", farmid);
-                        ContextCompat.startForegroundService(FarmManagementDetail.this, adminMonitorIntent);
+                                        //dismiss dialog
+                                        editFarmDialog.dismiss();
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+
+                    } else
+
+                    if (output == 0) {
+
+                        //unlock dialog
+                        editFarmDialog.setCancelable(true);
+                        editFarmDialog.setCanceledOnTouchOutside(true);
+
+                        //loading
+                        setButton.setEnabled(true);
+                        cancelButton.setEnabled(true);
+                        setProgress.setVisibility(View.GONE);
+                        setText.setVisibility(View.VISIBLE);
+
+                        //no internet
+                        Toast.makeText(FarmManagementDetail.this, "No internet access", Toast.LENGTH_SHORT).show();
+
+                    } else
+
+                    if (output == 2) {
+
+                        //unlock dialog
+                        editFarmDialog.setCancelable(true);
+                        editFarmDialog.setCanceledOnTouchOutside(true);
+
+                        //loading
+                        setButton.setEnabled(true);
+                        cancelButton.setEnabled(true);
+                        setProgress.setVisibility(View.GONE);
+                        setText.setVisibility(View.VISIBLE);
+
+                        //no internet
+                        Toast.makeText(FarmManagementDetail.this, "Not connected to a network", Toast.LENGTH_SHORT).show();
 
                     }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                }).execute();
 
-                    }
-                });
+            }
+
+        });
+
+        //listeners
+        editFarmDialog.setOnCancelListener(dialogInterface -> isEditing = false);
+        editFarmDialog.setOnDismissListener(dialogInterface -> isEditing = false);
+
+        editFarmDialog.show();
+
+    }
+
+    /*---   LOADING DIALOG   ---*/
+    public void showLoadingDialog(String theMessage){
+
+        //loading
+        isLoading = true;
+
+        alertDialog = new AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.loading_dialog,null);
+
+        final TextView loadingText = viewOptions.findViewById(R.id.loadingText);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
 
+        loadingText.setText(theMessage);
+
+        alertDialog.setCancelable(false);
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                isLoading = false;
+            }
+        });
+        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                isLoading = false;
+            }
+        });
+
+        alertDialog.show();
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isLoading){
+
+            alertDialog.dismiss();
+
+        }
+        if (isDisplayingDialog) {
+
+
+            endSponsorshipDialog.dismiss();
+        }
+        if (isEditing){
+
+            editFarmDialog.dismiss();
+        }
+        finish();
     }
 }

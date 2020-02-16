@@ -38,6 +38,13 @@
                     android:src="@drawable/profile"
                     android:id="@+id/userAvatar"/>
 
+                <ProgressBar
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_centerInParent="true"
+                    android:visibility="gone"
+                    android:id="@+id/imageProgress"/>
+
             </RelativeLayout>
 
             <LinearLayout
@@ -198,7 +205,7 @@
                                 <ImageView
                                     android:layout_width="70dp"
                                     android:layout_height="wrap_content"
-                                    android:src="@drawable/profile_user"
+                                    android:src="@drawable/ic_personal_new"
                                     android:padding="15dp"
                                     android:adjustViewBounds="true"
                                     android:layout_centerInParent="true"
@@ -242,7 +249,7 @@
                                 <ImageView
                                     android:layout_width="70dp"
                                     android:layout_height="wrap_content"
-                                    android:src="@drawable/profile_contact"
+                                    android:src="@drawable/ic_contact_new"
                                     android:padding="15dp"
                                     android:adjustViewBounds="true"
                                     android:layout_centerInParent="true"/>
@@ -284,7 +291,7 @@
                                 <ImageView
                                     android:layout_width="70dp"
                                     android:layout_height="wrap_content"
-                                    android:src="@drawable/profile_bank"
+                                    android:src="@drawable/ic_bank_new"
                                     android:padding="15dp"
                                     android:adjustViewBounds="true"
                                     android:layout_centerInParent="true"/>
@@ -338,7 +345,7 @@
                                 <ImageView
                                     android:layout_width="70dp"
                                     android:layout_height="wrap_content"
-                                    android:src="@drawable/profile_next_of_kin"
+                                    android:src="@drawable/ic_kin_new"
                                     android:padding="15dp"
                                     android:adjustViewBounds="true"
                                     android:layout_centerInParent="true"/>
@@ -381,7 +388,7 @@
                                 <ImageView
                                     android:layout_width="70dp"
                                     android:layout_height="wrap_content"
-                                    android:src="@drawable/profile_social"
+                                    android:src="@drawable/ic_social_new"
                                     android:padding="15dp"
                                     android:adjustViewBounds="true"
                                     android:layout_centerInParent="true"/>
@@ -424,7 +431,7 @@
                                 <ImageView
                                     android:layout_width="70dp"
                                     android:layout_height="wrap_content"
-                                    android:src="@drawable/profile_student"
+                                    android:src="@drawable/ic_student_new"
                                     android:padding="15dp"
                                     android:adjustViewBounds="true"
                                     android:layout_centerInParent="true"/>
@@ -479,7 +486,7 @@
                                 <ImageView
                                     android:layout_width="70dp"
                                     android:layout_height="wrap_content"
-                                    android:src="@drawable/profile_history"
+                                    android:src="@drawable/ic_history_new"
                                     android:padding="18dp"
                                     android:adjustViewBounds="true"
                                     android:layout_centerInParent="true"/>
@@ -522,7 +529,7 @@
                                 <ImageView
                                     android:layout_width="70dp"
                                     android:layout_height="wrap_content"
-                                    android:src="@drawable/profile_logout"
+                                    android:src="@drawable/ic_logout_new"
                                     android:padding="15dp"
                                     android:adjustViewBounds="true"
                                     android:layout_centerInParent="true"/>
@@ -600,8 +607,8 @@
                 android:visibility="gone">
 
                 <ImageView
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
                     android:layout_margin="10dp"
                     android:layout_alignParentEnd="true"
                     android:id="@+id/reloadPage"
@@ -623,7 +630,7 @@
                         android:text="E-Mail Not Verified"
                         android:gravity="center"
                         android:textColor="@color/colorAccent"
-                        android:textSize="25sp"
+                        android:textSize="18sp"
                         android:textStyle="bold"
                         android:fontFamily="@font/proxima_nova_bold"/>
 
@@ -633,25 +640,27 @@
                         android:text="You have not verified your E-Mail. Please Check your inbox for an Activation Mail or Click the Button Below to resend Mail."
                         android:gravity="center"
                         android:textColor="@color/grey"
-                        android:textSize="15sp"
+                        android:textSize="13sp"
                         android:layout_marginTop="10dp"
                         android:fontFamily="@font/proxima_nova_regular"/>
 
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="25dp"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginEnd="20dp"
-                        android:background="@drawable/read_more_ring"
-                        android:text="Resend Mail"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:id="@+id/resendActivationBtn"
-                        android:fontFamily="@font/proxima_nova_bold"/>
-
                 </LinearLayout>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:background="@drawable/new_login_button"
+                    android:text="Resend Mail"
+                    android:textColor="@color/white"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:id="@+id/resendActivationBtn"
+                    android:fontFamily="@font/proxima_nova_bold"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_margin="10dp"/>
 
             </RelativeLayout>
 

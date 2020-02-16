@@ -49,7 +49,7 @@
 
     </RelativeLayout>
 
-    <android.support.design.widget.TabLayout
+    <com.google.android.material.tabs.TabLayout
         android:id="@+id/historyTabs"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
@@ -60,17 +60,17 @@
         app:tabTextColor="@color/grey"
         app:tabIndicatorHeight="3.2dp">
 
-        <android.support.design.widget.TabItem
+        <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="SUMMARY" />
 
-        <android.support.design.widget.TabItem
+        <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="BY PROJECT" />
 
-    </android.support.design.widget.TabLayout>
+    </com.google.android.material.tabs.TabLayout>
 
     <View
         android:layout_width="match_parent"
@@ -78,7 +78,7 @@
         android:layout_below="@+id/historyTabs"
         android:background="@color/grey"/>
 
-    <android.support.v4.view.ViewPager
+    <androidx.viewpager.widget.ViewPager
         android:layout_below="@+id/historyTabs"
         android:id="@+id/historyViewPager"
         android:layout_width="match_parent"

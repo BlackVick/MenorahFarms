@@ -1,12 +1,9 @@
 package com.blackviking.menorahfarms.AccountMenus;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -17,6 +14,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.blackviking.menorahfarms.Common.ApplicationClass;
 import com.blackviking.menorahfarms.Common.CheckInternet;
@@ -24,10 +22,7 @@ import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Models.BankModel;
 import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
-import com.blackviking.menorahfarms.Registration;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -66,8 +61,8 @@ public class BankDetails extends AppCompatActivity {
 
 
         /*---   FIREBASE   ---*/
-        userRef = db.getReference("Users");
-        bankRef = db.getReference("Banks");
+        userRef = db.getReference(Common.USERS_NODE);
+        bankRef = db.getReference(Common.BANKS_NODE);
         if (mAuth.getCurrentUser() != null)
             currentUid = mAuth.getCurrentUser().getUid();
 
@@ -77,13 +72,13 @@ public class BankDetails extends AppCompatActivity {
 
 
         /*---   WIDGETS   ---*/
-        profileAccountName = (MaterialEditText)findViewById(R.id.profileAccountName);
-        profileAccountNumber = (MaterialEditText)findViewById(R.id.profileAccountNumber);
-        profileBankName = (MaterialEditText)findViewById(R.id.profileBankName);
+        profileAccountName = findViewById(R.id.profileAccountName);
+        profileAccountNumber = findViewById(R.id.profileAccountNumber);
+        profileBankName = findViewById(R.id.profileBankName);
         profileBankName.setEnabled(false);
-        profileBank = (Spinner) findViewById(R.id.bankSpinner);
-        backButton = (ImageView)findViewById(R.id.backButton);
-        updateProfile = (Button)findViewById(R.id.updateProfileButton);
+        profileBank =  findViewById(R.id.bankSpinner);
+        backButton = findViewById(R.id.backButton);
+        updateProfile = findViewById(R.id.updateProfileButton);
 
         //set current user info
         setUserInfo(paperUser);
@@ -97,6 +92,7 @@ public class BankDetails extends AppCompatActivity {
         dataAdapterGender = new ArrayAdapter(this, android.R.layout.simple_spinner_item, bankList);
         dataAdapterGender.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
+        //get bank lists
         bankRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -119,7 +115,7 @@ public class BankDetails extends AppCompatActivity {
             }
         });
 
-
+        //set list click listener
         profileBank.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -139,59 +135,48 @@ public class BankDetails extends AppCompatActivity {
             }
         });
 
-
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        //back
+        backButton.setOnClickListener(v -> finish());
 
 
 
         /*---   UPDATE   ---*/
-        updateProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        updateProfile.setOnClickListener(v -> {
 
-                //show loading dialog
-                mDialog = new SpotsDialog(BankDetails.this, "Updating . . .");
-                mDialog.setCancelable(false);
-                mDialog.setCanceledOnTouchOutside(false);
-                mDialog.show();
+            //show loading dialog
+            mDialog = new SpotsDialog(BankDetails.this, "Updating . . .");
+            mDialog.setCancelable(false);
+            mDialog.setCanceledOnTouchOutside(false);
+            mDialog.show();
 
-                //execute network check async task
-                CheckInternet asyncTask = (CheckInternet) new CheckInternet(BankDetails.this, new CheckInternet.AsyncResponse(){
-                    @Override
-                    public void processFinish(Integer output) {
+            //run network check
+            new CheckInternet(BankDetails.this, output -> {
 
-                        //check all cases
-                        if (output == 1){
+                //check all cases
+                if (output == 1){
 
-                            updateChanges();
+                    updateChanges();
 
-                        } else
+                } else
 
-                        if (output == 0){
+                if (output == 0){
 
-                            //no internet
-                            mDialog.dismiss();
-                            showErrorDialog("No internet access");
+                    //no internet
+                    mDialog.dismiss();
+                    Toast.makeText(this, "No internet access", Toast.LENGTH_SHORT).show();
 
-                        } else
+                } else
 
-                        if (output == 2){
+                if (output == 2){
 
-                            //no internet
-                            mDialog.dismiss();
-                            showErrorDialog("Not connected to any network");
+                    //no internet
+                    mDialog.dismiss();
+                    Toast.makeText(this, "Not connected to any network", Toast.LENGTH_SHORT).show();
 
-                        }
+                }
 
-                    }
-                }).execute();
+            }).execute();
 
-            }
         });
     }
 
@@ -214,55 +199,68 @@ public class BankDetails extends AppCompatActivity {
         if (TextUtils.isEmpty(theNewAccountName)){
 
             mDialog.dismiss();
-            showErrorDialog("Please Enter Account Holder Name");
+            Toast.makeText(this, "Please Enter Account Holder Name", Toast.LENGTH_LONG).show();
 
         } else if (TextUtils.isEmpty(theNewAccountNumber)){
 
             mDialog.dismiss();
-            showErrorDialog("Please Enter Account Number");
+            Toast.makeText(this, "Please Enter Account Number", Toast.LENGTH_LONG).show();
 
         } else if (selectedBank.equalsIgnoreCase("")){
 
             mDialog.dismiss();
-            showErrorDialog("Please Select A Bank");
+            Toast.makeText(this, "Please Select A Bank", Toast.LENGTH_LONG).show();
 
         } else if (selectedBank.equalsIgnoreCase("Bank")){
 
             mDialog.dismiss();
-            showErrorDialog("Please Select A Valid Bank");
+            Toast.makeText(this, "Please Select A Valid Bank", Toast.LENGTH_LONG).show();
 
         } else {
 
-            final UserModel updateUser = new UserModel(
-                    thePaperUser.getEmail(), thePaperUser.getFirstName(), thePaperUser.getLastName(),
-                    thePaperUser.getProfilePicture(), thePaperUser.getProfilePictureThumb(), thePaperUser.getSignUpMode(),
-                    thePaperUser.getFacebook(), thePaperUser.getInstagram(), thePaperUser.getTwitter(), thePaperUser.getLinkedIn(),
-                    thePaperUser.getUserType(), thePaperUser.getUserPackage(), thePaperUser.getPhone(), thePaperUser.getBirthday(),
-                    thePaperUser.getGender(), thePaperUser.getNationality(), thePaperUser.getAddress(), thePaperUser.getCity(),
-                    thePaperUser.getState(), selectedBank, theNewAccountName, theNewAccountNumber,
-                    thePaperUser.getKinName(), thePaperUser.getKinEmail(), thePaperUser.getKinRelationship(), thePaperUser.getKinPhone(),
-                    thePaperUser.getKinAddress(), thePaperUser.getAccountManager()
-            );
 
+            //create map
+            Map<String, Object> updateMap = new HashMap<>();
+            updateMap.put("bank", selectedBank);
+            updateMap.put("accountName", theNewAccountName);
+            updateMap.put("accountNumber", theNewAccountNumber);
+
+            //push
             userRef.child(currentUid)
-                    .setValue(updateUser)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
+                    .updateChildren(updateMap)
+                    .addOnCompleteListener(task -> {
 
-                            if (task.isSuccessful()){
+                        if (task.isSuccessful()){
 
-                                ((ApplicationClass)(getApplicationContext())).setUser(updateUser);
-                                mDialog.dismiss();
-                                finish();
+                            userRef.child(currentUid)
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                            } else {
+                                            UserModel updatedUser = dataSnapshot.getValue(UserModel.class);
 
-                                showErrorDialog("Error occurred, please try again later");
+                                            if (updatedUser != null){
 
-                            }
+                                                ((ApplicationClass)(getApplicationContext())).setUser(updatedUser);
+                                                mDialog.dismiss();
+                                                finish();
+
+                                            }
+
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+
+                        } else {
+
+                            Toast.makeText(this, "Error occurred, please try again later", Toast.LENGTH_LONG).show();
 
                         }
+
                     });
 
         }
@@ -271,36 +269,6 @@ public class BankDetails extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
         finish();
-    }
-
-    /*---   WARNING DIALOG   ---*/
-    public void showErrorDialog(String theWarning){
-
-        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this).create();
-        LayoutInflater inflater = this.getLayoutInflater();
-        View viewOptions = inflater.inflate(R.layout.dialog_layout,null);
-
-        final TextView message = (TextView) viewOptions.findViewById(R.id.dialogMessage);
-        final Button okButton = (Button) viewOptions.findViewById(R.id.dialogButton);
-
-        alertDialog.setView(viewOptions);
-
-        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
-        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-
-        message.setText(theWarning);
-
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-            }
-        });
-
-        alertDialog.show();
-
     }
 }

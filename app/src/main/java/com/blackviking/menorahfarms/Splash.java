@@ -2,7 +2,7 @@ package com.blackviking.menorahfarms;
 
 import android.content.Intent;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 
@@ -27,18 +27,17 @@ public class Splash extends AppCompatActivity {
 
             Intent goToHome = new Intent(Splash.this, Dashboard.class);
             startActivity(goToHome);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             finish();
 
         } else {
 
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Intent loginIntent = new Intent(Splash.this, SignIn.class);
-                    startActivity(loginIntent);
-                    finish();
-                }
-            }, 0);
+            new Handler().postDelayed(() -> {
+                Intent loginIntent = new Intent(Splash.this, SignIn.class);
+                startActivity(loginIntent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                finish();
+            }, 300);
 
         }
 

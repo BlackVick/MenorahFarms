@@ -5,10 +5,11 @@ import android.app.AlertDialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
+import androidx.annotation.NonNull;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.fragment.app.Fragment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +17,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -25,22 +25,19 @@ import android.widget.Toast;
 
 import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
-import com.blackviking.menorahfarms.Models.BankModel;
-import com.blackviking.menorahfarms.Models.FarmModel;
 import com.blackviking.menorahfarms.Notification.APIService;
 import com.blackviking.menorahfarms.Notification.DataMessage;
 import com.blackviking.menorahfarms.Notification.MyResponse;
 import com.blackviking.menorahfarms.R;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.functions.FirebaseFunctionsException;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -58,19 +55,23 @@ import retrofit2.Response;
  */
 public class AdminNotify extends Fragment {
 
+    //widgets
     private EditText followedTopic, followedMessage, sponsoredTopic, sponsoredMessage;
     private Button sendFollowedNotiBtn, sendSponsoredNotiBtn;
+    private FloatingActionButton broadcastToAllFab;
+    private RelativeLayout directionLayout, followedFarmLayout, sponsoredFarmLayout;
 
+    //firebase
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference notificationRef, userRef, farmRef, followedFarmNotiRef, sponsoredFarmNotiRef;
+    private FirebaseFunctions mFunctions = FirebaseFunctions.getInstance();
     private APIService mService;
 
+    //controller
     private Spinner followedSpinner, sponsoredSpinner;
     private RadioGroup notificationStyle;
     private String selectedFollowedGroup = "", selectedSponsoredGroup = "";
 
-    private FloatingActionButton broadcastToAllFab;
-    private RelativeLayout directionLayout, followedFarmLayout, sponsoredFarmLayout;
 
     public AdminNotify() {
         // Required empty public constructor
@@ -83,11 +84,11 @@ public class AdminNotify extends Fragment {
 
         
         /*---   FIREBASE   ---*/
-        notificationRef = db.getReference("Notifications");
-        userRef = db.getReference("Users");
-        farmRef = db.getReference("Farms");
-        followedFarmNotiRef = db.getReference("FollowedFarmsNotification");
-        sponsoredFarmNotiRef = db.getReference("SponsoredFarmsNotification");
+        notificationRef = db.getReference(Common.NOTIFICATIONS_NODE);
+        userRef = db.getReference(Common.USERS_NODE);
+        farmRef = db.getReference(Common.FARM_NODE);
+        followedFarmNotiRef = db.getReference(Common.FOLLOWED_FARMS_NOTIFICATION_NODE);
+        sponsoredFarmNotiRef = db.getReference(Common.SPONSORED_FARMS_NOTIFICATION_NODE);
 
 
         /*---   FCM   ---*/
@@ -111,30 +112,22 @@ public class AdminNotify extends Fragment {
 
 
         //notification style
-        notificationStyle.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId){
+        notificationStyle.setOnCheckedChangeListener((group, checkedId) -> {
+            switch (checkedId){
 
-                    case R.id.followedFarmsNoti:
-                        loadFollowedFarms();
-                        break;
+                case R.id.followedFarmsNoti:
+                    loadFollowedFarms();
+                    break;
 
-                    case R.id.sponsoredFarmsNoti:
-                        loadSponsoredFarms();
-                        break;
+                case R.id.sponsoredFarmsNoti:
+                    loadSponsoredFarms();
+                    break;
 
-                }
             }
         });
 
 
-        broadcastToAllFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openBroadcastDialog();
-            }
-        });
+        broadcastToAllFab.setOnClickListener(v1 -> openBroadcastDialog());
         
         return v;
     }
@@ -156,38 +149,35 @@ public class AdminNotify extends Fragment {
         dataAdapterFollowedFarm = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, followedFarmList);
         dataAdapterFollowedFarm.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        //execute network check async task
-        CheckInternet asyncTask = (CheckInternet) new CheckInternet(getContext(), new CheckInternet.AsyncResponse(){
-            @Override
-            public void processFinish(Integer output) {
+        //run network check
+        new CheckInternet(getContext(), output -> {
 
-                //check all cases
-                if (output == 1){
+            //check all cases
+            if (output == 1){
 
-                    followedFarmNotiRef.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
+                followedFarmNotiRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-                            for (DataSnapshot child : dataSnapshot.getChildren()){
+                        for (DataSnapshot child : dataSnapshot.getChildren()){
 
-                                followedFarmList.add(child.getKey());
-
-                            }
-
-                            followedSpinner.setAdapter(dataAdapterFollowedFarm);
-                            dataAdapterFollowedFarm.notifyDataSetChanged();
+                            followedFarmList.add(child.getKey());
 
                         }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
+                        followedSpinner.setAdapter(dataAdapterFollowedFarm);
+                        dataAdapterFollowedFarm.notifyDataSetChanged();
 
-                        }
-                    });
+                    }
 
-                }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
 
             }
+
         }).execute();
 
         followedSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -210,12 +200,7 @@ public class AdminNotify extends Fragment {
 
 
         //validate
-        sendFollowedNotiBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                checkFollowedFarmsNotiParam();
-            }
-        });
+        sendFollowedNotiBtn.setOnClickListener(v -> checkFollowedFarmsNotiParam());
 
     }
 
@@ -238,111 +223,88 @@ public class AdminNotify extends Fragment {
 
         } else if (TextUtils.isEmpty(selectedFollowedGroup)) {
 
-            showErrorDialog("Select A Farm");
+            Toast.makeText(getContext(), "Select A Farm", Toast.LENGTH_SHORT).show();
 
         } else {
 
             //execute network check async task
-            CheckInternet asyncTask = (CheckInternet) new CheckInternet(getContext(), new CheckInternet.AsyncResponse(){
-                @Override
-                public void processFinish(Integer output) {
+            new CheckInternet(getContext(), output -> {
 
-                    //check all cases
-                    if (output == 1){
+                //check all cases
+                if (output == 1){
 
-                        followedFarmNotiRef
-                                .child(selectedFollowedGroup)
-                                .addListenerForSingleValueEvent(
-                                        new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(DataSnapshot dataSnapshot) {
+                    sendNotificationToFollowedFarms(selectedFollowedGroup, theTopic, theMessage)
+                            .addOnCompleteListener(task -> {
 
-                                                for (DataSnapshot snap : dataSnapshot.getChildren()){
+                                if (!task.isSuccessful()) {
 
-                                                    String theKey = snap.getKey();
-                                                    sendFollowedFarmNoti(theTopic, theMessage, theKey);
+                                    Exception e = task.getException();
+                                    if (e instanceof FirebaseFunctionsException) {
+                                        FirebaseFunctionsException ffe = (FirebaseFunctionsException) e;
+                                        FirebaseFunctionsException.Code code = ffe.getCode();
+                                        Object details = ffe.getDetails();
 
-                                                }
+                                    }
 
-                                                Toast.makeText(getContext(), "Message Sent Successfully", Toast.LENGTH_SHORT).show();
-                                                followedTopic.setText("");
-                                                followedMessage.setText("");
+                                }
 
-                                            }
+                                Toast.makeText(getContext(), "DONE", Toast.LENGTH_SHORT).show();
+                                followedTopic.setText("");
+                                followedMessage.setText("");
 
-                                            @Override
-                                            public void onCancelled(DatabaseError databaseError) {
+                            });
 
-                                            }
-                                        }
-                                );
+                } else
 
-                    } else
+                if (output == 0){
 
-                    if (output == 0){
+                    //set layout
+                    Toast.makeText(getContext(), "No internet access", Toast.LENGTH_SHORT).show();
 
-                        //set layout
-                        showErrorDialog("Failed due to lack of internet access");
+                } else
 
-                    } else
+                if (output == 2){
 
-                    if (output == 2){
-
-                        //set layout
-                        showErrorDialog("Failed due to lack of network connection");
-
-                    }
+                    //set layout
+                    Toast.makeText(getContext(), "Not connected to a network", Toast.LENGTH_SHORT).show();
 
                 }
+
             }).execute();
 
         }
 
     }
 
-    private void sendFollowedFarmNoti(String theTopic, final String theMessage, final String theKey) {
+    private Task<String> sendNotificationToFollowedFarms(final String theFarm, final String theTopic, final String theMessage) {
 
+        //get today String
         final Date todayDate = Calendar.getInstance().getTime();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy  hh:mm");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
         String todayString = formatter.format(todayDate);
 
-        final Map<String, Object> notificationMap = new HashMap<>();
-        notificationMap.put("topic", theTopic);
-        notificationMap.put("message", theMessage);
-        notificationMap.put("time", todayString);
+        // Create the arguments to the callable function.
+        Map<String, Object> data = new HashMap<>();
+        data.put("farm", theFarm);
+        data.put("topic", theTopic);
+        data.put("message", theMessage);
+        data.put("time", todayString);
 
-        notificationRef.child(theKey)
-                .push()
-                .setValue(notificationMap)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
+        return mFunctions
+                .getHttpsCallable("sendNotificationToFollowedFarms")
+                .call(data)
+                .continueWith(task -> {
+                    // This continuation runs on either success or failure, but if the task
+                    // has failed then getResult() will throw an Exception which will be
+                    // propagated down.
+                    String result = (String) task.getResult().getData();
+                    Log.e("SendFollowedNoti", result);
 
-                        if (task.isSuccessful()){
-
-                            Map<String, String> dataSend = new HashMap<>();
-                            dataSend.put("title", "Followed Farms");
-                            dataSend.put("message", theMessage);
-                            DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(theKey).toString(), dataSend);
-
-                            mService.sendNotification(dataMessage)
-                                    .enqueue(new retrofit2.Callback<MyResponse>() {
-                                        @Override
-                                        public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
-
-                                        }
-
-                                        @Override
-                                        public void onFailure(Call<MyResponse> call, Throwable t) {
-                                        }
-                                    });
-
-                        }
-
-                    }
+                    return result;
                 });
-
     }
+
+
 
 
     //SPONSORED FARMS
@@ -360,38 +322,35 @@ public class AdminNotify extends Fragment {
         dataAdapterSponsoredFarm = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, sponsoredFarmList);
         dataAdapterSponsoredFarm.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        //execute network check async task
-        CheckInternet asyncTask = (CheckInternet) new CheckInternet(getContext(), new CheckInternet.AsyncResponse(){
-            @Override
-            public void processFinish(Integer output) {
+        //run network check
+        new CheckInternet(getContext(), output -> {
 
-                //check all cases
-                if (output == 1){
+            //check all cases
+            if (output == 1){
 
-                    sponsoredFarmNotiRef.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
+                sponsoredFarmNotiRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-                            for (DataSnapshot child : dataSnapshot.getChildren()){
+                        for (DataSnapshot child : dataSnapshot.getChildren()){
 
-                                sponsoredFarmList.add(child.getKey());
-
-                            }
-
-                            sponsoredSpinner.setAdapter(dataAdapterSponsoredFarm);
-                            dataAdapterSponsoredFarm.notifyDataSetChanged();
+                            sponsoredFarmList.add(child.getKey());
 
                         }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
+                        sponsoredSpinner.setAdapter(dataAdapterSponsoredFarm);
+                        dataAdapterSponsoredFarm.notifyDataSetChanged();
 
-                        }
-                    });
+                    }
 
-                }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
 
             }
+
         }).execute();
 
         sponsoredSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -413,12 +372,7 @@ public class AdminNotify extends Fragment {
         });
 
         //validate
-        sendSponsoredNotiBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                checkSponsoredFarmsNotiParam();
-            }
-        });
+        sendSponsoredNotiBtn.setOnClickListener(v -> checkSponsoredFarmsNotiParam());
 
     }
 
@@ -441,111 +395,87 @@ public class AdminNotify extends Fragment {
 
         } else if (TextUtils.isEmpty(selectedSponsoredGroup)) {
 
-            showErrorDialog("Select A Farm");
+            Toast.makeText(getContext(), "Select A Farm", Toast.LENGTH_SHORT).show();
 
         } else {
 
             //execute network check async task
-            CheckInternet asyncTask = (CheckInternet) new CheckInternet(getContext(), new CheckInternet.AsyncResponse(){
-                @Override
-                public void processFinish(Integer output) {
+            new CheckInternet(getContext(), output -> {
 
-                    //check all cases
-                    if (output == 1){
+                //check all cases
+                if (output == 1){
 
-                        sponsoredFarmNotiRef
-                                .child(selectedSponsoredGroup)
-                                .addListenerForSingleValueEvent(
-                                        new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(DataSnapshot dataSnapshot) {
+                    sendNotificationToFarmSponsors(selectedSponsoredGroup, theTopic, theMessage)
+                            .addOnCompleteListener(task -> {
 
-                                                for (DataSnapshot snap : dataSnapshot.getChildren()){
+                                if (!task.isSuccessful()) {
 
-                                                    String theKey = snap.getKey();
-                                                    sendSponsoredFarmNoti(theTopic, theMessage, theKey);
+                                    Exception e = task.getException();
+                                    if (e instanceof FirebaseFunctionsException) {
+                                        FirebaseFunctionsException ffe = (FirebaseFunctionsException) e;
+                                        FirebaseFunctionsException.Code code = ffe.getCode();
+                                        Object details = ffe.getDetails();
 
-                                                }
+                                    }
 
-                                                Toast.makeText(getContext(), "Message Sent Successfully", Toast.LENGTH_SHORT).show();
-                                                sponsoredTopic.setText("");
-                                                sponsoredMessage.setText("");
+                                }
 
-                                            }
+                                Toast.makeText(getContext(), "DONE", Toast.LENGTH_SHORT).show();
+                                sponsoredTopic.setText("");
+                                sponsoredMessage.setText("");
 
-                                            @Override
-                                            public void onCancelled(DatabaseError databaseError) {
+                            });
 
-                                            }
-                                        }
-                                );
+                } else
 
-                    } else
+                if (output == 0){
 
-                    if (output == 0){
+                    //set layout
+                    Toast.makeText(getContext(), "No internet access", Toast.LENGTH_SHORT).show();
 
-                        //set layout
-                        showErrorDialog("Failed due to lack of internet access");
+                } else
 
-                    } else
+                if (output == 2){
 
-                    if (output == 2){
-
-                        //set layout
-                        showErrorDialog("Failed due to lack of network connection");
-
-                    }
+                    //set layout
+                    Toast.makeText(getContext(), "No network access", Toast.LENGTH_SHORT).show();
 
                 }
+
             }).execute();
 
         }
 
     }
 
-    private void sendSponsoredFarmNoti(String theTopic, final String theMessage, final String theKey) {
+    private Task<String> sendNotificationToFarmSponsors(final String theFarm, final String theTopic, final String theMessage) {
 
+        //get today String
         final Date todayDate = Calendar.getInstance().getTime();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy  hh:mm");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
         String todayString = formatter.format(todayDate);
 
-        final Map<String, Object> notificationMap = new HashMap<>();
-        notificationMap.put("topic", theTopic);
-        notificationMap.put("message", theMessage);
-        notificationMap.put("time", todayString);
+        // Create the arguments to the callable function.
+        Map<String, Object> data = new HashMap<>();
+        data.put("farm", theFarm);
+        data.put("topic", theTopic);
+        data.put("message", theMessage);
+        data.put("time", todayString);
 
-        notificationRef.child(theKey)
-                .push()
-                .setValue(notificationMap)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
+        return mFunctions
+                .getHttpsCallable("sendNotificationToFarmSponsors")
+                .call(data)
+                .continueWith(task -> {
+                    // This continuation runs on either success or failure, but if the task
+                    // has failed then getResult() will throw an Exception which will be
+                    // propagated down.
+                    String result = (String) task.getResult().getData();
+                    Log.e("SendSponsoredNoti", result);
 
-                        if (task.isSuccessful()){
-
-                            Map<String, String> dataSend = new HashMap<>();
-                            dataSend.put("title", "Sponsored Farms");
-                            dataSend.put("message", theMessage);
-                            DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(theKey).toString(), dataSend);
-
-                            mService.sendNotification(dataMessage)
-                                    .enqueue(new retrofit2.Callback<MyResponse>() {
-                                        @Override
-                                        public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
-
-                                        }
-
-                                        @Override
-                                        public void onFailure(Call<MyResponse> call, Throwable t) {
-                                        }
-                                    });
-
-                        }
-
-                    }
+                    return result;
                 });
-
     }
+
 
 
     //BROADCAST TO ALL
@@ -563,14 +493,7 @@ public class AdminNotify extends Fragment {
         alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
         alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-        sendBroadcastBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                checkBroadcastNotiParam(alertDialog, broadcastTopic, broadcastMessage);
-
-            }
-        });
+        sendBroadcastBtn.setOnClickListener(v -> checkBroadcastNotiParam(alertDialog, broadcastTopic, broadcastMessage));
 
 
         alertDialog.show();
@@ -595,134 +518,79 @@ public class AdminNotify extends Fragment {
 
         } else {
 
-            //execute network check async task
-            CheckInternet asyncTask = (CheckInternet) new CheckInternet(getContext(), new CheckInternet.AsyncResponse(){
-                @Override
-                public void processFinish(Integer output) {
+            //run network check
+            new CheckInternet(getContext(), output -> {
 
-                    //check all cases
-                    if (output == 1){
+                //check all cases
+                if (output == 1){
 
-                        userRef.addListenerForSingleValueEvent(
-                                        new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(DataSnapshot dataSnapshot) {
+                    sendNotificationToAll(theTopic, theMessage)
+                            .addOnCompleteListener(task -> {
 
-                                                for (DataSnapshot snap : dataSnapshot.getChildren()){
+                                if (!task.isSuccessful()) {
 
-                                                    String theKey = snap.getKey();
-                                                    sendBroadcastNoti(theTopic, theMessage, theKey);
+                                    Exception e = task.getException();
+                                    if (e instanceof FirebaseFunctionsException) {
+                                        FirebaseFunctionsException ffe = (FirebaseFunctionsException) e;
+                                        FirebaseFunctionsException.Code code = ffe.getCode();
+                                        Object details = ffe.getDetails();
 
-                                                }
+                                    }
 
-                                                Toast.makeText(getContext(), "Message Sent Successfully", Toast.LENGTH_SHORT).show();
-                                                alertDialog.dismiss();
+                                }
 
-                                            }
+                                Toast.makeText(getContext(), "DONE", Toast.LENGTH_SHORT).show();
+                                alertDialog.dismiss();
 
-                                            @Override
-                                            public void onCancelled(DatabaseError databaseError) {
+                            });
 
-                                            }
-                                        }
-                                );
+                } else
 
-                    } else
+                if (output == 0){
 
-                    if (output == 0){
+                    //set layout
+                    Toast.makeText(getContext(), "No internet access", Toast.LENGTH_SHORT).show();
 
-                        //set layout
-                        showErrorDialog("Failed due to lack of internet access");
+                } else
 
-                    } else
+                if (output == 2){
 
-                    if (output == 2){
-
-                        //set layout
-                        showErrorDialog("Failed due to lack of network connection");
-
-                    }
+                    //set layout
+                    Toast.makeText(getContext(), "No network access", Toast.LENGTH_SHORT).show();
 
                 }
+
             }).execute();
 
         }
 
     }
 
-    private void sendBroadcastNoti(String theTopic, final String theMessage, final String theKey) {
+    private Task<String> sendNotificationToAll(final String theTopic, final String theMessage) {
 
-        Map<String, String> dataSend = new HashMap<>();
-        dataSend.put("title", "Menorah Farms");
-        dataSend.put("message", theMessage);
-        DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(theKey).toString(), dataSend);
-
-        mService.sendNotification(dataMessage)
-                .enqueue(new retrofit2.Callback<MyResponse>() {
-                    @Override
-                    public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
-
-                    }
-
-                    @Override
-                    public void onFailure(Call<MyResponse> call, Throwable t) {
-                    }
-                });
-
+        //get today String
         final Date todayDate = Calendar.getInstance().getTime();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy  hh:mm");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
         String todayString = formatter.format(todayDate);
 
-        final Map<String, Object> notificationMap = new HashMap<>();
-        notificationMap.put("topic", theTopic);
-        notificationMap.put("message", theMessage);
-        notificationMap.put("time", todayString);
+        // Create the arguments to the callable function.
+        Map<String, Object> data = new HashMap<>();
+        data.put("topic", theTopic);
+        data.put("message", theMessage);
+        data.put("time", todayString);
 
-        notificationRef.child(theKey)
-                .push()
-                .setValue(notificationMap)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
+        return mFunctions
+                .getHttpsCallable("sendNotificationToAll")
+                .call(data)
+                .continueWith(task -> {
+                    // This continuation runs on either success or failure, but if the task
+                    // has failed then getResult() will throw an Exception which will be
+                    // propagated down.
+                    String result = (String) task.getResult().getData();
+                    Log.e("SendNotiToAll", result);
 
-                        if (task.isSuccessful()){
-
-
-
-                        }
-
-                    }
+                    return result;
                 });
-
     }
 
-
-    /*---   WARNING DIALOG   ---*/
-    public void showErrorDialog(String theWarning){
-
-        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(getContext()).create();
-        LayoutInflater inflater = this.getLayoutInflater();
-        View viewOptions = inflater.inflate(R.layout.dialog_layout,null);
-
-        final TextView message = (TextView) viewOptions.findViewById(R.id.dialogMessage);
-        final Button okButton = (Button) viewOptions.findViewById(R.id.dialogButton);
-
-        alertDialog.setView(viewOptions);
-
-        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
-        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-
-        message.setText(theWarning);
-
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-            }
-        });
-
-        alertDialog.show();
-
-    }
 }

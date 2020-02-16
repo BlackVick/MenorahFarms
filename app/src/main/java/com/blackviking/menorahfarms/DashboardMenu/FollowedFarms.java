@@ -4,11 +4,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -18,17 +18,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.blackviking.menorahfarms.AccountMenus.StudentDetails;
-import com.blackviking.menorahfarms.CartAndHistory.Cart;
 import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.FarmDetails;
 import com.blackviking.menorahfarms.Interface.ItemClickListener;
-import com.blackviking.menorahfarms.Models.CartModel;
 import com.blackviking.menorahfarms.Models.FarmModel;
 import com.blackviking.menorahfarms.Models.FollowedFarmModel;
 import com.blackviking.menorahfarms.R;
-import com.blackviking.menorahfarms.ViewHolders.CartViewHolder;
 import com.blackviking.menorahfarms.ViewHolders.FollowedFarmViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -39,7 +35,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -54,7 +49,7 @@ public class FollowedFarms extends AppCompatActivity {
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private DatabaseReference followedFarmRef, userRef, farmRef, followedFarmNotiRef;
+    private DatabaseReference followedFarmRef, farmRef, followedFarmNotiRef;
     private String currentuid;
 
     private android.app.AlertDialog alertDialog;
@@ -68,93 +63,84 @@ public class FollowedFarms extends AppCompatActivity {
 
 
         /*---   FIREBASE   ---*/
-        followedFarmRef = db.getReference("FollowedFarms");
-        userRef = db.getReference("Users");
-        farmRef = db.getReference("Farms");
-        followedFarmNotiRef = db.getReference("FollowedFarmsNotification");
+        followedFarmRef = db.getReference(Common.FOLLOWED_FARMS_NODE);
+        farmRef = db.getReference(Common.FARM_NODE);
+        followedFarmNotiRef = db.getReference(Common.FOLLOWED_FARMS_NOTIFICATION_NODE);
         if (mAuth.getCurrentUser() != null)
             currentuid = mAuth.getCurrentUser().getUid();
 
 
         /*---   WIDGETS   ---*/
-        backButton = (ImageView)findViewById(R.id.backButton);
-        emptyLayout = (LinearLayout)findViewById(R.id.emptyLayout);
-        followedFarmRecycler = (RecyclerView)findViewById(R.id.followedFarmsRecycler);
+        backButton = findViewById(R.id.backButton);
+        emptyLayout = findViewById(R.id.emptyLayout);
+        followedFarmRecycler = findViewById(R.id.followedFarmsRecycler);
         noInternetLayout = findViewById(R.id.noInternetLayout);
 
 
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        backButton.setOnClickListener(v -> finish());
 
 
         //show loading dialog
         showLoadingDialog("Loading followed farms . . .");
 
-        //execute network check async task
-        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
-            @Override
-            public void processFinish(Integer output) {
+        //run network check
+        new CheckInternet(this, output -> {
 
-                //check all cases
-                if (output == 1){
+            //check all cases
+            if (output == 1){
 
-                    /*---   CHECK IF USER CART EMPTY   ---*/
-                    followedFarmRef.child(currentuid)
-                            .addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
+                /*---   CHECK IF USER CART EMPTY   ---*/
+                followedFarmRef.child(currentuid)
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                    if (dataSnapshot.exists()){
+                                if (dataSnapshot.exists()){
 
-                                        emptyLayout.setVisibility(View.GONE);
-                                        noInternetLayout.setVisibility(View.GONE);
-                                        followedFarmRecycler.setVisibility(View.VISIBLE);
-                                        loadFollowedFarms();
+                                    emptyLayout.setVisibility(View.GONE);
+                                    noInternetLayout.setVisibility(View.GONE);
+                                    followedFarmRecycler.setVisibility(View.VISIBLE);
+                                    loadFollowedFarms();
 
-                                    } else {
+                                } else {
 
-                                        alertDialog.dismiss();
-                                        emptyLayout.setVisibility(View.VISIBLE);
-                                        noInternetLayout.setVisibility(View.GONE);
-                                        followedFarmRecycler.setVisibility(View.GONE);
-
-                                    }
+                                    alertDialog.dismiss();
+                                    emptyLayout.setVisibility(View.VISIBLE);
+                                    noInternetLayout.setVisibility(View.GONE);
+                                    followedFarmRecycler.setVisibility(View.GONE);
 
                                 }
 
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
+                            }
 
-                                }
-                            });
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
 
-                } else
+                            }
+                        });
 
-                if (output == 0){
+            } else
 
-                    //set layout
-                    alertDialog.dismiss();
-                    noInternetLayout.setVisibility(View.VISIBLE);
-                    followedFarmRecycler.setVisibility(View.GONE);
-                    emptyLayout.setVisibility(View.GONE);
+            if (output == 0){
 
-                } else
+                //set layout
+                alertDialog.dismiss();
+                noInternetLayout.setVisibility(View.VISIBLE);
+                followedFarmRecycler.setVisibility(View.GONE);
+                emptyLayout.setVisibility(View.GONE);
 
-                if (output == 2){
+            } else
 
-                    //set layout
-                    alertDialog.dismiss();
-                    noInternetLayout.setVisibility(View.VISIBLE);
-                    followedFarmRecycler.setVisibility(View.GONE);
-                    emptyLayout.setVisibility(View.GONE);
+            if (output == 2){
 
-                }
+                //set layout
+                alertDialog.dismiss();
+                noInternetLayout.setVisibility(View.VISIBLE);
+                followedFarmRecycler.setVisibility(View.GONE);
+                emptyLayout.setVisibility(View.GONE);
 
             }
+
         }).execute();
 
     }

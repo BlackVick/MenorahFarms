@@ -3,9 +3,9 @@ package com.blackviking.menorahfarms.AdminFragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,12 +18,8 @@ import com.blackviking.menorahfarms.Models.FarmModel;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.ViewHolders.FarmManagementViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -61,33 +57,30 @@ public class FarmManagement extends Fragment {
 
 
         //execute network check async task
-        CheckInternet asyncTask = (CheckInternet) new CheckInternet(getContext(), new CheckInternet.AsyncResponse(){
-            @Override
-            public void processFinish(Integer output) {
+        new CheckInternet(getContext(), output -> {
 
-                //check all cases
-                if (output == 1){
+            //check all cases
+            if (output == 1){
 
-                    loadFarms();
+                loadFarms();
 
-                } else
+            } else
 
-                if (output == 0){
+            if (output == 0){
 
-                    //set layout
-                    noInternetLayout.setVisibility(View.VISIBLE);
-                    farmsRecycler.setVisibility(View.GONE);
+                //set layout
+                noInternetLayout.setVisibility(View.VISIBLE);
+                farmsRecycler.setVisibility(View.GONE);
 
-                } else
+            } else
 
-                if (output == 2){
+            if (output == 2){
 
-                    //set layout
-                    noInternetLayout.setVisibility(View.VISIBLE);
-                    farmsRecycler.setVisibility(View.GONE);
-                }
-
+                //set layout
+                noInternetLayout.setVisibility(View.VISIBLE);
+                farmsRecycler.setVisibility(View.GONE);
             }
+
         }).execute();
 
         return v;
@@ -130,16 +123,13 @@ public class FarmManagement extends Fragment {
                 viewHolder.farmManageStatus.setText(model.getFarmState());
 
 
-                viewHolder.setItemClickListener(new ItemClickListener() {
-                    @Override
-                    public void onClick(View view, int position, boolean isLongClick) {
+                viewHolder.setItemClickListener((view, position1, isLongClick) -> {
 
-                        Intent farmmanageIntent = new Intent(getContext(), FarmManagementDetail.class);
-                        farmmanageIntent.putExtra("FarmId", farmId);
-                        startActivity(farmmanageIntent);
-                        getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+                    Intent farmmanageIntent = new Intent(getContext(), FarmManagementDetail.class);
+                    farmmanageIntent.putExtra("FarmId", farmId);
+                    startActivity(farmmanageIntent);
+                    getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
 
-                    }
                 });
 
             }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
+<androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
@@ -28,8 +28,8 @@
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:background="@color/colorPrimaryDark"
+            android:layout_height="5dp"
+            android:background="@drawable/view_back"
             android:layout_marginStart="35dp"
             android:layout_marginEnd="35dp"/>
 
@@ -44,7 +44,7 @@
             android:textColor="@color/black"
             android:textSize="15sp"
             android:padding="15dp"
-            android:background="@color/offWhite"
+            android:background="@drawable/edittext_ring"
             android:drawableStart="@drawable/ic_notifications"
             android:drawablePadding="6dp"
             android:hint="Title"
@@ -62,13 +62,14 @@
             android:textColor="@color/black"
             android:textSize="13sp"
             android:padding="15dp"
-            android:background="@color/offWhite"
+            android:background="@drawable/edittext_ring"
             android:drawableStart="@drawable/ic_notifications"
             android:drawablePadding="6dp"
             android:hint="Message"
             android:textColorHint="@color/grey"
             android:id="@+id/broadcastMessage"
             android:minLines="4"
+            android:inputType="textCapSentences|textMultiLine"
             android:fontFamily="@font/proxima_nova_regular"/>
 
         <Button
@@ -78,10 +79,12 @@
             android:text="SEND BROADCAST"
             android:textSize="16sp"
             android:textColor="@color/white"
-            android:layout_margin="15dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="30dp"
             android:background="@drawable/new_login_button"
             android:fontFamily="@font/proxima_nova_bold"/>
 
     </LinearLayout>
 
-</android.support.v7.widget.CardView>
+</androidx.cardview.widget.CardView>

@@ -3,8 +3,8 @@ package com.blackviking.menorahfarms;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -56,18 +56,18 @@ public class Registration extends AppCompatActivity {
 
 
         /*---   FIREBASE   ---*/
-        userRef = db.getReference("Users");
-        authed = db.getReference("AuthedUsers");
+        userRef = db.getReference(Common.USERS_NODE);
+        authed = db.getReference(Common.AUTHED_USERS_NODE);
         if (mAuth.getCurrentUser() != null)
             currentUid = mAuth.getCurrentUser().getUid();
 
 
 
         /*---   WIDGETS   ---*/
-        backButton = (ImageView)findViewById(R.id.backButton);
-        registerFirstName = (MaterialEditText)findViewById(R.id.registerFirstName);
-        registerLastName = (MaterialEditText)findViewById(R.id.registerLastName);
-        signupButton = (Button)findViewById(R.id.signUpButton);
+        backButton = findViewById(R.id.backButton);
+        registerFirstName = findViewById(R.id.registerFirstName);
+        registerLastName = findViewById(R.id.registerLastName);
+        signupButton = findViewById(R.id.signUpButton);
 
 
         /*---   CURRENT USER   ---*/
@@ -96,58 +96,47 @@ public class Registration extends AppCompatActivity {
 
 
         /*---   SAVE CHANGES   ---*/
-        signupButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        signupButton.setOnClickListener(v -> {
 
-                //show dialog
-                mDialog = new SpotsDialog(Registration.this, "Writing Changes . . .");
-                mDialog.setCancelable(false);
-                mDialog.setCanceledOnTouchOutside(false);
-                mDialog.show();
+            //show dialog
+            mDialog = new SpotsDialog(Registration.this, "Writing Changes . . .");
+            mDialog.setCancelable(false);
+            mDialog.setCanceledOnTouchOutside(false);
+            mDialog.show();
 
-                //execute network check async task
-                CheckInternet asyncTask = (CheckInternet) new CheckInternet(Registration.this, new CheckInternet.AsyncResponse(){
-                    @Override
-                    public void processFinish(Integer output) {
+            //execute network check async task
+            new CheckInternet(Registration.this, output -> {
 
-                        //check all cases
-                        if (output == 1){
+                //check all cases
+                if (output == 1){
 
-                            saveChanges();
+                    saveChanges();
 
-                        } else
+                } else
 
-                        if (output == 0){
+                if (output == 0){
 
-                            //no internet
-                            mDialog.dismiss();
-                            showErrorDialog("No internet access");
+                    //no internet
+                    mDialog.dismiss();
+                    Toast.makeText(this, "No internet access", Toast.LENGTH_SHORT).show();
 
-                        } else
+                } else
 
-                        if (output == 2){
+                if (output == 2){
 
-                            //no internet
-                            mDialog.dismiss();
-                            showErrorDialog("Not connected to any network");
+                    //no internet
+                    mDialog.dismiss();
+                    Toast.makeText(this, "Not connected to any network", Toast.LENGTH_LONG).show();
 
-                        }
+                }
 
-                    }
-                }).execute();
+            }).execute();
 
-            }
         });
 
 
         /*---    BACK   ---*/
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                resetSignIn();
-            }
-        });
+        backButton.setOnClickListener(v -> resetSignIn());
     }
 
     private void saveChanges() {
@@ -180,24 +169,21 @@ public class Registration extends AppCompatActivity {
             userMap.put("lastName", theLastName);
 
             userRef.child(currentUid)
-                    .updateChildren(userMap).addOnSuccessListener(
-                    new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
+                    .updateChildren(userMap)
+                    .addOnCompleteListener(task -> {
+
+                        if (task.isSuccessful()){
 
                             goToHome(currentUid);
 
-                        }
-                    }
-            ).addOnFailureListener(
-                    new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
+                        } else {
+
                             mDialog.dismiss();
-                            Toast.makeText(Registration.this, "Error occurred, please try again later.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Registration.this, "Error occurred, please try again later.", Toast.LENGTH_LONG).show();
+
                         }
-                    }
-            );
+
+                    });
 
         }
 
@@ -205,6 +191,7 @@ public class Registration extends AppCompatActivity {
 
     private void goToHome(String currentUid) {
 
+        //save user profile offline
         userRef.child(currentUid)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -222,39 +209,32 @@ public class Registration extends AppCompatActivity {
                     }
                 });
 
+        //dismiss dialog
         mDialog.dismiss();
 
+        //save user is locally
         Paper.book().write(Common.USER_ID, currentUid);
 
+        //subscribe to notifications
         FirebaseMessaging.getInstance().subscribeToTopic(currentUid);
         FirebaseMessaging.getInstance().subscribeToTopic(Common.GENERAL_NOTIFY);
 
+        //launch activity and clear back stack
         Intent homeIntent = new Intent(Registration.this, Dashboard.class);
         homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(homeIntent);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         finish();
 
     }
 
     private void resetSignIn() {
 
-        if (signUpType.equalsIgnoreCase("Facebook")){
-
-            mAuth.getCurrentUser().delete();
-            userRef.child(currentUid).removeValue();
-            authed.child(currentUid).removeValue();
-            mAuth.signOut();
-            finish();
-
-        } else {
-
-            mAuth.getCurrentUser().delete();
-            userRef.child(currentUid).removeValue();
-            authed.child(currentUid).removeValue();
-            mAuth.signOut();
-            finish();
-
-        }
+        mAuth.getCurrentUser().delete();
+        userRef.child(currentUid).removeValue();
+        authed.child(currentUid).removeValue();
+        mAuth.signOut();
+        finish();
 
     }
 
@@ -263,32 +243,4 @@ public class Registration extends AppCompatActivity {
         resetSignIn();
     }
 
-    /*---   WARNING DIALOG   ---*/
-    public void showErrorDialog(String theWarning){
-
-        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this).create();
-        LayoutInflater inflater = this.getLayoutInflater();
-        View viewOptions = inflater.inflate(R.layout.dialog_layout,null);
-
-        final TextView message = (TextView) viewOptions.findViewById(R.id.dialogMessage);
-        final Button okButton = (Button) viewOptions.findViewById(R.id.dialogButton);
-
-        alertDialog.setView(viewOptions);
-
-        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
-        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-
-        message.setText(theWarning);
-
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-            }
-        });
-
-        alertDialog.show();
-
-    }
 }

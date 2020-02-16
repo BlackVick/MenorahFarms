@@ -5,21 +5,17 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.blackviking.menorahfarms.AccountMenus.StudentDetails;
-import com.blackviking.menorahfarms.CartAndHistory.Cart;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.FarmDetails;
 import com.blackviking.menorahfarms.Interface.ItemClickListener;
@@ -50,9 +46,8 @@ public class NowSellingFragment extends Fragment {
     private LinearLayoutManager layoutManager;
     private FirebaseRecyclerAdapter<FarmModel, FarmStoreViewHolder> adapter;
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private DatabaseReference userRef, farmRef;
-    private String currentUid, userType;
+    private DatabaseReference farmRef;
+    private String userType;
 
 
     public NowSellingFragment() {
@@ -66,15 +61,12 @@ public class NowSellingFragment extends Fragment {
 
 
         /*---   FIREBASE   ---*/
-        userRef = db.getReference("Users");
-        farmRef = db.getReference("Farms");
-        if (mAuth.getCurrentUser() != null)
-            currentUid = mAuth.getCurrentUser().getUid();
+        farmRef = db.getReference(Common.FARM_NODE);
 
 
         /*---   WIDGETS   ---*/
-        emptyLayout = (LinearLayout)v.findViewById(R.id.emptyNowSellingLayout);
-        nowSellingRecycler = (RecyclerView)v.findViewById(R.id.nowSellingRecycler);
+        emptyLayout = v.findViewById(R.id.emptyNowSellingLayout);
+        nowSellingRecycler = v.findViewById(R.id.nowSellingRecycler);
 
 
         /*---   CURRENT USER   ---*/
@@ -149,34 +141,31 @@ public class NowSellingFragment extends Fragment {
 
                     if (model.getPackagedType().equalsIgnoreCase("Student")){
 
-                        viewHolder.setItemClickListener(new ItemClickListener() {
-                            @Override
-                            public void onClick(View view, int position, boolean isLongClick) {
-                                if (userType.equalsIgnoreCase("Student")){
+                        viewHolder.setItemClickListener((view, position1, isLongClick) -> {
 
-                                    Intent farmDetailIntent = new Intent(getContext(), FarmDetails.class);
-                                    farmDetailIntent.putExtra("FarmId", adapter.getRef(viewHolder.getAdapterPosition()).getKey());
-                                    startActivity(farmDetailIntent);
-                                    getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+                            if (userType.equalsIgnoreCase("Student")){
 
-                                } else {
-
-                                    openAcadaDialog();
-
-                                }
-                            }
-                        });
-
-                    } else {
-
-                        viewHolder.setItemClickListener(new ItemClickListener() {
-                            @Override
-                            public void onClick(View view, int position, boolean isLongClick) {
                                 Intent farmDetailIntent = new Intent(getContext(), FarmDetails.class);
                                 farmDetailIntent.putExtra("FarmId", adapter.getRef(viewHolder.getAdapterPosition()).getKey());
                                 startActivity(farmDetailIntent);
                                 getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+
+                            } else {
+
+                                openAcadaDialog();
+
                             }
+
+                        });
+
+                    } else {
+
+                        viewHolder.setItemClickListener((view, position12, isLongClick) -> {
+
+                            Intent farmDetailIntent = new Intent(getContext(), FarmDetails.class);
+                            farmDetailIntent.putExtra("FarmId", adapter.getRef(viewHolder.getAdapterPosition()).getKey());
+                            startActivity(farmDetailIntent);
+                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
                         });
 
                     }
@@ -191,14 +180,11 @@ public class NowSellingFragment extends Fragment {
                     viewHolder.farmROI.setText("Returns " + model.getFarmRoi() + "% in " + model.getSponsorDuration() + " months");
                     viewHolder.farmName.setText(model.getFarmName());
 
-                    viewHolder.setItemClickListener(new ItemClickListener() {
-                        @Override
-                        public void onClick(View view, int position, boolean isLongClick) {
-                            Intent farmDetailIntent = new Intent(getContext(), FarmDetails.class);
-                            farmDetailIntent.putExtra("FarmId", adapter.getRef(viewHolder.getAdapterPosition()).getKey());
-                            startActivity(farmDetailIntent);
-                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-                        }
+                    viewHolder.setItemClickListener((view, position13, isLongClick) -> {
+                        Intent farmDetailIntent = new Intent(getContext(), FarmDetails.class);
+                        farmDetailIntent.putExtra("FarmId", adapter.getRef(viewHolder.getAdapterPosition()).getKey());
+                        startActivity(farmDetailIntent);
+                        getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
                     });
 
                 }

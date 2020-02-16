@@ -5,16 +5,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Build;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.core.app.NotificationCompat;
 
-import com.blackviking.menorahfarms.AdminDash;
-import com.blackviking.menorahfarms.CartAndHistory.SponsorshipHistory;
-import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.DashboardMenu.Notifications;
-import com.blackviking.menorahfarms.DashboardMenu.SponsoredFarms;
 import com.blackviking.menorahfarms.HomeActivities.Dashboard;
 import com.blackviking.menorahfarms.R;
 import com.google.firebase.messaging.FirebaseMessagingService;

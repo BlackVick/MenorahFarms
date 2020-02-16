@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_now_selling"
+        android:orderInCategory="101"
+        android:title="Now Selling"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_sold_out"
+        android:orderInCategory="102"
+        android:title="Sold Out"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_opening_soon"
+        android:orderInCategory="103"
+        android:title="Opening Soon"
+        app:showAsAction="never"/>
+
+</menu>

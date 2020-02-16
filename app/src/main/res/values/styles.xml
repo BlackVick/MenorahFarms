@@ -64,17 +64,18 @@
         <item name="android:windowBackground">@color/black</item>
     </style>
 
+    <!--  DIALOG THEME  -->
     <style name="DialogTheme" parent="Theme.AppCompat.Dialog">
-
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">fill_parent</item>
-        <!-- No backgrounds, titles or window float -->
         <item name="android:windowBackground">@null</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsFloating">false</item>
+        <item name="android:layout_gravity">bottom</item>
+        <item name="android:gravity">bottom</item>
     </style>
 
-
+    <!--  DIALOG APPEARANCE THEME  -->
     <style name="PauseDialogAnimation">
         <item name="android:windowEnterAnimation">@anim/scale_in</item>
         <item name="android:windowExitAnimation">@anim/scale_out</item>
@@ -137,6 +138,17 @@
         <item name="TabLayoutStyle">@style/tabLayoutStyle</item>
         <item name="PinHeaderStyle">@style/pinHeaderStyle</item>
         <item name="SavedCardButtonStyle">@style/svdCardsBtnStyle</item>
+    </style>
+
+    <!--  DIALOG APPEARANCE THEME  -->
+    <style name="SlideDialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/goup</item>
+        <item name="android:windowExitAnimation">@anim/godown</item>
+    </style>
+
+    <!--  PROGRESS THEME -->
+    <style name="ProgressTheme" parent="AppTheme">
+        <item name="colorAccent">@color/white</item>
     </style>
 
 </resources>

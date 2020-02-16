@@ -3,8 +3,8 @@ package com.blackviking.menorahfarms.AdminDetails;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +13,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.blackviking.menorahfarms.AccountMenus.BankDetails;
 import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Models.DueSponsorshipModel;
@@ -25,10 +24,7 @@ import com.blackviking.menorahfarms.Notification.DataMessage;
 import com.blackviking.menorahfarms.Notification.MyResponse;
 import com.blackviking.menorahfarms.R;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -81,94 +77,86 @@ public class DueSponsorshipDetail extends AppCompatActivity {
 
 
         /*---   FIREBASE   ---*/
-        userRef = db.getReference("Users");
-        dueSponsorshipRef = db.getReference("DueSponsorships");
-        notificationRef = db.getReference("Notifications");
-        adminHistoryRef = db.getReference("AdminHistory");
-        historyRef = db.getReference("History");
-        sponsoredFarmsRef = db.getReference("SponsoredFarms");
-        adminSponsorshipRef = db.getReference("RunningCycles");
-        sponsoredFarmNotiRef = db.getReference("SponsoredFarmsNotification");
-        farmRef = db.getReference("Farms");
+        userRef = db.getReference(Common.USERS_NODE);
+        dueSponsorshipRef = db.getReference(Common.DUE_SPONSORSHIPS_NODE);
+        notificationRef = db.getReference(Common.NOTIFICATIONS_NODE);
+        adminHistoryRef = db.getReference(Common.ADMIN_HISTORY_NODE);
+        historyRef = db.getReference(Common.HISTORY_NODE);
+        sponsoredFarmsRef = db.getReference(Common.SPONSORED_FARMS_NODE);
+        adminSponsorshipRef = db.getReference(Common.RUNNING_CYCLE_NODE);
+        sponsoredFarmNotiRef = db.getReference(Common.SPONSORED_FARMS_NOTIFICATION_NODE);
+        farmRef = db.getReference(Common.FARM_NODE);
 
 
         /*---   WIDGETS   ---*/
-        backButton = (ImageView)findViewById(R.id.backButton);
-        dueSettled = (Button)findViewById(R.id.dueSettled);
-        dueUserName = (TextView)findViewById(R.id.dueUserName);
-        dueUserEmail = (TextView)findViewById(R.id.dueUserEmail);
-        dueUserBank = (TextView)findViewById(R.id.dueUserBank);
-        dueFarmType = (TextView)findViewById(R.id.dueFarmType);
-        dueUnitPrice = (TextView)findViewById(R.id.dueUnitPrice);
-        dueUnits = (TextView)findViewById(R.id.dueUnits);
-        dueRoi = (TextView)findViewById(R.id.dueRoi);
-        dueTotalPaid = (TextView)findViewById(R.id.dueTotalPaid);
-        dueDuration = (TextView)findViewById(R.id.dueDuration);
-        dueStartDate = (TextView)findViewById(R.id.dueStartDate);
-        dueEndDate = (TextView)findViewById(R.id.dueEndDate);
-        dueTotalReturn = (TextView)findViewById(R.id.dueTotalReturn);
-        dueRefNumber = (TextView)findViewById(R.id.dueRefNumber);
+        backButton = findViewById(R.id.backButton);
+        dueSettled = findViewById(R.id.dueSettled);
+        dueUserName = findViewById(R.id.dueUserName);
+        dueUserEmail = findViewById(R.id.dueUserEmail);
+        dueUserBank = findViewById(R.id.dueUserBank);
+        dueFarmType = findViewById(R.id.dueFarmType);
+        dueUnitPrice = findViewById(R.id.dueUnitPrice);
+        dueUnits = findViewById(R.id.dueUnits);
+        dueRoi = findViewById(R.id.dueRoi);
+        dueTotalPaid = findViewById(R.id.dueTotalPaid);
+        dueDuration = findViewById(R.id.dueDuration);
+        dueStartDate = findViewById(R.id.dueStartDate);
+        dueEndDate = findViewById(R.id.dueEndDate);
+        dueTotalReturn = findViewById(R.id.dueTotalReturn);
+        dueRefNumber = findViewById(R.id.dueRefNumber);
 
 
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        backButton.setOnClickListener(v -> finish());
 
 
         //show loading dialog
         showLoadingDialog("Loading sponsorship details");
 
-        //execute network check async task
-        CheckInternet asyncTask = (CheckInternet) new CheckInternet(DueSponsorshipDetail.this, new CheckInternet.AsyncResponse(){
-            @Override
-            public void processFinish(Integer output) {
+        //run network check
+        new CheckInternet(DueSponsorshipDetail.this, output -> {
 
-                //check all cases
-                if (output == 1){
+            //check all cases
+            if (output == 1){
 
-                    dueSponsorshipRef.child(dueSponsorshipId)
-                            .addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
+                dueSponsorshipRef.child(dueSponsorshipId)
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                    DueSponsorshipModel currentDue = dataSnapshot.getValue(DueSponsorshipModel.class);
+                                DueSponsorshipModel currentDue = dataSnapshot.getValue(DueSponsorshipModel.class);
 
-                                    if (currentDue != null){
+                                if (currentDue != null){
 
-                                        loadAllDetails(currentDue.getUser(), currentDue.getSponsorshipId());
-
-                                    }
+                                    loadAllDetails(currentDue.getUser(), currentDue.getSponsorshipId());
 
                                 }
 
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
+                            }
 
-                                }
-                            });
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
 
-                } else
+                            }
+                        });
 
-                if (output == 0){
+            } else
 
-                    //no internet
-                    alertDialog.dismiss();
-                    Toast.makeText(DueSponsorshipDetail.this, "No internet access", Toast.LENGTH_SHORT).show();
+            if (output == 0){
 
-                } else
+                //no internet
+                alertDialog.dismiss();
+                Toast.makeText(DueSponsorshipDetail.this, "No internet access", Toast.LENGTH_SHORT).show();
 
-                if (output == 2){
+            } else
 
-                    //no internet
-                    alertDialog.dismiss();
-                    Toast.makeText(DueSponsorshipDetail.this, "Not connected to any network", Toast.LENGTH_SHORT).show();
+            if (output == 2){
 
-                }
+                //no internet
+                alertDialog.dismiss();
+                Toast.makeText(DueSponsorshipDetail.this, "Not connected to any network", Toast.LENGTH_SHORT).show();
 
             }
+
         }).execute();
 
     }
@@ -176,7 +164,7 @@ public class DueSponsorshipDetail extends AppCompatActivity {
     private void loadAllDetails(final String userId, final String sponsorshipId) {
 
         userRef.child(userId)
-                .addValueEventListener(
+                .addListenerForSingleValueEvent(
                         new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -202,7 +190,7 @@ public class DueSponsorshipDetail extends AppCompatActivity {
 
         sponsoredFarmsRef.child(userId)
                 .child(sponsorshipId)
-                .addValueEventListener(
+                .addListenerForSingleValueEvent(
                         new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -260,48 +248,42 @@ public class DueSponsorshipDetail extends AppCompatActivity {
         dueTotalReturn.setText(Common.convertToPrice(DueSponsorshipDetail.this, totalReturn));
         dueRefNumber.setText(theDueRefNumber);
 
-        dueSettled.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        dueSettled.setOnClickListener(v -> {
 
-                //show loading dialog
-                mDialog = new SpotsDialog(DueSponsorshipDetail.this, "Processing");
-                mDialog.setCancelable(false);
-                mDialog.setCanceledOnTouchOutside(false);
-                mDialog.show();
+            //show loading dialog
+            mDialog = new SpotsDialog(DueSponsorshipDetail.this, "Processing");
+            mDialog.setCancelable(false);
+            mDialog.setCanceledOnTouchOutside(false);
+            mDialog.show();
 
-                //execute network check async task
-                CheckInternet asyncTask = (CheckInternet) new CheckInternet(DueSponsorshipDetail.this, new CheckInternet.AsyncResponse(){
-                    @Override
-                    public void processFinish(Integer output) {
+            //execute network check async task
+            new CheckInternet(DueSponsorshipDetail.this, output -> {
 
-                        //check all cases
-                        if (output == 1){
+                //check all cases
+                if (output == 1){
 
-                            settleSponsorship(userId, sponsorshipId, currentSponsorship);
+                    settleSponsorship(userId, sponsorshipId, currentSponsorship);
 
-                        } else
+                } else
 
-                        if (output == 0){
+                if (output == 0){
 
-                            //no internet
-                            mDialog.dismiss();
-                            Toast.makeText(DueSponsorshipDetail.this, "No internet access", Toast.LENGTH_SHORT).show();
+                    //no internet
+                    mDialog.dismiss();
+                    Toast.makeText(DueSponsorshipDetail.this, "No internet access", Toast.LENGTH_SHORT).show();
 
-                        } else
+                } else
 
-                        if (output == 2){
+                if (output == 2){
 
-                            //no internet
-                            mDialog.dismiss();
-                            Toast.makeText(DueSponsorshipDetail.this, "Not connected to any network", Toast.LENGTH_SHORT).show();
+                    //no internet
+                    mDialog.dismiss();
+                    Toast.makeText(DueSponsorshipDetail.this, "Not connected to any network", Toast.LENGTH_SHORT).show();
 
-                        }
+                }
 
-                    }
-                }).execute();
+            }).execute();
 
-            }
         });
 
     }
@@ -334,74 +316,66 @@ public class DueSponsorshipDetail extends AppCompatActivity {
 
         adminHistoryRef.child(pushId)
                 .setValue(historyMap)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()){
-                            historyRef.child(theUserId)
-                                    .child(pushId)
-                                    .setValue(historyMap)
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
+                .addOnCompleteListener(task -> {
 
-                                            if (task.isSuccessful()){
+                    if (task.isSuccessful()){
+                        historyRef.child(theUserId)
+                                .child(pushId)
+                                .setValue(historyMap)
+                                .addOnCompleteListener(task1 -> {
 
-                                                removeFromCycle(currentSponsorship.getFarmId(), theSponsorshipId);
+                                    if (task1.isSuccessful()){
 
-                                                removeNotification(currentSponsorship.getFarmId(), theUserId);
-                                                sponsoredFarmsRef.child(theUserId)
-                                                        .child(theSponsorshipId)
-                                                        .removeValue()
-                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                            @Override
-                                                            public void onComplete(@NonNull Task<Void> task) {
+                                        removeFromCycle(currentSponsorship.getFarmId(), theSponsorshipId);
 
-                                                                if (task.isSuccessful()){
+                                        removeNotification(currentSponsorship.getFarmId(), theUserId);
+                                        sponsoredFarmsRef.child(theUserId)
+                                                .child(theSponsorshipId)
+                                                .removeValue()
+                                                .addOnCompleteListener(task11 -> {
 
-                                                                    dueSponsorshipRef.child(dueSponsorshipId)
-                                                                            .removeValue()
-                                                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                                @Override
-                                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task11.isSuccessful()){
 
-                                                                                    if (task.isSuccessful()){
+                                                        dueSponsorshipRef.child(dueSponsorshipId)
+                                                                .removeValue()
+                                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                    @Override
+                                                                    public void onComplete(@NonNull Task<Void> task11) {
 
-                                                                                        mDialog.dismiss();
-                                                                                        sendNotification(theUserId);
-                                                                                        Toast.makeText(DueSponsorshipDetail.this, "Sponsorship was successfully settled", Toast.LENGTH_LONG).show();
+                                                                        if (task11.isSuccessful()){
 
-                                                                                    }
+                                                                            mDialog.dismiss();
+                                                                            sendNotification(theUserId);
+                                                                            Toast.makeText(DueSponsorshipDetail.this, "Sponsorship was successfully settled", Toast.LENGTH_LONG).show();
 
-                                                                                }
-                                                                            });
+                                                                        }
 
-                                                                } else {
+                                                                    }
+                                                                });
 
-                                                                    mDialog.dismiss();
-                                                                    Toast.makeText(DueSponsorshipDetail.this, "Error occurred", Toast.LENGTH_SHORT).show();
+                                                    } else {
 
-                                                                }
+                                                        mDialog.dismiss();
+                                                        Toast.makeText(DueSponsorshipDetail.this, "Error occurred", Toast.LENGTH_SHORT).show();
 
-                                                            }
-                                                        });
+                                                    }
 
-                                            } else {
+                                                });
 
-                                                mDialog.dismiss();
-                                                Toast.makeText(DueSponsorshipDetail.this, "Error occurred", Toast.LENGTH_SHORT).show();
+                                    } else {
 
-                                            }
+                                        mDialog.dismiss();
+                                        Toast.makeText(DueSponsorshipDetail.this, "Error occurred", Toast.LENGTH_SHORT).show();
 
-                                        }
-                                    });
+                                    }
 
-                        } else {
+                                });
 
-                            mDialog.dismiss();
-                            Toast.makeText(DueSponsorshipDetail.this, "Error occurred", Toast.LENGTH_SHORT).show();
+                    } else {
 
-                        }
+                        mDialog.dismiss();
+                        Toast.makeText(DueSponsorshipDetail.this, "Error occurred", Toast.LENGTH_SHORT).show();
+
                     }
                 });
 

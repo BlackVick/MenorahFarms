@@ -7,13 +7,11 @@ import android.media.AudioAttributes;
 import android.os.Build;
 
 import com.blackviking.menorahfarms.Models.UserModel;
-import com.crashlytics.android.Crashlytics;
 import com.firebase.ui.auth.User;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
 
-import io.fabric.sdk.android.Fabric;
 import io.paperdb.Paper;
 
 /**
@@ -50,8 +48,6 @@ public class ApplicationClass extends Application {
         /*---   PAPER   ---*/
         Paper.init(getApplicationContext());
 
-        /*---   CRASHLYTICS   ---*/
-        Fabric.with(this, new Crashlytics());
 
         /*---   FIREBASE OFFLINE   ---*/
         FirebaseDatabase.getInstance().setPersistenceEnabled(false);

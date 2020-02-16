@@ -2,11 +2,10 @@ package com.blackviking.menorahfarms.CartAndHistory;
 
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,11 +14,9 @@ import android.widget.Toast;
 
 import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
-import com.blackviking.menorahfarms.HomeActivities.Dashboard;
 import com.blackviking.menorahfarms.Models.HistoryModel;
 import com.blackviking.menorahfarms.Models.SponsoredFarmModel;
 import com.blackviking.menorahfarms.R;
-import com.blackviking.menorahfarms.Services.CheckForSponsorship;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -56,48 +53,45 @@ public class HistorySummary extends Fragment {
 
 
         /*---   FIREBASE   ---*/
-        historyRef = db.getReference("History");
-        sponsoredFarmRef = db.getReference("SponsoredFarms");
+        historyRef = db.getReference(Common.HISTORY_NODE);
+        sponsoredFarmRef = db.getReference(Common.SPONSORED_FARMS_NODE);
         if (mAuth.getCurrentUser() != null)
             currentUid = mAuth.getCurrentUser().getUid();
 
 
         /*---   WIDGETS   ---*/
-        summaryReturns = (TextView)v.findViewById(R.id.summaryReturns);
-        summaryCycleEnd = (TextView)v.findViewById(R.id.summaryCycleEnd);
-        summarySponsored = (TextView)v.findViewById(R.id.summarySponsored);
-        summaryCollected = (TextView)v.findViewById(R.id.summaryCollected);
+        summaryReturns = v.findViewById(R.id.summaryReturns);
+        summaryCycleEnd = v.findViewById(R.id.summaryCycleEnd);
+        summarySponsored = v.findViewById(R.id.summarySponsored);
+        summaryCollected = v.findViewById(R.id.summaryCollected);
 
 
         //execute network check async task
-        CheckInternet asyncTask = (CheckInternet) new CheckInternet(getContext(), new CheckInternet.AsyncResponse(){
-            @Override
-            public void processFinish(Integer output) {
+        new CheckInternet(getContext(), output -> {
 
-                //check all cases
-                if (output == 1){
+            //check all cases
+            if (output == 1){
 
-                    loadSummary();
+                loadSummary();
 
-                } else
+            } else
 
-                if (output == 0){
+            if (output == 0){
 
-                    //set layout
-                    alertDialog.dismiss();
-                    Toast.makeText(getContext(), "No internet access", Toast.LENGTH_SHORT).show();
+                //set layout
+                alertDialog.dismiss();
+                Toast.makeText(getContext(), "No internet access", Toast.LENGTH_SHORT).show();
 
-                } else
+            } else
 
-                if (output == 2){
+            if (output == 2){
 
-                    //set layout
-                    alertDialog.dismiss();
-                    Toast.makeText(getContext(), "Not connected to any network", Toast.LENGTH_SHORT).show();
-
-                }
+                //set layout
+                alertDialog.dismiss();
+                Toast.makeText(getContext(), "Not connected to any network", Toast.LENGTH_SHORT).show();
 
             }
+
         }).execute();
 
         return v;

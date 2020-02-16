@@ -6,9 +6,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,7 +44,7 @@ public class HistoryProjects extends Fragment {
 
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference userRef, farmRef, sponsorshipRef, historyRef;
+    private DatabaseReference farmRef, sponsorshipRef, historyRef;
 
     private RelativeLayout noInternetLayout;
     private String currentUid;
@@ -62,17 +62,16 @@ public class HistoryProjects extends Fragment {
 
 
         /*---   FIREBASE   ---*/
-        userRef = db.getReference("Users");
-        farmRef = db.getReference("Farms");
-        sponsorshipRef = db.getReference("SponsoredFarms");
-        historyRef = db.getReference("History");
+        farmRef = db.getReference(Common.FARM_NODE);
+        sponsorshipRef = db.getReference(Common.SPONSORED_FARMS_NODE);
+        historyRef = db.getReference(Common.HISTORY_NODE);
         if (mAuth.getCurrentUser() != null)
             currentUid = mAuth.getCurrentUser().getUid();
 
 
         /*---   WIDGET   ---*/
-        emptyLayout = (LinearLayout)v.findViewById(R.id.emptyLayout);
-        historyRecycler = (RecyclerView)v.findViewById(R.id.projectRecycler);
+        emptyLayout = v.findViewById(R.id.emptyLayout);
+        historyRecycler = v.findViewById(R.id.projectRecycler);
         noInternetLayout = v.findViewById(R.id.noInternetLayout);
 
 
@@ -80,69 +79,66 @@ public class HistoryProjects extends Fragment {
         showLoadingDialog("Loading history by projects . . .");
 
 
-        //execute network check async task
-        CheckInternet asyncTask = (CheckInternet) new CheckInternet(getContext(), new CheckInternet.AsyncResponse(){
-            @Override
-            public void processFinish(Integer output) {
+        //run network check
+        new CheckInternet(getContext(), output -> {
 
-                //check all cases
-                if (output == 1){
+            //check all cases
+            if (output == 1){
 
-                    /*---   CHECK   ---*/
-                    historyRef.child(currentUid)
-                            .addListenerForSingleValueEvent(
-                                    new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                /*---   CHECK   ---*/
+                historyRef.child(currentUid)
+                        .addListenerForSingleValueEvent(
+                                new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                            if (dataSnapshot.exists()){
+                                        if (dataSnapshot.exists()){
 
-                                                noInternetLayout.setVisibility(View.GONE);
-                                                historyRecycler.setVisibility(View.VISIBLE);
-                                                emptyLayout.setVisibility(View.GONE);
-                                                loadHistory();
+                                            noInternetLayout.setVisibility(View.GONE);
+                                            historyRecycler.setVisibility(View.VISIBLE);
+                                            emptyLayout.setVisibility(View.GONE);
+                                            loadHistory();
 
-                                            } else {
+                                        } else {
 
-                                                alertDialog.dismiss();
-                                                noInternetLayout.setVisibility(View.GONE);
-                                                historyRecycler.setVisibility(View.GONE);
-                                                emptyLayout.setVisibility(View.VISIBLE);
-
-                                            }
+                                            alertDialog.dismiss();
+                                            noInternetLayout.setVisibility(View.GONE);
+                                            historyRecycler.setVisibility(View.GONE);
+                                            emptyLayout.setVisibility(View.VISIBLE);
 
                                         }
 
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) {
-
-                                        }
                                     }
-                            );
 
-                } else
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
 
-                if (output == 0){
+                                    }
+                                }
+                        );
 
-                    //set layout
-                    alertDialog.dismiss();
-                    noInternetLayout.setVisibility(View.VISIBLE);
-                    historyRecycler.setVisibility(View.GONE);
-                    emptyLayout.setVisibility(View.GONE);
+            } else
 
-                } else
+            if (output == 0){
 
-                if (output == 2){
+                //set layout
+                alertDialog.dismiss();
+                noInternetLayout.setVisibility(View.VISIBLE);
+                historyRecycler.setVisibility(View.GONE);
+                emptyLayout.setVisibility(View.GONE);
 
-                    //set layout
-                    alertDialog.dismiss();
-                    noInternetLayout.setVisibility(View.VISIBLE);
-                    historyRecycler.setVisibility(View.GONE);
-                    emptyLayout.setVisibility(View.GONE);
+            } else
 
-                }
+            if (output == 2){
+
+                //set layout
+                alertDialog.dismiss();
+                noInternetLayout.setVisibility(View.VISIBLE);
+                historyRecycler.setVisibility(View.GONE);
+                emptyLayout.setVisibility(View.GONE);
 
             }
+
         }).execute();
 
         return v;

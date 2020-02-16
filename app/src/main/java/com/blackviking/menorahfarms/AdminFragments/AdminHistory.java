@@ -3,9 +3,9 @@ package com.blackviking.menorahfarms.AdminFragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,14 +13,11 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.blackviking.menorahfarms.CartAndHistory.HistoryDetails;
-import com.blackviking.menorahfarms.CartAndHistory.SponsorshipHistory;
 import com.blackviking.menorahfarms.Common.CheckInternet;
-import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Interface.ItemClickListener;
 import com.blackviking.menorahfarms.Models.HistoryModel;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.ViewHolders.AdminViewHolder;
-import com.blackviking.menorahfarms.ViewHolders.HistoryViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -59,67 +56,64 @@ public class AdminHistory extends Fragment {
 
 
         /*---   WIDGETS    ---*/
-        adminHistoryRecycler = (RecyclerView)v.findViewById(R.id.adminHistoryRecycler);
+        adminHistoryRecycler = v.findViewById(R.id.adminHistoryRecycler);
         noInternetLayout = v.findViewById(R.id.noInternetLayout);
         emptyLayout = v.findViewById(R.id.emptyLayout);
 
 
-        //execute network check async task
-        CheckInternet asyncTask = (CheckInternet) new CheckInternet(getContext(), new CheckInternet.AsyncResponse(){
-            @Override
-            public void processFinish(Integer output) {
+        //run network check
+        new CheckInternet(getContext(), output -> {
 
-                //check all cases
-                if (output == 1){
+            //check all cases
+            if (output == 1){
 
-                    adminHistoryRef.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
+                adminHistoryRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-                            if (dataSnapshot.exists()){
+                        if (dataSnapshot.exists()){
 
-                                noInternetLayout.setVisibility(View.GONE);
-                                emptyLayout.setVisibility(View.GONE);
-                                adminHistoryRecycler.setVisibility(View.VISIBLE);
-                                loadHistory();
+                            noInternetLayout.setVisibility(View.GONE);
+                            emptyLayout.setVisibility(View.GONE);
+                            adminHistoryRecycler.setVisibility(View.VISIBLE);
+                            loadHistory();
 
-                            } else {
+                        } else {
 
-                                noInternetLayout.setVisibility(View.GONE);
-                                emptyLayout.setVisibility(View.VISIBLE);
-                                adminHistoryRecycler.setVisibility(View.GONE);
-
-                            }
+                            noInternetLayout.setVisibility(View.GONE);
+                            emptyLayout.setVisibility(View.VISIBLE);
+                            adminHistoryRecycler.setVisibility(View.GONE);
 
                         }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
+                    }
 
-                        }
-                    });
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-                } else
+                    }
+                });
 
-                if (output == 0){
+            } else
 
-                    //set layout
-                    noInternetLayout.setVisibility(View.VISIBLE);
-                    emptyLayout.setVisibility(View.GONE);
-                    adminHistoryRecycler.setVisibility(View.GONE);
+            if (output == 0){
 
-                } else
+                //set layout
+                noInternetLayout.setVisibility(View.VISIBLE);
+                emptyLayout.setVisibility(View.GONE);
+                adminHistoryRecycler.setVisibility(View.GONE);
 
-                if (output == 2){
+            } else
 
-                    //set layout
-                    noInternetLayout.setVisibility(View.VISIBLE);
-                    emptyLayout.setVisibility(View.GONE);
-                    adminHistoryRecycler.setVisibility(View.GONE);
+            if (output == 2){
 
-                }
+                //set layout
+                noInternetLayout.setVisibility(View.VISIBLE);
+                emptyLayout.setVisibility(View.GONE);
+                adminHistoryRecycler.setVisibility(View.GONE);
 
             }
+
         }).execute();
 
         return v;
@@ -137,7 +131,7 @@ public class AdminHistory extends Fragment {
                 HistoryModel.class,
                 R.layout.admin_item,
                 AdminViewHolder.class,
-                adminHistoryRef
+                adminHistoryRef.limitToLast(25)
         ) {
             @Override
             protected void populateViewHolder(final AdminViewHolder viewHolder, HistoryModel model, int position) {

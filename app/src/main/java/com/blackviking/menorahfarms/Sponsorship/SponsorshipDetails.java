@@ -3,7 +3,7 @@ package com.blackviking.menorahfarms.Sponsorship;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +32,7 @@ public class SponsorshipDetails extends AppCompatActivity {
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private DatabaseReference farmref, sponsoredFarmRef;
+    private DatabaseReference sponsoredFarmRef;
     private String currentUid, sponsorshipId;
 
     //loading
@@ -53,72 +53,63 @@ public class SponsorshipDetails extends AppCompatActivity {
 
 
         /*---   FIREBASE   ---*/
-        farmref = db.getReference("Farms");
-        sponsoredFarmRef = db.getReference("SponsoredFarms");
+        sponsoredFarmRef = db.getReference(Common.SPONSORED_FARMS_NODE);
         if (mAuth.getCurrentUser() != null)
             currentUid = mAuth.getCurrentUser().getUid();
 
 
         /*---   WIDGETS   ---*/
-        backButton = (ImageView)findViewById(R.id.backButton);
-        sponsoredFarmType = (TextView)findViewById(R.id.sponsoredFarmType);
-        sponsoredFarmUnitPrice = (TextView)findViewById(R.id.sponsoredFarmUnitPrice);
-        sponsoredFarmUnits = (TextView)findViewById(R.id.sponsoredFarmUnits);
-        sponsoredFarmROI = (TextView)findViewById(R.id.sponsoredFarmROI);
-        sponsoredFarmDuration = (TextView)findViewById(R.id.sponsoredFarmDuration);
-        sponsoredFarmStartDate = (TextView)findViewById(R.id.sponsoredFarmStartDate);
-        sponsoredFarmEndDate = (TextView)findViewById(R.id.sponsoredFarmEndDate);
-        sponsoredFarmTotalReturn = (TextView)findViewById(R.id.sponsoredFarmTotalReturn);
-        sponsoredFarmRefNumber = (TextView)findViewById(R.id.sponsoredFarmRefNumber);
-        sponsoredFarmTotalPrice = (TextView)findViewById(R.id.sponsoredFarmTotalPrice);
+        backButton = findViewById(R.id.backButton);
+        sponsoredFarmType = findViewById(R.id.sponsoredFarmType);
+        sponsoredFarmUnitPrice = findViewById(R.id.sponsoredFarmUnitPrice);
+        sponsoredFarmUnits = findViewById(R.id.sponsoredFarmUnits);
+        sponsoredFarmROI = findViewById(R.id.sponsoredFarmROI);
+        sponsoredFarmDuration = findViewById(R.id.sponsoredFarmDuration);
+        sponsoredFarmStartDate = findViewById(R.id.sponsoredFarmStartDate);
+        sponsoredFarmEndDate = findViewById(R.id.sponsoredFarmEndDate);
+        sponsoredFarmTotalReturn = findViewById(R.id.sponsoredFarmTotalReturn);
+        sponsoredFarmRefNumber = findViewById(R.id.sponsoredFarmRefNumber);
+        sponsoredFarmTotalPrice = findViewById(R.id.sponsoredFarmTotalPrice);
         noInternetLayout = findViewById(R.id.noInternetLayout);
         contentLayout = findViewById(R.id.contentLayout);
 
 
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        backButton.setOnClickListener(v -> finish());
 
 
         //show loading dialog
         showLoadingDialog("Loading sponsorship details . . .");
 
-        //execute network check async task
-        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
-            @Override
-            public void processFinish(Integer output) {
+        //run network check
+        new CheckInternet(this, output -> {
 
-                //check all cases
-                if (output == 1){
+            //check all cases
+            if (output == 1){
 
-                    noInternetLayout.setVisibility(View.GONE);
-                    contentLayout.setVisibility(View.VISIBLE);
-                    loadSponsorshipDetails();
+                noInternetLayout.setVisibility(View.GONE);
+                contentLayout.setVisibility(View.VISIBLE);
+                loadSponsorshipDetails();
 
-                } else
+            } else
 
-                if (output == 0){
+            if (output == 0){
 
-                    //set layout
-                    alertDialog.dismiss();
-                    noInternetLayout.setVisibility(View.VISIBLE);
-                    contentLayout.setVisibility(View.GONE);
+                //set layout
+                alertDialog.dismiss();
+                noInternetLayout.setVisibility(View.VISIBLE);
+                contentLayout.setVisibility(View.GONE);
 
-                } else
+            } else
 
-                if (output == 2){
+            if (output == 2){
 
-                    //set layout
-                    alertDialog.dismiss();
-                    noInternetLayout.setVisibility(View.VISIBLE);
-                    contentLayout.setVisibility(View.GONE);
-
-                }
+                //set layout
+                alertDialog.dismiss();
+                noInternetLayout.setVisibility(View.VISIBLE);
+                contentLayout.setVisibility(View.GONE);
 
             }
+
         }).execute();
 
 

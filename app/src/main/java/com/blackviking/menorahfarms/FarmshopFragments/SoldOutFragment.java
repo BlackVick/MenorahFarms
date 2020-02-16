@@ -5,16 +5,14 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.blackviking.menorahfarms.AccountMenus.StudentDetails;
 import com.blackviking.menorahfarms.Common.Common;
@@ -26,11 +24,8 @@ import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.ViewHolders.FarmStoreViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -46,9 +41,8 @@ public class SoldOutFragment extends Fragment {
     private LinearLayoutManager layoutManager;
     private FirebaseRecyclerAdapter<FarmModel, FarmStoreViewHolder> adapter;
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private DatabaseReference userRef, farmRef;
-    private String currentUid, userType;
+    private DatabaseReference farmRef;
+    private String userType;
 
     public SoldOutFragment() {
         // Required empty public constructor
@@ -62,14 +56,11 @@ public class SoldOutFragment extends Fragment {
 
 
         /*---   FIREBASE   ---*/
-        userRef = db.getReference("Users");
-        farmRef = db.getReference("Farms");
-        if (mAuth.getCurrentUser() != null)
-            currentUid = mAuth.getCurrentUser().getUid();
+        farmRef = db.getReference(Common.FARM_NODE);
 
 
         /*---   WIDGETS   ---*/
-        soldOutRecycler = (RecyclerView)v.findViewById(R.id.soldOutRecycler);
+        soldOutRecycler = v.findViewById(R.id.soldOutRecycler);
 
 
         /*---   CURRENT USER   ---*/

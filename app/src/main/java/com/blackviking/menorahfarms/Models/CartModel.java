@@ -1,5 +1,8 @@
 package com.blackviking.menorahfarms.Models;
 
+import com.google.firebase.database.IgnoreExtraProperties;
+
+@IgnoreExtraProperties
 public class CartModel {
 
     private String farmId;

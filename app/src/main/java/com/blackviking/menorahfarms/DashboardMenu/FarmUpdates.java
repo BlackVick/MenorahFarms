@@ -4,10 +4,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -16,6 +16,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.blackviking.menorahfarms.Common.CheckInternet;
+import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Models.FarmUpdateModel;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.ViewHolders.FarmUpdateViewHolder;
@@ -48,11 +49,11 @@ public class FarmUpdates extends AppCompatActivity {
 
 
         //firebase
-        updateRef = db.getReference("FarmUpdates");
+        updateRef = db.getReference(Common.FARM_UPDATES_NODE);
 
 
         /*---   WIDGETS   ---*/
-        backButton = (ImageView)findViewById(R.id.backButton);
+        backButton = findViewById(R.id.backButton);
         noInternetLayout = findViewById(R.id.noInternetLayout);
         emptyLayout = findViewById(R.id.emptyLayout);
         farmUpdateRecycler = findViewById(R.id.farmUpdateRecycler);
@@ -62,75 +63,67 @@ public class FarmUpdates extends AppCompatActivity {
         showLoadingDialog("Loading farm updates . . .");
 
 
-        //execute network check async task
-        CheckInternet asyncTask = (CheckInternet) new CheckInternet(this, new CheckInternet.AsyncResponse(){
-            @Override
-            public void processFinish(Integer output) {
+        //run network check
+        new CheckInternet(this, output -> {
 
-                //check all cases
-                if (output == 1){
+            //check all cases
+            if (output == 1){
 
-                    
-                    updateRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            
-                            if (dataSnapshot.exists()){
 
-                                alertDialog.dismiss();
-                                emptyLayout.setVisibility(View.GONE);
-                                noInternetLayout.setVisibility(View.GONE);
-                                farmUpdateRecycler.setVisibility(View.VISIBLE);
-                                loadUpdates();
-                                
-                            } else {
+                updateRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                alertDialog.dismiss();
-                                emptyLayout.setVisibility(View.VISIBLE);
-                                noInternetLayout.setVisibility(View.GONE);
-                                farmUpdateRecycler.setVisibility(View.GONE);
-                                
-                            }
-                            
-                        }
+                        if (dataSnapshot.exists()){
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
+                            alertDialog.dismiss();
+                            emptyLayout.setVisibility(View.GONE);
+                            noInternetLayout.setVisibility(View.GONE);
+                            farmUpdateRecycler.setVisibility(View.VISIBLE);
+                            loadUpdates();
+
+                        } else {
+
+                            alertDialog.dismiss();
+                            emptyLayout.setVisibility(View.VISIBLE);
+                            noInternetLayout.setVisibility(View.GONE);
+                            farmUpdateRecycler.setVisibility(View.GONE);
 
                         }
-                    });
 
-                } else
+                    }
 
-                if (output == 0){
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-                    //set layout
-                    alertDialog.dismiss();
-                    noInternetLayout.setVisibility(View.VISIBLE);
-                    emptyLayout.setVisibility(View.GONE);
-                    farmUpdateRecycler.setVisibility(View.GONE);
+                    }
+                });
 
-                } else
+            } else
 
-                if (output == 2){
+            if (output == 0){
 
-                    //set layout
-                    alertDialog.dismiss();
-                    noInternetLayout.setVisibility(View.VISIBLE);
-                    emptyLayout.setVisibility(View.GONE);
-                    farmUpdateRecycler.setVisibility(View.GONE);
+                //set layout
+                alertDialog.dismiss();
+                noInternetLayout.setVisibility(View.VISIBLE);
+                emptyLayout.setVisibility(View.GONE);
+                farmUpdateRecycler.setVisibility(View.GONE);
 
-                }
+            } else
+
+            if (output == 2){
+
+                //set layout
+                alertDialog.dismiss();
+                noInternetLayout.setVisibility(View.VISIBLE);
+                emptyLayout.setVisibility(View.GONE);
+                farmUpdateRecycler.setVisibility(View.GONE);
 
             }
+
         }).execute();
 
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        backButton.setOnClickListener(v -> finish());
     }
 
     private void loadUpdates() {
@@ -146,7 +139,7 @@ public class FarmUpdates extends AppCompatActivity {
                 FarmUpdateModel.class,
                 R.layout.farm_update_item,
                 FarmUpdateViewHolder.class,
-                updateRef
+                updateRef.limitToLast(10)
         ) {
             @Override
             protected void populateViewHolder(FarmUpdateViewHolder viewHolder, final FarmUpdateModel model, int position) {

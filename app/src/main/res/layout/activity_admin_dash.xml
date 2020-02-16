@@ -247,35 +247,6 @@
                     android:layout_width="65dp"
                     android:animateLayoutChanges="true"
                     android:layout_height="match_parent"
-                    android:id="@+id/pendingSponsorshipLayout">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_centerInParent="true"
-                        android:src="@drawable/ic_pending_sponsorships_green"
-                        android:adjustViewBounds="true"
-                        android:padding="17dp"
-                        android:id="@+id/pendingSponsorshipImage"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:textColor="@color/red"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:layout_alignParentEnd="true"
-                        android:layout_margin="4dp"
-                        android:id="@+id/pendingSponsorshipCounter"
-                        android:fontFamily="@font/proxima_nova_regular"/>
-
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:layout_width="65dp"
-                    android:animateLayoutChanges="true"
-                    android:layout_height="match_parent"
                     android:id="@+id/farmManagementLayout">
 
                     <ImageView

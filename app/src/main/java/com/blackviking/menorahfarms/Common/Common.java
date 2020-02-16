@@ -55,13 +55,6 @@ public class Common {
 
 
     /*---   NOTIFICATION   ---*/
-    public static final String NOTIFICATION_STATE = "Notification";
-    public static String FEED_NOTIFICATION_STATE = "Feed";
-    public static String MY_FEED_NOTIFICATION_STATE = "MyFeed";
-    public static String GAMERS_NOTIFICATION_STATE = "Gamers";
-    public static String SKIT_NOTIFICATION_STATE = "Skit";
-
-
     public static String ADMIN_MESSAGE = "ADMIN_MESSAGE_TOPIC";
     public static final String GENERAL_NOTIFY = "menorahtopic";
 

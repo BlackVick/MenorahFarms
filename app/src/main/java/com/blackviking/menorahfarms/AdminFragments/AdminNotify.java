@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -60,6 +61,7 @@ public class AdminNotify extends Fragment {
     private Button sendFollowedNotiBtn, sendSponsoredNotiBtn;
     private FloatingActionButton broadcastToAllFab;
     private RelativeLayout directionLayout, followedFarmLayout, sponsoredFarmLayout;
+    private ProgressBar sendProgress;
 
     //firebase
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
@@ -109,6 +111,7 @@ public class AdminNotify extends Fragment {
         directionLayout = v.findViewById(R.id.directionLayout);
         followedFarmLayout = v.findViewById(R.id.followedFarmLayout);
         sponsoredFarmLayout = v.findViewById(R.id.sponsoredFarmLayout);
+        sendProgress = v.findViewById(R.id.sendProgress);
 
 
         //notification style
@@ -227,6 +230,10 @@ public class AdminNotify extends Fragment {
 
         } else {
 
+            //loading
+            sendFollowedNotiBtn.setEnabled(false);
+            sendProgress.setVisibility(View.VISIBLE);
+
             //execute network check async task
             new CheckInternet(getContext(), output -> {
 
@@ -248,6 +255,10 @@ public class AdminNotify extends Fragment {
 
                                 }
 
+                                //stop loading
+                                sendFollowedNotiBtn.setEnabled(true);
+                                sendProgress.setVisibility(View.GONE);
+
                                 Toast.makeText(getContext(), "DONE", Toast.LENGTH_SHORT).show();
                                 followedTopic.setText("");
                                 followedMessage.setText("");
@@ -258,12 +269,20 @@ public class AdminNotify extends Fragment {
 
                 if (output == 0){
 
+                    //stop loading
+                    sendFollowedNotiBtn.setEnabled(true);
+                    sendProgress.setVisibility(View.GONE);
+
                     //set layout
                     Toast.makeText(getContext(), "No internet access", Toast.LENGTH_SHORT).show();
 
                 } else
 
                 if (output == 2){
+
+                    //stop loading
+                    sendFollowedNotiBtn.setEnabled(true);
+                    sendProgress.setVisibility(View.GONE);
 
                     //set layout
                     Toast.makeText(getContext(), "Not connected to a network", Toast.LENGTH_SHORT).show();
@@ -399,7 +418,11 @@ public class AdminNotify extends Fragment {
 
         } else {
 
-            //execute network check async task
+            //loading
+            sendSponsoredNotiBtn.setEnabled(false);
+            sendProgress.setVisibility(View.VISIBLE);
+
+            //run network check
             new CheckInternet(getContext(), output -> {
 
                 //check all cases
@@ -420,6 +443,10 @@ public class AdminNotify extends Fragment {
 
                                 }
 
+                                //stop loading
+                                sendSponsoredNotiBtn.setEnabled(true);
+                                sendProgress.setVisibility(View.GONE);
+
                                 Toast.makeText(getContext(), "DONE", Toast.LENGTH_SHORT).show();
                                 sponsoredTopic.setText("");
                                 sponsoredMessage.setText("");
@@ -430,12 +457,20 @@ public class AdminNotify extends Fragment {
 
                 if (output == 0){
 
+                    //stop loading
+                    sendSponsoredNotiBtn.setEnabled(true);
+                    sendProgress.setVisibility(View.GONE);
+
                     //set layout
                     Toast.makeText(getContext(), "No internet access", Toast.LENGTH_SHORT).show();
 
                 } else
 
                 if (output == 2){
+
+                    //stop loading
+                    sendSponsoredNotiBtn.setEnabled(true);
+                    sendProgress.setVisibility(View.GONE);
 
                     //set layout
                     Toast.makeText(getContext(), "No network access", Toast.LENGTH_SHORT).show();
@@ -487,19 +522,20 @@ public class AdminNotify extends Fragment {
         final EditText broadcastTopic = viewOptions.findViewById(R.id.broadcastTopic);
         final EditText broadcastMessage = viewOptions.findViewById(R.id.broadcastMessage);
         final Button sendBroadcastBtn = viewOptions.findViewById(R.id.sendBroadcastBtn);
+        final ProgressBar sendProgress = viewOptions.findViewById(R.id.sendProgress);
 
         alertDialog.setView(viewOptions);
 
         alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
         alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-        sendBroadcastBtn.setOnClickListener(v -> checkBroadcastNotiParam(alertDialog, broadcastTopic, broadcastMessage));
+        sendBroadcastBtn.setOnClickListener(v -> checkBroadcastNotiParam(sendBroadcastBtn, sendProgress, alertDialog, broadcastTopic, broadcastMessage));
 
 
         alertDialog.show();
     }
 
-    private void checkBroadcastNotiParam(final AlertDialog alertDialog, EditText broadcastTopic, EditText broadcastMessage) {
+    private void checkBroadcastNotiParam(final Button sendBroadcastBtn, final ProgressBar sendProgress, final AlertDialog alertDialog, EditText broadcastTopic, EditText broadcastMessage) {
 
         final String theTopic = broadcastTopic.getText().toString().trim();
         final String theMessage = broadcastMessage.getText().toString().trim();
@@ -517,6 +553,10 @@ public class AdminNotify extends Fragment {
             broadcastMessage.setError("Field required !");
 
         } else {
+
+            //loading
+            sendBroadcastBtn.setEnabled(false);
+            sendProgress.setVisibility(View.VISIBLE);
 
             //run network check
             new CheckInternet(getContext(), output -> {
@@ -539,6 +579,10 @@ public class AdminNotify extends Fragment {
 
                                 }
 
+                                //stop loading
+                                sendBroadcastBtn.setEnabled(true);
+                                sendProgress.setVisibility(View.GONE);
+
                                 Toast.makeText(getContext(), "DONE", Toast.LENGTH_SHORT).show();
                                 alertDialog.dismiss();
 
@@ -548,12 +592,20 @@ public class AdminNotify extends Fragment {
 
                 if (output == 0){
 
+                    //stop loading
+                    sendBroadcastBtn.setEnabled(true);
+                    sendProgress.setVisibility(View.GONE);
+
                     //set layout
                     Toast.makeText(getContext(), "No internet access", Toast.LENGTH_SHORT).show();
 
                 } else
 
                 if (output == 2){
+
+                    //stop loading
+                    sendBroadcastBtn.setEnabled(true);
+                    sendProgress.setVisibility(View.GONE);
 
                     //set layout
                     Toast.makeText(getContext(), "No network access", Toast.LENGTH_SHORT).show();

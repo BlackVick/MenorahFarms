@@ -59,9 +59,9 @@ public class Dashboard extends AppCompatActivity {
     private CircleImageView userAvatar;
     private RelativeLayout goToFarmstoreButton;
     private RelativeLayout sponsoredFarmsLayout, farmsToWatchLayout, farmUpdatesLayout, allFarmsLayout, projectManagerLayout, notificationLayout, faqLayout, adminLayout;
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference userRef, sponsoredRef, cartRef;
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private String currentUid;
     private UserModel paperUser;
     private android.app.AlertDialog alertDialog;
@@ -81,9 +81,10 @@ public class Dashboard extends AppCompatActivity {
         userRef = db.getReference(Common.USERS_NODE);
         sponsoredRef = db.getReference(Common.SPONSORED_FARMS_NODE);
         cartRef = db.getReference(Common.CART_NODE);
-        if (mAuth.getCurrentUser() != null)
-            currentUid = mAuth.getCurrentUser().getUid();
+        currentUid = Paper.book().read(Common.USER_ID);
 
+        //sub to notification
+        FirebaseMessaging.getInstance().subscribeToTopic(Common.GENERAL_NOTIFY);
 
 
         /*---   WIDGETS   ---*/

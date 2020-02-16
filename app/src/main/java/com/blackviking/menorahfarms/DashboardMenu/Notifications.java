@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import io.paperdb.Paper;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -36,7 +38,6 @@ public class Notifications extends AppCompatActivity {
     private FirebaseRecyclerAdapter<NotificationModel, NotificationViewHolder> adapter;
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private DatabaseReference notificationRef;
     private String currentUid;
 
@@ -49,6 +50,9 @@ public class Notifications extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notifications);
+
+        //user
+        currentUid = Paper.book().read(Common.USER_ID);
 
 
         /*---   FIREBASE   ---*/

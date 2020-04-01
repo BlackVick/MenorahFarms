@@ -502,7 +502,7 @@ public class Account extends AppCompatActivity {
 
         //open camera
         cameraPick.setOnClickListener(v -> {
-            openCamera();
+            dispatchTakePictureIntent();
             alertDialog.dismiss();
         });
 
@@ -523,19 +523,47 @@ public class Account extends AppCompatActivity {
 
     }
 
-    private void openCamera() {
+    //camera
+    private void dispatchTakePictureIntent() {
 
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-        File file=getOutputMediaFile(1);
-        imageUri = FileProvider.getUriForFile(
-                this,
-                BuildConfig.APPLICATION_ID + ".provider",
-                file);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
 
-        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-        startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
+            // Create the File where the photo should go
+            File photoFile = null;
 
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                Toast.makeText(this, ex.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                imageUri = FileProvider.getUriForFile(this,
+                        BuildConfig.APPLICATION_ID + ".provider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                startActivityForResult(takePictureIntent, CAMERA_REQUEST_CODE);
+            }
+        }
+    }
+
+    private File createImageFile() throws IOException {
+
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,
+                ".jpg",
+                storageDir
+        );
+
+        return image;
     }
 
     @Override
@@ -751,30 +779,6 @@ public class Account extends AppCompatActivity {
                     }
 
                 });
-    }
-
-    private File getOutputMediaFile(int type){
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "Campus Rush");
-
-        /**Create the storage directory if it does not exist*/
-        if (! mediaStorageDir.exists()){
-            if (! mediaStorageDir.mkdirs()){
-                return null;
-            }
-        }
-
-        /**Create a media file name*/
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File mediaFile;
-        if (type == 1){
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "IMG_"+ timeStamp + ".png");
-        } else {
-            return null;
-        }
-
-        return mediaFile;
     }
 
     private void setProfileProgress(UserModel paperUser) {

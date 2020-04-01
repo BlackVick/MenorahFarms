@@ -64,30 +64,40 @@
 
     </LinearLayout>
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:orientation="horizontal"
         android:background="@color/offWhite"
         android:id="@+id/controlLayout"
+        android:weightSum="10"
         android:visibility="gone">
 
-        <ImageView
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="10dp"
-            android:src="@drawable/ic_menorah_back_button_green"
-            android:padding="8dp"
-            android:id="@+id/backButton"/>
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_centerInParent="true"
+                android:layout_marginStart="10dp"
+                android:src="@drawable/ic_menorah_back_button_green"
+                android:padding="3dp"
+                android:id="@+id/backButton"/>
+
+        </RelativeLayout>
 
         <EditText
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="8"
             android:layout_height="match_parent"
-            android:layout_toEndOf="@+id/backButton"
             android:background="@color/white"
             android:id="@+id/searchText"
             android:gravity="center_vertical"
             android:inputType="textCapCharacters"
+            android:layout_gravity="center"
             android:paddingStart="5dp"
             android:paddingEnd="10dp"
             android:layout_marginTop="5dp"
@@ -104,13 +114,23 @@
             android:textColorHint="@color/grey"
             android:fontFamily="@font/proxima_nova_regular"/>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.4dp"
-            android:background="@color/offBlack"
-            android:layout_alignParentBottom="true"/>
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent">
 
-    </RelativeLayout>
+            <ImageView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_centerInParent="true"
+                android:layout_marginStart="10dp"
+                android:src="@drawable/ic_menu_green"
+                android:padding="1dp"
+                android:id="@+id/optionsButton"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
@@ -118,5 +138,12 @@
         android:id="@+id/runningCycleRecycler"
         android:layout_below="@+id/controlLayout"
         android:visibility="gone"/>
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        android:id="@+id/compileProgress"/>
 
 </RelativeLayout>

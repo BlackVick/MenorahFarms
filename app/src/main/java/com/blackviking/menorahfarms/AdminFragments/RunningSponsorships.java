@@ -1,20 +1,30 @@
 package com.blackviking.menorahfarms.AdminFragments;
 
 
+import android.graphics.Color;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.os.Environment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
+import com.blackviking.menorahfarms.AdminDetails.FarmManagementDetail;
 import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Interface.ItemClickListener;
@@ -31,7 +41,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -46,10 +61,14 @@ public class RunningSponsorships extends Fragment {
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference userRef, sponsorshipRef, adminSponsorshipRef;
 
-    private RelativeLayout noInternetLayout, controlLayout;
-    private LinearLayout emptyLayout;
-    private ImageView backButton;
+    private RelativeLayout noInternetLayout;
+    private LinearLayout emptyLayout, controlLayout;
+    private ImageView backButton, optionsButton;
     private EditText searchText;
+    private ProgressBar compileProgress;
+
+    private List<String> stuffList;
+    private StringBuilder total = new StringBuilder();
     
     //classification
     private boolean isList = false;
@@ -81,6 +100,8 @@ public class RunningSponsorships extends Fragment {
         controlLayout = v.findViewById(R.id.controlLayout);
         backButton = v.findViewById(R.id.backButton);
         searchText = v.findViewById(R.id.searchText);
+        optionsButton = v.findViewById(R.id.optionsButton);
+        compileProgress = v.findViewById(R.id.compileProgress);
 
 
         //execute network check async task
@@ -196,6 +217,8 @@ public class RunningSponsorships extends Fragment {
         layoutManager.setStackFromEnd(true);
         runningCycleRecycler.setLayoutManager(layoutManager);
 
+        stuffList = new ArrayList<>();
+
         adapter = new FirebaseRecyclerAdapter<RunningCycleModel, RunningCycleViewHolder>(
                 RunningCycleModel.class,
                 R.layout.running_cycle_item,
@@ -218,6 +241,8 @@ public class RunningSponsorships extends Fragment {
                                             viewHolder.cycleUserName.setText(currentUser.getFirstName() + " " + currentUser.getLastName());
 
                                         }
+
+                                        stuffList.add(currentUser.getEmail());
 
                                     }
 
@@ -290,6 +315,60 @@ public class RunningSponsorships extends Fragment {
                 }
             }
         });
+
+
+        //menu
+        optionsButton.setOnClickListener(view -> {
+
+            PopupMenu popup = new PopupMenu(getContext(), optionsButton);
+            popup.inflate(R.menu.cycle_menu);
+            popup.setOnMenuItemClickListener(item -> {
+
+                switch (item.getItemId()) {
+
+                    case R.id.action_get_email:
+
+                        getAllEmails(farmId);
+                        return true;
+
+                    default:
+                        return false;
+                }
+            });
+
+            popup.show();
+
+        });
+
+    }
+
+    private void getAllEmails(String farmId) {
+
+        //loading
+        compileProgress.setVisibility(View.VISIBLE);
+
+
+        String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Menorah Farms";
+
+                File file = new File(path);
+                if (!file.exists()) {
+                    file.mkdir();
+                }
+                try {
+                    File gpxfile = new File(file, farmId+".txt");
+                    FileWriter writer = new FileWriter(gpxfile);
+
+                    writer.write(stuffList.toString());
+                    writer.flush();
+                    writer.close();
+
+
+
+
+                    compileProgress.setVisibility(View.GONE);
+                    stuffList.clear();
+
+                } catch (Exception e) { }
 
     }
 

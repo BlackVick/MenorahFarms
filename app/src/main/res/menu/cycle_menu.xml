@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_get_email"
+        android:orderInCategory="101"
+        android:title="Complie Emails"
+        app:showAsAction="never"/>
+
+</menu>

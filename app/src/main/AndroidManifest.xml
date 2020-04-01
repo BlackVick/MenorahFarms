@@ -23,13 +23,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
-        tools:ignore="GoogleAppIndexingWarning">
+        tools:ignore="GoogleAppIndexingWarning"
+        tools:targetApi="m">
 
         <activity
             android:name=".Splash"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
-            android:theme="@style/SplashTheme">
+            android:theme="@style/SplashTheme"
+            tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -43,131 +45,161 @@
             android:configChanges="orientation"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"
             android:theme="@style/Base.Theme.AppCompat" />
 
         <activity
             android:name=".SignIn"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"
             android:theme="@style/LoginBackground" />
 
         <activity
             android:name=".SignUp"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"
             android:theme="@style/LoginBackground" />
 
         <activity
             android:name=".Registration"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"
             android:theme="@style/LoginBackground" />
 
         <activity
             android:name=".DashboardMenu.SponsoredFarms"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".DashboardMenu.FollowedFarms"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".HomeActivities.Account"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".HomeActivities.Dashboard"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".HomeActivities.FarmShop"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"/>
         <activity
             android:name=".DashboardMenu.FarmUpdates"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"/>
         <activity
             android:name=".DashboardMenu.AccountManager"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".DashboardMenu.Faq"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".CartAndHistory.Cart"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"/>
         <activity
             android:name=".CartAndHistory.SponsorshipHistory"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"/>
         <activity
             android:name=".AccountMenus.PersonalDetails"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"/>
         <activity
             android:name=".AccountMenus.ContactDetails"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".AccountMenus.BankDetails"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".AccountMenus.NextOfKin"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".AccountMenus.SocialMedia"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".FarmDetails"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".AccountMenus.StudentDetails"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"/>
         <activity
             android:name=".FarmDescription"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"/>
         <activity
             android:name=".CartAndHistory.HistoryDetails"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Sponsorship.SponsorshipDetails"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".AdminDash"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".DashboardMenu.Notifications"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".AdminDetails.DueSponsorshipDetail"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".AdminDetails.StudentRequestDetails"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".AdminDetails.FarmManagementDetail"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".DashboardMenu.FarmUpdateFullscreen"
             android:configChanges="orientation"
-            android:screenOrientation="sensorLandscape"></activity>
+            android:screenOrientation="sensorLandscape"
+            tools:ignore="LockedOrientationActivity"></activity>
 
         <!--  crashylytics key  -->
         <meta-data

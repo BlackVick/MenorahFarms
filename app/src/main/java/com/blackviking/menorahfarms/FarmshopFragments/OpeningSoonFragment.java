@@ -15,16 +15,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import com.blackviking.menorahfarms.AccountMenus.StudentDetails;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.FarmDetails;
-import com.blackviking.menorahfarms.Interface.ItemClickListener;
 import com.blackviking.menorahfarms.Models.FarmModel;
 import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.ViewHolders.FarmStoreViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -47,7 +44,6 @@ public class OpeningSoonFragment extends Fragment {
     private FirebaseRecyclerAdapter<FarmModel, FarmStoreViewHolder> adapter;
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference farmRef;
-    private String userType;
 
     public OpeningSoonFragment() {
         // Required empty public constructor
@@ -68,10 +64,6 @@ public class OpeningSoonFragment extends Fragment {
         emptyLayout = v.findViewById(R.id.emptyOpeningSoonLayout);
         openingSoonRecycler = v.findViewById(R.id.openingSoonRecycler);
 
-
-        /*---   CURRENT USER   ---*/
-        UserModel paperUser = Paper.book().read(Common.PAPER_USER);
-        userType = paperUser.getUserPackage();
 
         checkOpeningSoon();
 
@@ -128,63 +120,20 @@ public class OpeningSoonFragment extends Fragment {
 
                 long priceToLong = Long.parseLong(model.getPricePerUnit());
 
-                if (model.getPackaged().equalsIgnoreCase("true")){
+                viewHolder.farmPackage.setVisibility(View.GONE);
 
-                    viewHolder.farmPackage.setVisibility(View.VISIBLE);
+                viewHolder.farmType.setText(model.getFarmType());
+                viewHolder.farmLocation.setText(model.getFarmLocation());
+                viewHolder.farmUnitPrice.setText(Common.convertToPrice(getContext(), priceToLong));
+                viewHolder.farmROI.setText("Returns " + model.getFarmRoi() + "% in " + model.getSponsorDuration() + " months");
+                viewHolder.farmName.setText(model.getFarmName());
 
-                    viewHolder.farmPackage.setText(model.getPackagedType());
-                    viewHolder.farmType.setText(model.getFarmType());
-                    viewHolder.farmLocation.setText(model.getFarmLocation());
-                    viewHolder.farmUnitPrice.setText(Common.convertToPrice(getContext(), priceToLong));
-                    viewHolder.farmROI.setText("Returns " + model.getFarmRoi() + "% in " + model.getSponsorDuration() + " months");
-                    viewHolder.farmName.setText(model.getFarmName());
-
-                    if (model.getPackagedType().equalsIgnoreCase("Student")){
-
-                        viewHolder.setItemClickListener((view, position1, isLongClick) -> {
-                            if (userType.equalsIgnoreCase("Student")){
-
-                                Intent farmDetailIntent = new Intent(getContext(), FarmDetails.class);
-                                farmDetailIntent.putExtra("FarmId", adapter.getRef(viewHolder.getAdapterPosition()).getKey());
-                                startActivity(farmDetailIntent);
-                                getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-
-                            } else {
-
-                                openAcadaDialog();
-
-                            }
-                        });
-
-                    } else {
-
-                        viewHolder.setItemClickListener((view, position12, isLongClick) -> {
-                            Intent farmDetailIntent = new Intent(getContext(), FarmDetails.class);
-                            farmDetailIntent.putExtra("FarmId", adapter.getRef(viewHolder.getAdapterPosition()).getKey());
-                            startActivity(farmDetailIntent);
-                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-                        });
-
-                    }
-
-                } else {
-
-                    viewHolder.farmPackage.setVisibility(View.GONE);
-
-                    viewHolder.farmType.setText(model.getFarmType());
-                    viewHolder.farmLocation.setText(model.getFarmLocation());
-                    viewHolder.farmUnitPrice.setText(Common.convertToPrice(getContext(), priceToLong));
-                    viewHolder.farmROI.setText("Returns " + model.getFarmRoi() + "% in " + model.getSponsorDuration() + " months");
-                    viewHolder.farmName.setText(model.getFarmName());
-
-                    viewHolder.setItemClickListener((view, position13, isLongClick) -> {
-                        Intent farmDetailIntent = new Intent(getContext(), FarmDetails.class);
-                        farmDetailIntent.putExtra("FarmId", adapter.getRef(viewHolder.getAdapterPosition()).getKey());
-                        startActivity(farmDetailIntent);
-                        getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-                    });
-
-                }
+                viewHolder.setItemClickListener((view, position13, isLongClick) -> {
+                    Intent farmDetailIntent = new Intent(getContext(), FarmDetails.class);
+                    farmDetailIntent.putExtra("FarmId", adapter.getRef(viewHolder.getAdapterPosition()).getKey());
+                    startActivity(farmDetailIntent);
+                    getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
+                });
 
 
                 if (!model.getFarmImageThumb().equalsIgnoreCase("")){
@@ -212,42 +161,6 @@ public class OpeningSoonFragment extends Fragment {
             }
         };
         openingSoonRecycler.setAdapter(adapter);
-
-    }
-
-    private void openAcadaDialog() {
-
-        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(getContext()).create();
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        View viewOptions = inflater.inflate(R.layout.acada_cash_layout,null);
-
-        final Button cancel = (Button) viewOptions.findViewById(R.id.cancelAcada);
-        final Button proceed = (Button) viewOptions.findViewById(R.id.proceedAcada);
-
-        alertDialog.setView(viewOptions);
-
-        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
-        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-
-        proceed.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-                Intent studentRegIntent = new Intent(getContext(), StudentDetails.class);
-                startActivity(studentRegIntent);
-                getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-            }
-        });
-
-        cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.cancel();
-            }
-        });
-
-        alertDialog.show();
 
     }
 

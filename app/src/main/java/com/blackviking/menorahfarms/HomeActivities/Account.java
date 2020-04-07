@@ -2,7 +2,6 @@ package com.blackviking.menorahfarms.HomeActivities;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -36,23 +35,18 @@ import com.blackviking.menorahfarms.AccountMenus.ContactDetails;
 import com.blackviking.menorahfarms.AccountMenus.NextOfKin;
 import com.blackviking.menorahfarms.AccountMenus.PersonalDetails;
 import com.blackviking.menorahfarms.AccountMenus.SocialMedia;
-import com.blackviking.menorahfarms.AccountMenus.StudentDetails;
 import com.blackviking.menorahfarms.BuildConfig;
 import com.blackviking.menorahfarms.CartAndHistory.Cart;
 import com.blackviking.menorahfarms.CartAndHistory.SponsorshipHistory;
 import com.blackviking.menorahfarms.Common.ApplicationClass;
 import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
-import com.blackviking.menorahfarms.Common.Permissions;
 import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.SignIn;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -78,7 +72,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import dmax.dialog.SpotsDialog;
 import id.zelory.compressor.Compressor;
 import io.paperdb.Paper;
 
@@ -100,7 +93,7 @@ public class Account extends AppCompatActivity {
 
     private RelativeLayout personalDetailsLayout, contactDetailsLayout,
             bankDetailsLayout, nextOfKinLayout, socialMediaLayout,
-            studentProfileLayout, historyLayout, logOutLayout;
+            historyLayout, logOutLayout;
 
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
@@ -170,7 +163,6 @@ public class Account extends AppCompatActivity {
         bankDetailsLayout = findViewById(R.id.bankDetailsLayout);
         nextOfKinLayout = findViewById(R.id.nextOfKinLayout);
         socialMediaLayout = findViewById(R.id.socialMediaLayout);
-        studentProfileLayout = findViewById(R.id.studentProfileLayout);
         historyLayout = findViewById(R.id.historyLayout);
         logOutLayout = findViewById(R.id.logOutLayout);
 
@@ -270,13 +262,6 @@ public class Account extends AppCompatActivity {
         socialMediaLayout.setOnClickListener(v -> {
             Intent socialIntent = new Intent(Account.this, SocialMedia.class);
             startActivity(socialIntent);
-            overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
-        });
-
-        //student dets
-        studentProfileLayout.setOnClickListener(v -> {
-            Intent studentIntent = new Intent(Account.this, StudentDetails.class);
-            startActivity(studentIntent);
             overridePendingTransition(R.anim.fade_in, R.anim.fade_in);
         });
 

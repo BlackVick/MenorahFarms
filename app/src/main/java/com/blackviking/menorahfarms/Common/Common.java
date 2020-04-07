@@ -35,7 +35,6 @@ public class Common {
     public static final String NOTIFICATIONS_NODE = "Notifications";
     public static final String SPONSORED_FARMS_NODE = "SponsoredFarms";
     public static final String FOLLOWED_FARMS_NODE = "FollowedFarms";
-    public static final String STUDENT_DETAILS_NODE = "StudentDetails";
     public static final String FOLLOWED_FARMS_NOTIFICATION_NODE = "FollowedFarmsNotification";
     public static final String SPONSORED_FARMS_NOTIFICATION_NODE = "SponsoredFarmsNotification";
     public static final String RUNNING_CYCLE_NODE = "RunningCycles";

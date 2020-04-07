@@ -251,35 +251,15 @@ public class FarmDetails extends AppCompatActivity {
                                     /*---   UNIT NUMBERS   ---*/
                                     increaseUnitNumber.setOnClickListener(v -> {
 
-                                        if (currentFarm.getPackagedType().equalsIgnoreCase("Student")){
+                                        if (unitNumberText < 50) {
+                                            unitNumberText++;
+                                            unitNumber.setText(String.valueOf(unitNumberText));
 
-                                            if (unitNumberText < 10) {
-                                                unitNumberText++;
-                                                unitNumber.setText(String.valueOf(unitNumberText));
+                                            calculateChanges(unitNumberText, theFarmUnitPrice, theFarmROI);
 
-                                                calculateChanges(unitNumberText, theFarmUnitPrice, theFarmROI);
+                                        } else {
 
-                                            } else {
-
-                                                Toast.makeText(FarmDetails.this, "Your sponsorship limit is 10", Toast.LENGTH_LONG).show();
-
-                                            }
-
-                                        }
-
-                                        if (currentFarm.getPackagedType().equalsIgnoreCase("Worker")){
-
-                                            if (unitNumberText < 100) {
-                                                unitNumberText++;
-                                                unitNumber.setText(String.valueOf(unitNumberText));
-
-                                                calculateChanges(unitNumberText, theFarmUnitPrice, theFarmROI);
-
-                                            } else {
-
-                                                Toast.makeText(FarmDetails.this, "Your sponsorship limit is 100", Toast.LENGTH_LONG).show();
-
-                                            }
+                                            Toast.makeText(FarmDetails.this, "Sponsorship limit is 50 per attempt", Toast.LENGTH_LONG).show();
 
                                         }
 
@@ -325,65 +305,7 @@ public class FarmDetails extends AppCompatActivity {
                                             //check all cases
                                             if (output == 1){
 
-
-                                                sponsorshipRef.child(currentUid)
-                                                        .orderByChild("farmId")
-                                                        .equalTo(farmId)
-                                                        .addListenerForSingleValueEvent(new ValueEventListener() {
-                                                            @Override
-                                                            public void onDataChange(DataSnapshot dataSnapshot1) {
-
-                                                                int theCount = 0;
-
-                                                                for (DataSnapshot snap : dataSnapshot1.getChildren()){
-
-                                                                    int newCount = Integer.parseInt(snap.child("sponsoredUnits").getValue().toString());
-
-                                                                    theCount = theCount + newCount;
-
-                                                                }
-
-                                                                if (currentFarm.getPackagedType().equalsIgnoreCase("Worker")){
-
-                                                                    int spaceRemaining = 100 - theCount;
-
-                                                                    if (theCount < 100 && unitNumberText <= spaceRemaining){
-
-                                                                        addToCart(unitNumberText, theFarmUnitPrice, theFarmROI);
-
-                                                                    } else {
-
-                                                                        Toast.makeText(FarmDetails.this, "Your sponsorship limit is 100", Toast.LENGTH_LONG).show();
-
-                                                                    }
-
-                                                                } else
-
-                                                                if (currentFarm.getPackagedType().equalsIgnoreCase("Student")){
-
-                                                                    int spaceRemaining = 10 - theCount;
-
-                                                                    if (theCount < 10 && unitNumberText <= spaceRemaining){
-
-                                                                        addToCart(unitNumberText, theFarmUnitPrice, theFarmROI);
-
-                                                                    } else {
-
-                                                                        Toast.makeText(FarmDetails.this, "Your sponsorship limit is 10", Toast.LENGTH_LONG).show();
-
-                                                                    }
-
-                                                                }
-
-
-
-                                                            }
-
-                                                            @Override
-                                                            public void onCancelled(DatabaseError databaseError) {
-
-                                                            }
-                                                        });
+                                                addToCart(unitNumberText, theFarmUnitPrice, theFarmROI);
 
                                             } else
 

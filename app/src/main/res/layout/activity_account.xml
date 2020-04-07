@@ -419,61 +419,6 @@
                             android:layout_marginEnd="8dp"
                             android:layout_marginTop="4dp"
                             android:layout_marginBottom="4dp"
-                            android:id="@+id/studentProfileLayout"
-                            android:background="@drawable/menu_back"
-                            android:elevation="2dp">
-
-                            <RelativeLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_above="@+id/studentText">
-
-                                <ImageView
-                                    android:layout_width="70dp"
-                                    android:layout_height="wrap_content"
-                                    android:src="@drawable/ic_student_new"
-                                    android:padding="15dp"
-                                    android:adjustViewBounds="true"
-                                    android:layout_centerInParent="true"/>
-
-                            </RelativeLayout>
-
-                            <TextView
-                                android:layout_gravity="center"
-                                android:gravity="center"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="Student"
-                                android:textColor="@color/colorAccent"
-                                android:textStyle="bold"
-                                android:textSize="14sp"
-                                android:layout_margin="6dp"
-                                android:layout_alignParentBottom="true"
-                                android:id="@+id/studentText"
-                                android:fontFamily="@font/proxima_nova_bold"/>
-
-                        </RelativeLayout>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="130dp"
-                        android:orientation="horizontal"
-                        android:layout_marginStart="2dp"
-                        android:layout_marginEnd="2dp"
-                        android:layout_marginTop="18dp"
-                        android:layout_marginBottom="15dp"
-                        android:weightSum="3">
-
-                        <RelativeLayout
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="match_parent"
-                            android:layout_marginStart="8dp"
-                            android:layout_marginEnd="8dp"
-                            android:layout_marginTop="4dp"
-                            android:layout_marginBottom="4dp"
                             android:id="@+id/historyLayout"
                             android:background="@drawable/menu_back"
                             android:elevation="2dp">
@@ -508,6 +453,18 @@
                                 android:fontFamily="@font/proxima_nova_bold"/>
 
                         </RelativeLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="130dp"
+                        android:orientation="horizontal"
+                        android:layout_marginStart="2dp"
+                        android:layout_marginEnd="2dp"
+                        android:layout_marginTop="18dp"
+                        android:layout_marginBottom="15dp"
+                        android:weightSum="3">
 
                         <RelativeLayout
                             android:layout_width="0dp"
@@ -549,6 +506,47 @@
                                 android:id="@+id/logoutText"
                                 android:layout_alignParentBottom="true"
                                 android:fontFamily="@font/proxima_nova_bold"/>
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:visibility="invisible"
+                            android:background="@drawable/menu_back"
+                            android:elevation="2dp">
+
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+                                <ImageView
+                                    android:layout_width="70dp"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/dash_admin"
+                                    android:padding="18dp"
+                                    android:adjustViewBounds="true"
+                                    android:layout_centerInParent="true"
+                                    android:layout_gravity="center"/>
+
+                            </RelativeLayout>
+
+                            <TextView
+                                android:layout_gravity="center"
+                                android:gravity="center"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentBottom="true"
+                                android:text=""
+                                android:textColor="@color/colorAccent"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:layout_margin="6dp"/>
 
                         </RelativeLayout>
 

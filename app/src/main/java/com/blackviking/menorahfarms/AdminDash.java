@@ -20,7 +20,6 @@ import com.blackviking.menorahfarms.AdminFragments.AdminNotify;
 import com.blackviking.menorahfarms.AdminFragments.DueSponsorships;
 import com.blackviking.menorahfarms.AdminFragments.FarmManagement;
 import com.blackviking.menorahfarms.AdminFragments.RunningSponsorships;
-import com.blackviking.menorahfarms.AdminFragments.StudentRequest;
 import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Models.UserModel;
@@ -37,14 +36,14 @@ public class AdminDash extends AppCompatActivity {
     private ImageView backButton;
     private TextView fragmentName;
 
-    private RelativeLayout dueSponsorshipLayout, studentApplyLayout, adminNotifyLayout,
+    private RelativeLayout dueSponsorshipLayout, adminNotifyLayout,
                             runningSponsorshipLayout, adminHistoryLayout, farmManagementLayout;
-    private ImageView dueSponsorshipImage, studentApplyImage, adminNotifyImage, runningSponsorshipImage,
+    private ImageView dueSponsorshipImage, adminNotifyImage, runningSponsorshipImage,
                             adminHistoryImage, farmManagementImage;
-    private TextView dueSponsorshipCounter, studentApplyCounter, runningSponsorshipCounter;
+    private TextView dueSponsorshipCounter, runningSponsorshipCounter;
 
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference studentRef, dueSponsorshipRef,  adminSponsorshipRef;
+    private DatabaseReference dueSponsorshipRef,  adminSponsorshipRef;
 
 
     private RelativeLayout noInternetLayout, adminBottomNav;
@@ -65,7 +64,6 @@ public class AdminDash extends AppCompatActivity {
 
 
         /*---   FIREBASE   ---*/
-        studentRef = db.getReference(Common.STUDENT_DETAILS_NODE);
         dueSponsorshipRef = db.getReference(Common.DUE_SPONSORSHIPS_NODE);
         adminSponsorshipRef = db.getReference(Common.RUNNING_CYCLE_NODE);
 
@@ -78,17 +76,14 @@ public class AdminDash extends AppCompatActivity {
         fragmentName = findViewById(R.id.fragmentName);
 
         dueSponsorshipLayout = findViewById(R.id.dueSponsorshipLayout);
-        studentApplyLayout = findViewById(R.id.studentApplyLayout);
         adminNotifyLayout = findViewById(R.id.adminNotifyLayout);
         runningSponsorshipLayout = findViewById(R.id.runningSponsorshipLayout);
         adminHistoryLayout = findViewById(R.id.adminHistoryLayout);
         dueSponsorshipImage = findViewById(R.id.dueSponsorshipImage);
-        studentApplyImage = findViewById(R.id.studentApplyImage);
         adminNotifyImage = findViewById(R.id.adminNotifyImage);
         runningSponsorshipImage = findViewById(R.id.runningSponsorshipImage);
         adminHistoryImage = findViewById(R.id.adminHistoryImage);
         dueSponsorshipCounter = findViewById(R.id.dueSponsorshipCounter);
-        studentApplyCounter = findViewById(R.id.studentApplyCounter);
         runningSponsorshipCounter = findViewById(R.id.runningSponsorshipCounter);
 
         noInternetLayout = findViewById(R.id.noInternetLayout);
@@ -103,7 +98,6 @@ public class AdminDash extends AppCompatActivity {
 
         /*---   FRAGMENTS   ---*/
         final DueSponsorships dueSponsorships = new DueSponsorships();
-        final StudentRequest studentRequest = new StudentRequest();
         final AdminNotify adminNotify = new AdminNotify();
         final RunningSponsorships runningSponsorships = new RunningSponsorships();
         final AdminHistory adminHistory = new AdminHistory();
@@ -162,10 +156,6 @@ public class AdminDash extends AppCompatActivity {
             dueSponsorshipImage.setImageResource(R.drawable.ic_due_sponsorships_white);
             dueSponsorshipCounter.setTextColor(getResources().getColor(R.color.white));
 
-            studentApplyLayout.setBackgroundResource(R.color.white);
-            studentApplyImage.setImageResource(R.drawable.ic_student_request);
-            studentApplyCounter.setTextColor(getResources().getColor(R.color.red));
-
             adminNotifyLayout.setBackgroundResource(R.color.white);
             adminNotifyImage.setImageResource(R.drawable.ic_notifications);
 
@@ -182,35 +172,6 @@ public class AdminDash extends AppCompatActivity {
             setFragment(dueSponsorships);
         });
 
-        studentApplyLayout.setOnClickListener(v -> {
-
-            fragmentName.setText("Student Request");
-
-            dueSponsorshipLayout.setBackgroundResource(R.color.white);
-            dueSponsorshipImage.setImageResource(R.drawable.ic_due_sponsorships);
-            dueSponsorshipCounter.setTextColor(getResources().getColor(R.color.red));
-
-            studentApplyLayout.setBackgroundResource(R.color.colorPrimaryDark);
-            studentApplyImage.setImageResource(R.drawable.ic_student_request_white);
-            studentApplyCounter.setTextColor(getResources().getColor(R.color.white));
-
-            adminNotifyLayout.setBackgroundResource(R.color.white);
-            adminNotifyImage.setImageResource(R.drawable.ic_notifications);
-
-            runningSponsorshipLayout.setBackgroundResource(R.color.white);
-            runningSponsorshipImage.setImageResource(R.drawable.ic_current_sponsorships_green);
-            runningSponsorshipCounter.setTextColor(getResources().getColor(R.color.red));
-
-            adminHistoryLayout.setBackgroundResource(R.color.white);
-            adminHistoryImage.setImageResource(R.drawable.ic_history);
-
-            farmManagementLayout.setBackgroundResource(R.color.white);
-            farmManagementImage.setImageResource(R.drawable.ic_farm_management_green);
-
-            setFragment(studentRequest);
-
-        });
-
         adminNotifyLayout.setOnClickListener(v -> {
 
             fragmentName.setText("Send Notifications");
@@ -218,10 +179,6 @@ public class AdminDash extends AppCompatActivity {
             dueSponsorshipLayout.setBackgroundResource(R.color.white);
             dueSponsorshipImage.setImageResource(R.drawable.ic_due_sponsorships);
             dueSponsorshipCounter.setTextColor(getResources().getColor(R.color.red));
-
-            studentApplyLayout.setBackgroundResource(R.color.white);
-            studentApplyImage.setImageResource(R.drawable.ic_student_request);
-            studentApplyCounter.setTextColor(getResources().getColor(R.color.red));
 
             adminNotifyLayout.setBackgroundResource(R.color.colorPrimaryDark);
             adminNotifyImage.setImageResource(R.drawable.ic_notifications_white);
@@ -248,10 +205,6 @@ public class AdminDash extends AppCompatActivity {
             dueSponsorshipImage.setImageResource(R.drawable.ic_due_sponsorships);
             dueSponsorshipCounter.setTextColor(getResources().getColor(R.color.red));
 
-            studentApplyLayout.setBackgroundResource(R.color.white);
-            studentApplyImage.setImageResource(R.drawable.ic_student_request);
-            studentApplyCounter.setTextColor(getResources().getColor(R.color.red));
-
             adminNotifyLayout.setBackgroundResource(R.color.white);
             adminNotifyImage.setImageResource(R.drawable.ic_notifications);
 
@@ -276,10 +229,6 @@ public class AdminDash extends AppCompatActivity {
             dueSponsorshipLayout.setBackgroundResource(R.color.white);
             dueSponsorshipImage.setImageResource(R.drawable.ic_due_sponsorships);
             dueSponsorshipCounter.setTextColor(getResources().getColor(R.color.red));
-
-            studentApplyLayout.setBackgroundResource(R.color.white);
-            studentApplyImage.setImageResource(R.drawable.ic_student_request);
-            studentApplyCounter.setTextColor(getResources().getColor(R.color.red));
 
             adminNotifyLayout.setBackgroundResource(R.color.white);
             adminNotifyImage.setImageResource(R.drawable.ic_notifications);
@@ -308,10 +257,6 @@ public class AdminDash extends AppCompatActivity {
                 dueSponsorshipLayout.setBackgroundResource(R.color.white);
                 dueSponsorshipImage.setImageResource(R.drawable.ic_due_sponsorships);
                 dueSponsorshipCounter.setTextColor(getResources().getColor(R.color.red));
-
-                studentApplyLayout.setBackgroundResource(R.color.white);
-                studentApplyImage.setImageResource(R.drawable.ic_student_request);
-                studentApplyCounter.setTextColor(getResources().getColor(R.color.red));
 
                 adminNotifyLayout.setBackgroundResource(R.color.white);
                 adminNotifyImage.setImageResource(R.drawable.ic_notifications);
@@ -383,23 +328,6 @@ public class AdminDash extends AppCompatActivity {
             }
         });
 
-        studentRef.orderByChild("approval")
-                .equalTo("pending")
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        int studentCount = (int) dataSnapshot.getChildrenCount();
-                        studentApplyCounter.setText(String.valueOf(studentCount));
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
     }
 
     private void setBaseFragment(DueSponsorships dueSponsorships) {
@@ -409,10 +337,6 @@ public class AdminDash extends AppCompatActivity {
         dueSponsorshipLayout.setBackgroundResource(R.color.colorPrimaryDark);
         dueSponsorshipImage.setImageResource(R.drawable.ic_due_sponsorships_white);
         dueSponsorshipCounter.setTextColor(getResources().getColor(R.color.white));
-
-        studentApplyLayout.setBackgroundResource(R.color.white);
-        studentApplyImage.setImageResource(R.drawable.ic_student_request);
-        studentApplyCounter.setTextColor(getResources().getColor(R.color.red));
 
         adminNotifyLayout.setBackgroundResource(R.color.white);
         adminNotifyImage.setImageResource(R.drawable.ic_notifications);

@@ -102,8 +102,7 @@ public class FarmManagement extends Fragment {
                 FarmModel.class,
                 R.layout.farm_management_item,
                 FarmManagementViewHolder.class,
-                farmRef.orderByChild("packagedType")
-                .equalTo("Worker")
+                farmRef
         ) {
             @Override
             protected void populateViewHolder(FarmManagementViewHolder viewHolder, FarmModel model, int position) {

@@ -2,12 +2,16 @@ package com.blackviking.menorahfarms.AdminFragments;
 
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.fragment.app.Fragment;
+
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,7 +25,6 @@ import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blackviking.menorahfarms.Common.CheckInternet;
@@ -30,7 +33,6 @@ import com.blackviking.menorahfarms.Notification.APIService;
 import com.blackviking.menorahfarms.Notification.DataMessage;
 import com.blackviking.menorahfarms.Notification.MyResponse;
 import com.blackviking.menorahfarms.R;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -564,29 +566,21 @@ public class AdminNotify extends Fragment {
                 //check all cases
                 if (output == 1){
 
-                    sendNotificationToAll(theTopic, theMessage)
-                            .addOnCompleteListener(task -> {
+                    //run in background
+                    new AsyncCaller().execute(theTopic, theMessage);
 
-                                if (!task.isSuccessful()) {
+                    //wait 5 seconds then stop loading
+                    new Handler().postDelayed(() -> {
 
-                                    Exception e = task.getException();
-                                    if (e instanceof FirebaseFunctionsException) {
-                                        FirebaseFunctionsException ffe = (FirebaseFunctionsException) e;
-                                        FirebaseFunctionsException.Code code = ffe.getCode();
-                                        Object details = ffe.getDetails();
+                        //stop loading
+                        sendBroadcastBtn.setEnabled(true);
+                        sendProgress.setVisibility(View.GONE);
+                        alertDialog.dismiss();
 
-                                    }
+                        //set layout
+                        Toast.makeText(getContext(), "STARTED", Toast.LENGTH_SHORT).show();
 
-                                }
-
-                                //stop loading
-                                sendBroadcastBtn.setEnabled(true);
-                                sendProgress.setVisibility(View.GONE);
-
-                                Toast.makeText(getContext(), "DONE", Toast.LENGTH_SHORT).show();
-                                alertDialog.dismiss();
-
-                            });
+                    }, 5000);
 
                 } else
 
@@ -618,31 +612,85 @@ public class AdminNotify extends Fragment {
 
     }
 
-    private Task<String> sendNotificationToAll(final String theTopic, final String theMessage) {
+    private class AsyncCaller extends AsyncTask<String, Void, String> {
 
-        //get today String
-        final Date todayDate = Calendar.getInstance().getTime();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-        String todayString = formatter.format(todayDate);
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
 
-        // Create the arguments to the callable function.
-        Map<String, Object> data = new HashMap<>();
-        data.put("topic", theTopic);
-        data.put("message", theMessage);
-        data.put("time", todayString);
+        }
 
-        return mFunctions
-                .getHttpsCallable("sendNotificationToAll")
-                .call(data)
-                .continueWith(task -> {
-                    // This continuation runs on either success or failure, but if the task
-                    // has failed then getResult() will throw an Exception which will be
-                    // propagated down.
-                    String result = (String) task.getResult().getData();
-                    Log.e("SendNotiToAll", result);
+        @Override
+        protected String doInBackground(String... strings) {
 
-                    return result;
-                });
+
+            String theTopic = strings[0];
+            String theMessage = strings[1];
+
+            //get user list from user node
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                    //create date string
+                    final Date todayDate = Calendar.getInstance().getTime();
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy  hh:mm");
+                    String todayString = formatter.format(todayDate);
+
+                    for (DataSnapshot snap : dataSnapshot.getChildren()){
+
+                        //get each user id
+                        String userId = snap.getKey();
+
+                        //create notification map
+                        final Map<String, Object> notificationMap = new HashMap<>();
+                        notificationMap.put("topic", theTopic);
+                        notificationMap.put("message", theMessage);
+                        notificationMap.put("time", todayString);
+
+                        //push to database
+                        notificationRef.child(userId)
+                                .push()
+                                .setValue(notificationMap);
+
+                    }
+
+                    //send broadcast notification
+                    Map<String, String> dataSend = new HashMap<>();
+                    dataSend.put("title", "Menorah Farms");
+                    dataSend.put("message", theTopic);
+                    DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(Common.GENERAL_NOTIFY).toString(), dataSend);
+
+                    mService.sendNotification(dataMessage)
+                            .enqueue(new retrofit2.Callback<MyResponse>() {
+                                @Override
+                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+
+
+                                }
+
+                                @Override
+                                public void onFailure(Call<MyResponse> call, Throwable t) {
+                                }
+                            });
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+        }
+
     }
 
 }

@@ -369,7 +369,6 @@ public class Cart extends AppCompatActivity {
     }
 
 
-
     //FlutterWave Payment Gateway
     private void checkoutAndPay(final String theCartKey, final String theFarmType, final String theFarmROI, final String theFarmUnitPrice, final String theFarmSponsorDuration, final long totalPayout, final int units, final String farmId) {
 

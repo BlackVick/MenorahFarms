@@ -1,5 +1,15 @@
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval">
-    <solid
-        android:color="@color/white"/>
-</shape>
+<ripple
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:color="@color/colorPrimary"
+    tools:targetApi="o">
+
+    <item>
+        <shape
+            android:shape="oval">
+            <solid
+                android:color="@color/white"/>
+        </shape>
+    </item>
+
+</ripple>

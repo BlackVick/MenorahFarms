@@ -54,7 +54,7 @@ public class SignIn extends AppCompatActivity {
 
     private MaterialEditText loginEmail, loginPassword;
     private Button loginButton;
-    private ImageView googleSignIn, showPassword;
+    private ImageView googleSignIn, appleSignIn, showPassword;
     private TextView registerLink, recoverPassword;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
@@ -70,31 +70,39 @@ public class SignIn extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
 
-        /*---   FIREBASE   ---*/
+        //firebase
         userRef = db.getReference(Common.USERS_NODE);
         authed = db.getReference(Common.AUTHED_USERS_NODE);
 
 
-        /*---   WIDGETS   ---*/
+        //widgets
         loginEmail = findViewById(R.id.loginEmail);
         loginPassword = findViewById(R.id.loginPassword);
         loginButton = findViewById(R.id.loginButton);
         googleSignIn = findViewById(R.id.googleSignIn);
+        appleSignIn = findViewById(R.id.appleSignIn);
         showPassword = findViewById(R.id.showPassword);
         registerLink = findViewById(R.id.registerLink);
         recoverPassword = findViewById(R.id.recoverPassword);
 
-        /*---   GOOGLE INIT   ---*/
+        //init ui
+        initializeUI();
+
+    }
+
+    private void initializeUI() {
+
+        //init google api
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
-
         mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
                 .enableAutoManage(this, connectionResult -> Toast.makeText(SignIn.this, "Unable to connect to google network", Toast.LENGTH_LONG).show())
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
+        //google sign in
         googleSignIn.setOnClickListener(v -> {
 
             //show dialog
@@ -133,10 +141,7 @@ public class SignIn extends AppCompatActivity {
 
         });
 
-
-
-        /*---   EMAIL SIGN IN   ---*/
-        /*---   SIGN IN   ---*/
+        //email sign in
         loginButton.setOnClickListener(v -> {
 
             //show dialog
@@ -176,9 +181,14 @@ public class SignIn extends AppCompatActivity {
 
         });
 
+        //apple sign in
+        appleSignIn.setOnClickListener(view -> {
 
+            //init apple sign in process
 
-        /*---   RESET PASSWORD   ---*/
+        });
+
+        //reset password
         recoverPassword.setOnClickListener(v -> {
 
             //show dialog
@@ -217,18 +227,14 @@ public class SignIn extends AppCompatActivity {
 
         });
 
-
-
-        /*---   SIGN UP   ---*/
+        //sign up link
         registerLink.setOnClickListener(v -> {
             Intent registerIntent = new Intent(SignIn.this, SignUp.class);
             startActivity(registerIntent);
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         });
 
-
-
-        /*---   PASSWORD VISIBILITY   ---*/
+        //password visibility
         showPassword.setOnClickListener(v -> {
 
             if (!isPasswordVisible){
@@ -247,6 +253,7 @@ public class SignIn extends AppCompatActivity {
 
 
         });
+
     }
 
     private void signInUserWithEmail() {

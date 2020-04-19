@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -30,12 +31,15 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.OAuthProvider;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -64,6 +68,8 @@ public class SignIn extends AppCompatActivity {
     private android.app.AlertDialog mDialog;
     private boolean isPasswordVisible = false;
     private String currentUid;
+    private OAuthProvider.Builder provider;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +79,7 @@ public class SignIn extends AppCompatActivity {
         //firebase
         userRef = db.getReference(Common.USERS_NODE);
         authed = db.getReference(Common.AUTHED_USERS_NODE);
+        provider = OAuthProvider.newBuilder("apple.com");
 
 
         //widgets
@@ -185,6 +192,7 @@ public class SignIn extends AppCompatActivity {
         appleSignIn.setOnClickListener(view -> {
 
             //init apple sign in process
+            signInWithApple();
 
         });
 
@@ -253,6 +261,174 @@ public class SignIn extends AppCompatActivity {
 
 
         });
+
+    }
+
+    private void signInWithApple() {
+
+        Task<AuthResult> pending = mAuth.getPendingAuthResult();
+        if (pending != null) {
+
+            pending.addOnSuccessListener(authResult -> {
+
+                //get user
+                FirebaseUser user = authResult.getUser();
+                loadAppleSignIn(user);
+
+            }).addOnFailureListener(e -> {
+
+                //apple auth failed
+                Toast.makeText(SignIn.this, "Apple auth Failed", Toast.LENGTH_LONG).show();
+
+            });
+
+        } else {
+
+            //init auth
+            mAuth.startActivityForSignInWithProvider(this, provider.build())
+                    .addOnSuccessListener(authResult -> {
+
+                        // Sign-in successful!
+                        FirebaseUser user = authResult.getUser();
+                        loadAppleSignIn(user);
+
+                    })
+                    .addOnFailureListener(e -> {
+
+                                //apple auth failed
+                                Toast.makeText(SignIn.this, "Apple auth Failed", Toast.LENGTH_LONG).show();
+
+                            });
+
+        }
+
+
+
+
+
+    }
+
+    private void loadAppleSignIn(FirebaseUser user) {
+
+        authed.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                if (dataSnapshot.child(user.getUid()).exists()){
+
+                    updateUI(user);
+
+                } else {
+
+                    authed.child(user.getUid())
+                            .child("userEmail")
+                            .setValue(user.getEmail())
+                            .addOnCompleteListener(task1 -> {
+
+                                if (task1.isSuccessful()){
+
+                                    registerAppleUser(user);
+
+                                } else {
+
+                                    //show error
+                                    Toast.makeText(SignIn.this, "Registration unsuccessful. Please try again later.", Toast.LENGTH_SHORT).show();
+
+                                    //dismiss dialog
+                                    mDialog.dismiss();
+
+                                    //remove auth
+                                    if (mAuth.getCurrentUser() != null){
+
+                                        mAuth.getCurrentUser().delete();
+                                        mAuth.signOut();
+
+                                    }
+
+                                }
+
+                            });
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void registerAppleUser(FirebaseUser user) {
+
+        currentUid = user.getUid();
+
+        //name separation
+        String[] parts = user.getDisplayName().split("\\s+");
+        final String theFirstName = parts[0];
+        final String theLastName = parts[1];
+        final String theEmail = user.getEmail();
+
+        final Map<String, Object> newUserMap = new HashMap<>();
+        newUserMap.put("email", theEmail);
+        newUserMap.put("firstName", theFirstName);
+        newUserMap.put("lastName", theLastName);
+        newUserMap.put("profilePicture", "");
+        newUserMap.put("profilePictureThumb", "");
+        newUserMap.put("signUpMode", "Apple");
+        newUserMap.put("facebook", "");
+        newUserMap.put("instagram", "");
+        newUserMap.put("twitter", "");
+        newUserMap.put("userType", "User");
+        newUserMap.put("userPackage", "Worker");
+        newUserMap.put("phone", "");
+        newUserMap.put("birthday", "");
+        newUserMap.put("gender", "");
+        newUserMap.put("nationality", "");
+        newUserMap.put("address", "");
+        newUserMap.put("city", "");
+        newUserMap.put("state", "");
+        newUserMap.put("bank", "");
+        newUserMap.put("accountName", "");
+        newUserMap.put("accountNumber", "");
+        newUserMap.put("kinName", "");
+        newUserMap.put("kinEmail", "");
+        newUserMap.put("kinRelationship", "");
+        newUserMap.put("kinPhone", "");
+        newUserMap.put("kinAddress", "");
+        newUserMap.put("linkedIn", "");
+        newUserMap.put("accountManager", "");
+
+        userRef.child(currentUid)
+                .setValue(newUserMap)
+                .addOnCompleteListener(task -> {
+
+                    if (task.isSuccessful()){
+
+                        updateUIRegister(user);
+
+                    } else {
+
+                        //show error
+                        Toast.makeText(SignIn.this, "Something happened. Please try again later.", Toast.LENGTH_LONG).show();
+
+                        //dismiss dialog
+                        mDialog.dismiss();
+
+                        //undo auth and remove from db
+                        if (mAuth.getCurrentUser() != null) {
+
+                            mAuth.getCurrentUser().delete();
+                            authed.child(currentUid).removeValue();
+                            mAuth.signOut();
+
+                        }
+
+                    }
+
+                });
 
     }
 

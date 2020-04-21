@@ -92,7 +92,7 @@ public class AdminMonitorService extends Service {
                 mTimeLeftInMillis = millisUntilFinished;
 
                 //update
-                updateCountDown(farmType, mTimeLeftInMillis);
+                //updateCountDown(farmType, mTimeLeftInMillis);
             }
 
             @Override

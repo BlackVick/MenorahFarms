@@ -44,6 +44,9 @@
 #viewholders
 -keep class com.blackviking.menorahfarms.ViewHolders.** {*;}
 
+#flutterwave
+-keepclasseswithmembers public class com.flutterwave.raveandroid.** { *; }
+-dontwarn com.flutterwave.raveandroid.card.CardFragment
 
 #class extensions
 -keep public class * extends android.app.Activity
@@ -289,8 +292,8 @@
 -dontwarn com.squareup.picasso.LruCache.**
 
 # Firebase
--keep class com.firebase.** { *; }
--dontwarn com.firebase.**
+-keep class com.google.firebase.** { *; }
+-dontwarn com.google.firebase.**
 
 -keepnames class com.shaded.fasterxml.** { *; }
 -dontwarn org.shaded.apache.**

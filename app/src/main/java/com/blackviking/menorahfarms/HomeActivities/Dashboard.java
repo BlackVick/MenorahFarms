@@ -70,7 +70,6 @@ public class Dashboard extends AppCompatActivity {
     //google
     private GoogleApiClient mGoogleApiClient;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

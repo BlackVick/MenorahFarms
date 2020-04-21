@@ -83,7 +83,7 @@ public class Common {
 
         if (currentUser != null){
 
-            if (currentUser.getPhone().equals("") || currentUser.getNationality().equals("")
+            if (currentUser.getPhone().equals("")
                     || currentUser.getGender().equals("") || currentUser.getBirthday().equals("")){
 
                 result = "Personal details incomplete!";
@@ -101,14 +101,6 @@ public class Common {
                     || currentUser.getAccountNumber().equals("")){
 
                 result = "Bank details incomplete!";
-
-            } else
-
-            if (currentUser.getKinName().equals("") || currentUser.getKinEmail().equals("")
-                    || currentUser.getKinAddress().equals("") || currentUser.getKinRelationship().equals("")
-                    || currentUser.getKinPhone().equals("")){
-
-                result = "Next of Kin details incomplete!";
 
             } else {
 

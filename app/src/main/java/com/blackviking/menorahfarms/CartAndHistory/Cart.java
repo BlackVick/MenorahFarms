@@ -1039,53 +1039,78 @@ public class Cart extends AppCompatActivity {
                             //link
                             proofUrl = downloadUri.toString();
 
+                            //send notification to user
+                            sendPendingNotification();
+
                             //image map
                             Map<String, Object> imageProofMap = new HashMap<>();
                             imageProofMap.put("paymentProof", proofUrl);
 
                             pendingSponsorRef.child(currentFarmNotiId)
                                     .child(currentPushId)
-                                    .updateChildren(imageProofMap);
+                                    .updateChildren(imageProofMap)
+                                    .addOnCompleteListener(task1 -> {
 
-                            //remove from cart
-                            cartRef.child(currentuid).child(currentCartKey).removeValue();
+                                        if (task1.isSuccessful()){
 
-                            //send notification to user
-                            sendPendingNotification();
+                                            //remove from cart
+                                            cartRef.child(currentuid)
+                                                    .child(currentCartKey)
+                                                    .removeValue()
+                                                    .addOnCompleteListener(task2 -> {
 
-                            //stop loading
-                            finishCheckout.setEnabled(true);
-                            checkoutProgress.setVisibility(View.GONE);
-                            actionText.setVisibility(View.VISIBLE);
+                                                        if (task2.isSuccessful()){
 
-                            //dialog
-                            alertDialog2.dismiss();
+                                                            //stop loading
+                                                            finishCheckout.setEnabled(true);
+                                                            checkoutProgress.setVisibility(View.GONE);
+                                                            actionText.setVisibility(View.VISIBLE);
 
-                            //go to sponsored farms
-                            Intent sponsoredIntent = new Intent(Cart.this, SponsoredFarms.class);
-                            startActivity(sponsoredIntent);
-                            finish();
-                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                                                            //dialog
+                                                            alertDialog2.dismiss();
+
+                                                            //go to sponsored farms
+                                                            Intent sponsoredIntent = new Intent(Cart.this, SponsoredFarms.class);
+                                                            startActivity(sponsoredIntent);
+                                                            finish();
+                                                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+                                                        }
+
+                                                    });
+
+                                        }
+
+                                    });
 
 
                         } else {
 
-                            //stop loading
-                            finishCheckout.setEnabled(true);
-                            checkoutProgress.setVisibility(View.GONE);
-                            actionText.setVisibility(View.VISIBLE);
+                            //remove from cart
+                            cartRef.child(currentuid)
+                                    .child(currentCartKey)
+                                    .removeValue()
+                                    .addOnCompleteListener(task2 -> {
 
-                            //value
-                            isUploading = false;
+                                        if (task2.isSuccessful()){
 
-                            //dialog
-                            alertDialog2.dismiss();
+                                            //stop loading
+                                            finishCheckout.setEnabled(true);
+                                            checkoutProgress.setVisibility(View.GONE);
+                                            actionText.setVisibility(View.VISIBLE);
 
-                            //go to sponsored farms
-                            Intent sponsoredIntent = new Intent(Cart.this, SponsoredFarms.class);
-                            startActivity(sponsoredIntent);
-                            finish();
-                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                                            //dialog
+                                            alertDialog2.dismiss();
+
+                                            //go to sponsored farms
+                                            Intent sponsoredIntent = new Intent(Cart.this, SponsoredFarms.class);
+                                            startActivity(sponsoredIntent);
+                                            finish();
+                                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+                                        }
+
+                                    });
 
                         }
                     });
@@ -1238,48 +1263,6 @@ public class Cart extends AppCompatActivity {
         String pushId = pushRef.getKey();
 
         //add to running sponsorships cycle
-        addToRunningCycle(pushId, currentFarmId, runningCycleMap);
-
-        //add to user sponsorship list
-        sponsorshipRef.child(currentuid)
-                .child(pushId)
-                .setValue(sponsorshipMap)
-                .addOnCompleteListener(task -> {
-
-                    if (task.isSuccessful()){
-
-                        //remove from cart
-                        cartRef.child(currentuid).child(currentCartKey).removeValue();
-
-                        //send notification to user
-                        sendApprovalNotification();
-
-                        //add transaction log
-                        payHistoryRef.child(currentuid)
-                                .push()
-                                .setValue(logMap);
-
-                        //dismiss loading
-                        loadingDialog.dismiss();
-
-                        //go to sponsored farms
-                        Intent sponsoredIntent = new Intent(Cart.this, SponsoredFarms.class);
-                        startActivity(sponsoredIntent);
-                        finish();
-                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-
-                    } else {
-
-                        Toast.makeText(this, "Unknown error occurred, please contact admin immediately", Toast.LENGTH_LONG).show();
-
-                    }
-
-                });
-
-    }
-
-    private void addToRunningCycle(final String pushId, String currentFarmId, final Map<String, Object> runningCycleMap) {
-
         farmRef.child(currentFarmId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -1289,16 +1272,70 @@ public class Cart extends AppCompatActivity {
 
                         if (theFarm != null){
 
-                            //add to running cycles
-                            runningCycleRef.child(theFarm.getFarmNotiId())
-                                    .child(pushId)
-                                    .setValue(runningCycleMap);
-
                             //add to notification group
                             sponsorshipNotificationRef.child(theFarm.getFarmNotiId())
                                     .child(currentuid)
                                     .child("timestamp")
                                     .setValue(ServerValue.TIMESTAMP);
+
+                            //add transaction log
+                            payHistoryRef.child(currentuid)
+                                    .push()
+                                    .setValue(logMap);
+
+                            //add to running cycles
+                            runningCycleRef.child(theFarm.getFarmNotiId())
+                                    .child(pushId)
+                                    .setValue(runningCycleMap)
+                                    .addOnCompleteListener(task -> {
+
+                                        if (task.isSuccessful()){
+
+                                            //add to user sponsorship list
+                                            sponsorshipRef.child(currentuid)
+                                                    .child(pushId)
+                                                    .setValue(sponsorshipMap)
+                                                    .addOnCompleteListener(task2 -> {
+
+                                                        if (task2.isSuccessful()){
+
+                                                            //dismiss loading
+                                                            loadingDialog.dismiss();
+
+                                                            //send notification to user
+                                                            sendApprovalNotification();
+
+                                                            //remove from cart
+                                                            cartRef.child(currentuid)
+                                                                    .child(currentCartKey)
+                                                                    .removeValue()
+                                                                    .addOnCompleteListener(task1 -> {
+
+                                                                        if (task1.isSuccessful()){
+
+                                                                            //go to sponsored farms
+                                                                            Intent sponsoredIntent = new Intent(Cart.this, SponsoredFarms.class);
+                                                                            startActivity(sponsoredIntent);
+                                                                            finish();
+                                                                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+                                                                        }
+
+                                                                    });
+
+                                                        } else {
+
+                                                            Toast.makeText(Cart.this, "Unknown error occurred, please contact admin immediately", Toast.LENGTH_LONG).show();
+
+                                                        }
+
+                                                    });
+
+                                        }
+
+                                    });
+
+
 
                         }
 

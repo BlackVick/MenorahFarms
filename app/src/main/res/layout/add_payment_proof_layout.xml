@@ -6,18 +6,16 @@
     android:background="@color/white"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:scrollbars="none">
 
-        <androidx.cardview.widget.CardView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardElevation="10dp"
-            app:cardBackgroundColor="@color/white"
-            android:padding="7dp"
-            android:layout_margin="7dp">
+            android:orientation="vertical"
+            android:layout_marginBottom="10dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -31,7 +29,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/transferNotice"
                     android:gravity="start"
-                    android:textSize="13sp"
+                    android:textSize="16sp"
                     android:fontFamily="@font/proxima_nova_regular"
                     android:textColor="@color/black"
                     android:layout_margin="4dp"/>
@@ -39,7 +37,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:layout_marginTop="25dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -67,7 +66,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:layout_marginTop="7dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -95,7 +95,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:layout_marginTop="7dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -121,61 +122,84 @@
 
                 </LinearLayout>
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="7dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="AMOUNT:"
+                        android:gravity="start|center_vertical"
+                        android:textSize="14sp"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_margin="4dp"
+                        android:fontFamily="@font/proxima_nova_bold"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:gravity="start|center_vertical"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"
+                        android:layout_margin="4dp"
+                        android:id="@+id/amountRequed"
+                        android:autoLink="all"
+                        android:fontFamily="@font/proxima_nova_bold"/>
+
+                </LinearLayout>
+
             </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardElevation="12dp"
-            app:cardBackgroundColor="@color/white"
-            android:padding="7dp"
-            android:layout_margin="7dp">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Your sponsorship will be activated once payment is confirmed"
+                android:text="Complete your sponsorship process by uploading a proof of payment below. Your sponsorship will be activated once payment is confirmed"
                 android:gravity="start"
-                android:textSize="13sp"
+                android:textSize="15sp"
                 android:fontFamily="@font/proxima_nova_regular"
                 android:textColor="@color/black"
                 android:layout_margin="14dp"/>
 
-        </androidx.cardview.widget.CardView>
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:background="@drawable/new_login_button"
-            android:layout_margin="20dp"
-            android:id="@+id/finishCheckout"
-            android:paddingStart="15dp"
-            android:paddingEnd="15dp"
-            android:layout_gravity="center"
-            android:animateLayoutChanges="true">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="@string/uploadFinish"
-                android:gravity="center"
-                android:textColor="@color/white"
-                android:textSize="13sp"
-                android:id="@+id/actionText"
-                android:visibility="visible"
-                android:fontFamily="@font/proxima_nova_bold"/>
-
-            <ProgressBar
+            <RelativeLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/checkoutProgress"
-                android:layout_centerInParent="true"
-                android:visibility="gone"/>
+                android:layout_height="50dp"
+                android:background="@drawable/new_login_button"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="40dp"
+                android:id="@+id/finishCheckout"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp"
+                android:layout_gravity="center"
+                android:animateLayoutChanges="true">
 
-        </RelativeLayout>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/uploadFinish"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:textSize="13sp"
+                    android:id="@+id/actionText"
+                    android:visibility="visible"
+                    android:fontFamily="@font/proxima_nova_bold"/>
 
-    </LinearLayout>
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/checkoutProgress"
+                    android:layout_centerInParent="true"
+                    android:visibility="gone"
+                    android:theme="@style/ProgressTheme"/>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </RelativeLayout>

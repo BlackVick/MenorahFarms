@@ -35,7 +35,7 @@
 
             <TextView
                 android:layout_width="0dp"
-                android:layout_weight="8.8"
+                android:layout_weight="7.6"
                 android:layout_height="match_parent"
                 android:text=""
                 android:id="@+id/fragmentName"
@@ -45,6 +45,21 @@
                 android:gravity="center_vertical"
                 android:paddingStart="30dp"
                 android:fontFamily="@font/proxima_nova_bold"/>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_weight="1.2"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_pending_shiii"
+                    android:layout_centerInParent="true"
+                    android:id="@+id/pendingIcon"
+                    android:adjustViewBounds="true"/>
+
+            </RelativeLayout>
 
         </LinearLayout>
 

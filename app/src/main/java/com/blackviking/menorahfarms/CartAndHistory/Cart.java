@@ -1,22 +1,33 @@
 package com.blackviking.menorahfarms.CartAndHistory;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,6 +36,7 @@ import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Models.CartModel;
 import com.blackviking.menorahfarms.Models.FarmModel;
+import com.blackviking.menorahfarms.Models.MenorahDetailsModel;
 import com.blackviking.menorahfarms.Models.SponsorshipDetailsModel;
 import com.blackviking.menorahfarms.Models.UserModel;
 import com.blackviking.menorahfarms.Notification.APIService;
@@ -36,6 +48,7 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.flutterwave.raveandroid.RaveConstants;
 import com.flutterwave.raveandroid.RavePayActivity;
 import com.flutterwave.raveandroid.RavePayManager;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -43,10 +56,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
+import com.theartofdev.edmodo.cropper.CropImage;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -54,6 +74,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import id.zelory.compressor.Compressor;
 import io.paperdb.Paper;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -72,7 +93,9 @@ public class Cart extends AppCompatActivity {
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private DatabaseReference cartRef, userRef, farmRef, sponsorshipRef, payHistoryRef, termsRef, runningCycleRef,
-            notificationRef, sponsorshipDetailsRef, sponsorshipNotificationRef;
+            notificationRef, sponsorshipDetailsRef, sponsorshipNotificationRef, bankRef, pendingSponsorRef;
+    private FirebaseStorage storage = FirebaseStorage.getInstance();
+    private StorageReference proofRef;
 
     //values
     private String currentuid;
@@ -82,7 +105,7 @@ public class Cart extends AppCompatActivity {
     private String currentFarmType = "", currentFarmRoi = "", currentUnitPrice = "",
             currentDuration = "", currentFarmId = "", currentCartKey = "";
     private String todayString = "", futureString = "";
-    private long totalPrice = 0, currentTotalPayout = 0;
+    private long totalPrice = 0, currentTotalPayout = 0, displayPrice = 0;
     private int currentUnits = 0;
     private UserModel paperUser;
 
@@ -92,9 +115,28 @@ public class Cart extends AppCompatActivity {
     //loading
     private android.app.AlertDialog loadingDialog;
     private boolean isLoading = false;
+    private android.app.AlertDialog alertDialog, alertDialog2;
 
     //random farm manager
     private static final String[] CHARS = {"01", "02"};
+
+    //for permissions
+    private static final int VERIFY_PERMISSIONS_REQUEST = 757;
+    private static final int GALLERY_REQUEST_CODE = 665;
+
+    //image helper
+    private Uri imageUri;
+    private UploadTask proofUploadTask;
+    private boolean isUploading = false;
+    private String proofUrl = "";
+
+    //transfer shit
+    private TextView actionText;
+    private RelativeLayout finishCheckout;
+    private ProgressBar checkoutProgress;
+
+    private String currentPushId;
+    private String currentFarmNotiId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +155,9 @@ public class Cart extends AppCompatActivity {
         notificationRef = db.getReference(Common.NOTIFICATIONS_NODE);
         runningCycleRef = db.getReference(Common.RUNNING_CYCLE_NODE);
         sponsorshipDetailsRef = db.getReference(Common.SPONSORSHIP_DETAILS_NODE);
+        bankRef = db.getReference(Common.MENORAH_BANK_NODE);
+        pendingSponsorRef = db.getReference(Common.PENDING_NODE);
+        proofRef = storage.getReference("PAYMENT_PROOFS");
         if (mAuth.getCurrentUser() != null)
             currentuid = mAuth.getCurrentUser().getUid();
 
@@ -323,7 +368,7 @@ public class Cart extends AppCompatActivity {
                                                     //proceed to checkout
                                                     proceed.setOnClickListener(v1 -> {
                                                         alertDialog.dismiss();
-                                                        checkoutAndPay(adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
+                                                        showPaymentDialog(adapter.getRef(viewHolder.getAdapterPosition()).getKey(), theFarmType, theFarmROI, theFarmUnitPrice, theFarmSponsorDuration, model.getTotalPayout(), model.getUnits(), model.getFarmId());
                                                     });
 
                                                     //cancel checkout
@@ -369,8 +414,364 @@ public class Cart extends AppCompatActivity {
     }
 
 
+    //show choice dialog
+    private void showPaymentDialog(final String theCartKey, final String theFarmType, final String theFarmROI,
+                                   final String theFarmUnitPrice, final String theFarmSponsorDuration, final long totalPayout,
+                                   final int units, final String farmId) {
+        alertDialog = new AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.payment_gateway_choice,null);
+
+        final ImageView onlinePick = viewOptions.findViewById(R.id.onlinePick);
+        final ImageView transferPick = viewOptions.findViewById(R.id.transferPick);
+
+        //dialog parameters
+        alertDialog.setView(viewOptions);
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog.getWindow().setGravity(Gravity.BOTTOM);
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        WindowManager.LayoutParams layoutParams = alertDialog.getWindow().getAttributes();
+        layoutParams.y = 100; // bottom margin
+        alertDialog.getWindow().setAttributes(layoutParams);
+
+        //open camera
+        onlinePick.setOnClickListener(v -> {
+            alertDialog.dismiss();
+            checkoutAndPay(theCartKey, theFarmType, theFarmROI,
+            theFarmUnitPrice, theFarmSponsorDuration, totalPayout,
+            units, farmId);
+        });
+
+        //open gallery
+        transferPick.setOnClickListener(v -> {
+            alertDialog.dismiss();
+            openTransferDialog(theCartKey, theFarmType, theFarmROI,
+                    theFarmUnitPrice, theFarmSponsorDuration, totalPayout,
+                    units, farmId);
+        });
+
+        alertDialog.show();
+    }
+
+
+
+
+    //uploading transfer sturv
+    private void openTransferDialog(String theCartKey, String theFarmType, String theFarmROI,
+                                    String theFarmUnitPrice, String theFarmSponsorDuration,
+                                    long totalPayout, int units, String farmId) {
+
+        alertDialog2 = new android.app.AlertDialog.Builder(Cart.this, R.style.DialogTheme).create();
+        LayoutInflater inflater = Cart.this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.add_payment_proof_layout, null);
+
+        final TextView menorahBank = viewOptions.findViewById(R.id.menorahBank);
+        final TextView menorahAccountName = viewOptions.findViewById(R.id.menorahAccountName);
+        final TextView menorahAccountNumber = viewOptions.findViewById(R.id.menorahAccountNumber);
+        final TextView amountRequed = viewOptions.findViewById(R.id.amountRequed);
+        actionText = viewOptions.findViewById(R.id.actionText);
+        finishCheckout = viewOptions.findViewById(R.id.finishCheckout);
+        checkoutProgress = viewOptions.findViewById(R.id.checkoutProgress);
+
+        alertDialog2.setView(viewOptions);
+
+        alertDialog2.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        alertDialog2.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        //get price
+        int thelongPrice = Integer.parseInt(theFarmUnitPrice);
+        displayPrice = thelongPrice * units;
+        amountRequed.setText(Common.convertToPrice(Cart.this, displayPrice));
+
+
+
+
+        bankRef.addListenerForSingleValueEvent(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        MenorahDetailsModel theDets = dataSnapshot.getValue(MenorahDetailsModel.class);
+
+                        if (theDets != null){
+
+                            menorahAccountName.setText(theDets.getAccount_name());
+                            menorahAccountNumber.setText(theDets.getAccount_number());
+                            menorahBank.setText(theDets.getBank());
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                }
+        );
+
+
+        //upload btn
+        finishCheckout.setOnClickListener(v -> {
+
+            //loading
+            finishCheckout.setEnabled(false);
+            actionText.setVisibility(View.GONE);
+            checkoutProgress.setVisibility(View.VISIBLE);
+
+
+            //get user
+            final UserModel user1 = Paper.book().read(Common.PAPER_USER);
+
+            /*---   GLOBAL SET   ---*/
+            currentFarmType = theFarmType;
+            currentFarmRoi = theFarmROI;
+            currentUnitPrice = theFarmUnitPrice;
+            currentDuration = theFarmSponsorDuration;
+            currentFarmId = farmId;
+            currentTotalPayout = totalPayout;
+            currentUnits = units;
+            currentCartKey = theCartKey;
+
+
+            //create initials from name
+            char firstInit = user1.getFirstName().charAt(0);
+            char lastInit = user1.getLastName().charAt(0);
+            String initials = String.valueOf(firstInit) + String.valueOf(lastInit);
+
+            //get reference
+            paymentReference = initials + "-MF-" + System.currentTimeMillis();
+
+            //get price
+            int thePrice = Integer.parseInt(theFarmUnitPrice);
+            totalPrice = thePrice * units;
+
+
+            //duration
+            int theDuration = Integer.parseInt(theFarmSponsorDuration);
+            int theDays = 30 * theDuration;
+
+            //get today date
+            Date todayDate = Calendar.getInstance().getTime();
+            SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+            todayString = formatter.format(todayDate);
+
+            //get end date
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(todayDate);
+            cal.add(Calendar.DATE, theDays);
+            Date futureDate = cal.getTime();
+            SimpleDateFormat formatterFuture = new SimpleDateFormat("dd-MM-yyyy");
+            futureString = formatterFuture.format(futureDate);
+
+            //user personal map
+            Map<String, Object> sponsorshipMap = new HashMap<>();
+            sponsorshipMap.put("sponsorReturn", String.valueOf(currentTotalPayout));
+            sponsorshipMap.put("cycleEndDate", futureString);
+            sponsorshipMap.put("cycleStartDate", todayString);
+            sponsorshipMap.put("sponsorRefNumber", paymentReference);
+            sponsorshipMap.put("unitPrice", currentUnitPrice);
+            sponsorshipMap.put("sponsoredUnits", String.valueOf(currentUnits));
+            sponsorshipMap.put("sponsoredFarmType", currentFarmType);
+            sponsorshipMap.put("sponsoredFarmRoi", currentFarmRoi);
+            sponsorshipMap.put("sponsorshipDuration", currentDuration);
+            sponsorshipMap.put("startPoint", ServerValue.TIMESTAMP);
+            sponsorshipMap.put("totalAmountPaid", totalPrice);
+            sponsorshipMap.put("farmId", currentFarmId);
+            sponsorshipMap.put("status", "pending");
+
+            //pending sponsorship map
+            Map<String, Object> adminPendingSponsorshipMap = new HashMap<>();
+            adminPendingSponsorshipMap.put("sponsorReturn", String.valueOf(currentTotalPayout));
+            adminPendingSponsorshipMap.put("cycleEndDate", futureString);
+            adminPendingSponsorshipMap.put("cycleStartDate", todayString);
+            adminPendingSponsorshipMap.put("sponsorRefNumber", paymentReference);
+            adminPendingSponsorshipMap.put("unitPrice", currentUnitPrice);
+            adminPendingSponsorshipMap.put("sponsoredUnits", String.valueOf(currentUnits));
+            adminPendingSponsorshipMap.put("sponsoredFarmType", currentFarmType);
+            adminPendingSponsorshipMap.put("sponsoredFarmRoi", currentFarmRoi);
+            adminPendingSponsorshipMap.put("sponsorshipDuration", currentDuration);
+            adminPendingSponsorshipMap.put("startPoint", ServerValue.TIMESTAMP);
+            adminPendingSponsorshipMap.put("totalAmountPaid", totalPrice);
+            adminPendingSponsorshipMap.put("farmId", currentFarmId);
+            adminPendingSponsorshipMap.put("userId", currentuid);
+            adminPendingSponsorshipMap.put("paymentProof", "");
+
+            //push id
+            DatabaseReference pushRef = sponsorshipRef.push();
+            currentPushId = pushRef.getKey();
+
+            //get farm state
+            farmRef.child(farmId)
+                    .addListenerForSingleValueEvent(
+                            new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                    FarmModel laFarm = dataSnapshot.getValue(FarmModel.class);
+
+                                    if (laFarm != null){
+
+                                        if (laFarm.getFarmState().equalsIgnoreCase("Now Selling")){
+
+                                            sponsorshipDetailsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                                    SponsorshipDetailsModel theDetails = dataSnapshot.getValue(SponsorshipDetailsModel.class);
+
+                                                    if (theDetails != null){
+
+                                                        if (theDetails.getSponsored_farm().equalsIgnoreCase(laFarm.getFarmNotiId())){
+
+                                                            if (units <= theDetails.getUnits_available()){
+
+                                                                //value
+                                                                currentFarmNotiId = laFarm.getFarmNotiId();
+
+                                                                //add to pending
+                                                                pendingSponsorRef.child(currentFarmNotiId)
+                                                                        .child(currentPushId)
+                                                                        .setValue(adminPendingSponsorshipMap)
+                                                                        .addOnCompleteListener(task2 -> {
+
+                                                                            if (task2.isSuccessful()){
+
+                                                                                //add to user sponsorship list
+                                                                                sponsorshipRef.child(currentuid)
+                                                                                        .child(currentPushId)
+                                                                                        .setValue(sponsorshipMap)
+                                                                                        .addOnCompleteListener(task -> {
+
+                                                                                            if (task.isSuccessful()){
+
+                                                                                                //init upload
+                                                                                                if (ContextCompat.checkSelfPermission(Cart.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
+
+                                                                                                    Intent pickPhoto = new Intent(Intent.ACTION_PICK,
+                                                                                                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                                                                                                    startActivityForResult(pickPhoto , GALLERY_REQUEST_CODE);
+
+                                                                                                } else {
+
+                                                                                                    ActivityCompat.requestPermissions(Cart.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, VERIFY_PERMISSIONS_REQUEST);
+
+                                                                                                }
+
+                                                                                            } else {
+
+                                                                                                //stop loading
+                                                                                                finishCheckout.setEnabled(true);
+                                                                                                checkoutProgress.setVisibility(View.GONE);
+                                                                                                actionText.setVisibility(View.VISIBLE);
+
+                                                                                                Toast.makeText(Cart.this, "Unknown error occurred, please contact admin immediately", Toast.LENGTH_LONG).show();
+
+                                                                                            }
+
+                                                                                        });
+
+                                                                            } else {
+
+                                                                                //stop loading
+                                                                                finishCheckout.setEnabled(true);
+                                                                                checkoutProgress.setVisibility(View.GONE);
+                                                                                actionText.setVisibility(View.VISIBLE);
+
+                                                                                Toast.makeText(Cart.this, "Unknown error occurred, please contact admin immediately", Toast.LENGTH_LONG).show();
+
+                                                                            }
+
+                                                                        });
+
+                                                            } else {
+
+                                                                //stop loading
+                                                                finishCheckout.setEnabled(true);
+                                                                checkoutProgress.setVisibility(View.GONE);
+                                                                actionText.setVisibility(View.VISIBLE);
+
+                                                                //show error
+                                                                Toast.makeText(Cart.this, "Remaining units can't serve your request.", Toast.LENGTH_LONG).show();
+
+                                                            }
+
+                                                        }
+
+                                                    }
+
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                }
+                                            });
+
+                                        } else {
+
+                                            //stop loading
+                                            finishCheckout.setEnabled(true);
+                                            checkoutProgress.setVisibility(View.GONE);
+                                            actionText.setVisibility(View.VISIBLE);
+
+                                            //loading
+                                            Toast.makeText(Cart.this, "Farm is sold out!", Toast.LENGTH_LONG).show();
+
+                                        }
+
+                                    }
+
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            }
+                    );
+
+        });
+
+        alertDialog2.show();
+
+    }
+
+    //permission
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        if (grantResults.length > 0) {
+
+            if (requestCode == VERIFY_PERMISSIONS_REQUEST && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                Intent pickPhoto = new Intent(Intent.ACTION_PICK,
+                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(pickPhoto , GALLERY_REQUEST_CODE);
+
+            } else {
+
+                Toast.makeText(Cart.this, "Permissions Denied", Toast.LENGTH_SHORT).show();
+
+            }
+
+        } else {
+
+            Toast.makeText(Cart.this, "Permissions Error", Toast.LENGTH_SHORT).show();
+
+        }
+
+    }
+
+
+
+
+
+
     //FlutterWave Payment Gateway
-    private void checkoutAndPay(final String theCartKey, final String theFarmType, final String theFarmROI, final String theFarmUnitPrice, final String theFarmSponsorDuration, final long totalPayout, final int units, final String farmId) {
+    private void checkoutAndPay(final String theCartKey, final String theFarmType, final String theFarmROI,
+                                final String theFarmUnitPrice, final String theFarmSponsorDuration, final long totalPayout,
+                                final int units, final String farmId) {
 
         //run network check
         new CheckInternet(this, output -> {
@@ -568,6 +969,125 @@ public class Cart extends AppCompatActivity {
                 Toast.makeText(this, "Transaction cancelled", Toast.LENGTH_SHORT).show();
 
             }
+        }
+
+        if (requestCode == GALLERY_REQUEST_CODE && resultCode == RESULT_OK){
+
+            if (data.getData() != null) {
+                imageUri = data.getData();
+
+                CropImage.activity(imageUri)
+                        .start(Cart.this);
+            }
+
+        }
+
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            final CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+
+                //value
+                isUploading = true;
+
+                //get data
+                Uri resultUri = result.getUri();
+
+                //user id
+                String currentUid = mAuth.getCurrentUser().getUid();
+
+                //get file path
+                File thumb_filepath = new File(resultUri.getPath());
+
+                try {
+
+                    //converting to bitmap
+                    Bitmap thumb_bitmap = new Compressor(Cart.this)
+                            .setMaxWidth(400)
+                            .setMaxHeight(600)
+                            .setQuality(70)
+                            .compressToBitmap(thumb_filepath);
+
+                    //compress file size and set format
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    thumb_bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+                    final byte[] thumb_byte = baos.toByteArray();
+
+
+                    //set file location and name in firebase
+                    final StorageReference imageThumbRef = proofRef.child(currentPushId + ".jpg");
+
+                    //start upload
+                    proofUploadTask = imageThumbRef.putBytes(thumb_byte);
+
+                    //get download link
+                    Task<Uri> urlTask = proofUploadTask.continueWithTask(task -> {
+
+                        if (!task.isSuccessful()) {
+
+                            throw task.getException();
+                        }
+
+                        // Continue with the task to get the download URL
+                        return imageThumbRef.getDownloadUrl();
+
+                    }).addOnCompleteListener(task -> {
+
+                        if (task.isSuccessful()) {
+
+                            Uri downloadUri = task.getResult();
+
+                            //link
+                            proofUrl = downloadUri.toString();
+
+                            //image map
+                            Map<String, Object> imageProofMap = new HashMap<>();
+                            imageProofMap.put("paymentProof", proofUrl);
+
+                            pendingSponsorRef.child(currentFarmNotiId)
+                                    .child(currentPushId)
+                                    .updateChildren(imageProofMap);
+
+                            //remove from cart
+                            cartRef.child(currentuid).child(currentCartKey).removeValue();
+
+                            //send notification to user
+                            sendPendingNotification();
+
+                            //stop loading
+                            finishCheckout.setEnabled(true);
+                            checkoutProgress.setVisibility(View.GONE);
+                            actionText.setVisibility(View.VISIBLE);
+
+                            //dialog
+                            alertDialog2.dismiss();
+
+
+                        } else {
+
+                            //stop loading
+                            finishCheckout.setEnabled(true);
+                            checkoutProgress.setVisibility(View.GONE);
+                            actionText.setVisibility(View.VISIBLE);
+
+                            //value
+                            isUploading = false;
+
+                            //dialog
+                            alertDialog2.dismiss();
+
+                        }
+                    });
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            } else
+
+            if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+            }
+
         }
 
     }
@@ -824,6 +1344,56 @@ public class Cart extends AppCompatActivity {
 
     }
 
+    private void sendPendingNotification() {
+
+        final Date todayDate = Calendar.getInstance().getTime();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy  hh:mm");
+        String todayString = formatter.format(todayDate);
+
+        //notification map
+        final Map<String, Object> notificationMap = new HashMap<>();
+        notificationMap.put("topic", "Sponsorship Pending");
+        notificationMap.put("message", "Your sponsorship has been processed pending approval. Please be patient as your sponsorship would be confirmed within 24 to 72 hours.");
+        notificationMap.put("time", todayString);
+
+
+        notificationRef.child(currentuid)
+                .push()
+                .setValue(notificationMap)
+                .addOnCompleteListener(task -> {
+
+                    if (task.isSuccessful()){
+
+                        Map<String, String> dataSend = new HashMap<>();
+                        dataSend.put("title", "Sponsorship Start");
+                        dataSend.put("message", "Your sponsorship has been processed pending approval. Please be patient as your sponsorship would be confirmed within 24 to 72 hours.");
+                        DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(currentuid).toString(), dataSend);
+
+                        mService.sendNotification(dataMessage)
+                                .enqueue(new retrofit2.Callback<MyResponse>() {
+                                    @Override
+                                    public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<MyResponse> call, Throwable t) {
+                                    }
+                                });
+
+                        //notification to admin
+                        sendAlertToAdmin();
+
+                    } else {
+
+                        Toast.makeText(Cart.this, "Error occurred while sending notification", Toast.LENGTH_SHORT).show();
+
+                    }
+
+                });
+
+    }
+
     private void sendAlertToAdmin() {
 
         userRef.orderByChild("userType")
@@ -975,6 +1545,10 @@ public class Cart extends AppCompatActivity {
         if (isLoading){
             loadingDialog.dismiss();
         }
+        if (isUploading){
+            proofUploadTask.cancel();
+        }
         finish();
     }
+
 }

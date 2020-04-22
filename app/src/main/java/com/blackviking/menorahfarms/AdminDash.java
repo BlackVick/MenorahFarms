@@ -19,6 +19,7 @@ import com.blackviking.menorahfarms.AdminFragments.AdminHistory;
 import com.blackviking.menorahfarms.AdminFragments.AdminNotify;
 import com.blackviking.menorahfarms.AdminFragments.DueSponsorships;
 import com.blackviking.menorahfarms.AdminFragments.FarmManagement;
+import com.blackviking.menorahfarms.AdminFragments.PendingSponsorships;
 import com.blackviking.menorahfarms.AdminFragments.RunningSponsorships;
 import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
@@ -33,7 +34,7 @@ import io.paperdb.Paper;
 
 public class AdminDash extends AppCompatActivity {
 
-    private ImageView backButton;
+    private ImageView backButton, pendingIcon;
     private TextView fragmentName;
 
     private RelativeLayout dueSponsorshipLayout, adminNotifyLayout,
@@ -73,6 +74,7 @@ public class AdminDash extends AppCompatActivity {
 
         /*---   WIDGETS   ---*/
         backButton = findViewById(R.id.backButton);
+        pendingIcon = findViewById(R.id.pendingIcon);
         fragmentName = findViewById(R.id.fragmentName);
 
         dueSponsorshipLayout = findViewById(R.id.dueSponsorshipLayout);
@@ -102,6 +104,7 @@ public class AdminDash extends AppCompatActivity {
         final RunningSponsorships runningSponsorships = new RunningSponsorships();
         final AdminHistory adminHistory = new AdminHistory();
         final FarmManagement farmManagement = new FarmManagement();
+        final PendingSponsorships pendingSponsorships = new PendingSponsorships();
 
 
         //show loading dialog
@@ -148,6 +151,32 @@ public class AdminDash extends AppCompatActivity {
 
 
         /*---   BOTTOM NAV   ---*/
+
+        pendingIcon.setOnClickListener(view -> {
+
+            fragmentName.setText("Pending Sponsorships");
+
+            dueSponsorshipLayout.setBackgroundResource(R.color.white);
+            dueSponsorshipImage.setImageResource(R.drawable.ic_due_sponsorships);
+            dueSponsorshipCounter.setTextColor(getResources().getColor(R.color.red));
+
+            adminNotifyLayout.setBackgroundResource(R.color.white);
+            adminNotifyImage.setImageResource(R.drawable.ic_notifications);
+
+            runningSponsorshipLayout.setBackgroundResource(R.color.white);
+            runningSponsorshipImage.setImageResource(R.drawable.ic_current_sponsorships_green);
+            runningSponsorshipCounter.setTextColor(getResources().getColor(R.color.red));
+
+            adminHistoryLayout.setBackgroundResource(R.color.white);
+            adminHistoryImage.setImageResource(R.drawable.ic_history);
+
+            farmManagementLayout.setBackgroundResource(R.color.white);
+            farmManagementImage.setImageResource(R.drawable.ic_farm_management_green);
+
+            setFragment(pendingSponsorships);
+
+        });
+
         dueSponsorshipLayout.setOnClickListener(v -> {
 
             fragmentName.setText("Due Sponsorships");

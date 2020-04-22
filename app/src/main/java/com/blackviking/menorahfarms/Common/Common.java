@@ -28,6 +28,8 @@ public class Common {
     public static final String FARM_NODE = "Farms";
     public static final String CART_NODE = "Carts";
     public static final String BANKS_NODE = "Banks";
+    public static final String MENORAH_BANK_NODE = "MenorahBankDetails";
+    public static final String PENDING_NODE = "PendingSponsorships";
     public static final String FARM_UPDATES_NODE = "FarmUpdates";
     public static final String HISTORY_NODE = "History";
     public static final String ADMIN_HISTORY_NODE = "AdminHistory";
@@ -83,10 +85,9 @@ public class Common {
 
         if (currentUser != null){
 
-            if (currentUser.getPhone().equals("")
-                    || currentUser.getGender().equals("") || currentUser.getBirthday().equals("")){
+            if (currentUser.getPhone().equals("")){
 
-                result = "Personal details incomplete!";
+                result = "Phone number is required!";
 
             } else
 

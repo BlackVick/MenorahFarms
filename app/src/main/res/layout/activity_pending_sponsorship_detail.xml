@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AdminDetails.PendingSponsorshipDetail"
+    android:background="@color/black">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:layout_centerInParent="true"
+        android:id="@+id/proofImage"/>
+
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/left_border_btn"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/ic_menorah_back_button_green"
+        android:id="@+id/backButton"
+        android:padding="9dp"/>
+
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/right_border_btn"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/ic_open_in_gallery"
+        android:id="@+id/openInGallery"
+        android:padding="9dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/choices"
+        android:orientation="vertical"
+        android:layout_margin="10dp"
+        android:background="@color/transparentWhite">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Amount Paid (claim)"
+            android:textSize="17sp"
+            android:textStyle="normal"
+            android:textColor="@color/black"
+            android:fontFamily="@font/proxima_nova_regular"
+            android:layout_margin="4dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="19sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorAccent"
+            android:fontFamily="@font/proxima_nova_bold"
+            android:layout_margin="4dp"
+            android:gravity="end"
+            android:id="@+id/amountPaid"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/choices"
+        android:weightSum="10"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10dp">
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_weight="5"
+            android:layout_height="35dp"
+            android:id="@+id/denySponsorship"
+            android:background="@drawable/cancel_ring"
+            android:layout_marginEnd="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="DENY"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:textColor="@color/red"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_weight="5"
+            android:layout_height="35dp"
+            android:id="@+id/approveSponsorship"
+            android:background="@drawable/read_more_ring">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="APPROVE"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:textColor="@color/colorPrimary"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:theme="@style/ProgressTheme"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        android:id="@+id/actionProgress"/>
+
+</RelativeLayout>

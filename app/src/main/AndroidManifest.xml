@@ -25,7 +25,6 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
-
         <activity
             android:name=".Splash"
             android:configChanges="orientation"
@@ -37,44 +36,37 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!--  Image cropper  -->
+        </activity> <!-- Image cropper -->
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:configChanges="orientation"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity"
-            android:theme="@style/Base.Theme.AppCompat" />
-
+            android:theme="@style/Base.Theme.AppCompat"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".SignIn"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity"
-            android:theme="@style/LoginBackground" />
-
+            android:theme="@style/LoginBackground"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".SignUp"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity"
-            android:theme="@style/LoginBackground" />
-
+            android:theme="@style/LoginBackground"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Registration"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity"
-            android:theme="@style/LoginBackground" />
-
+            android:theme="@style/LoginBackground"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".DashboardMenu.SponsoredFarms"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".DashboardMenu.FollowedFarms"
             android:configChanges="orientation"
@@ -94,12 +86,12 @@
             android:name=".HomeActivities.FarmShop"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity"/>
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".DashboardMenu.FarmUpdates"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity"/>
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".DashboardMenu.AccountManager"
             android:configChanges="orientation"
@@ -114,17 +106,17 @@
             android:name=".CartAndHistory.Cart"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity"/>
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".CartAndHistory.SponsorshipHistory"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity"/>
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".AccountMenus.PersonalDetails"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity"/>
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".AccountMenus.ContactDetails"
             android:configChanges="orientation"
@@ -154,7 +146,7 @@
             android:name=".FarmDescription"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity"/>
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".CartAndHistory.HistoryDetails"
             android:configChanges="orientation"
@@ -189,15 +181,17 @@
             android:name=".DashboardMenu.FarmUpdateFullscreen"
             android:configChanges="orientation"
             android:screenOrientation="sensorLandscape"
-            tools:ignore="LockedOrientationActivity"></activity>
-
-        <!--  crashylytics key  -->
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name=".AdminDetails.PendingSponsorshipDetail"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"/>
+        <!-- crashylytics key -->
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="97c5e0bb9711d1cf829d94e2147e8567b6542b37"
-            tools:replace="android:value" />
-
-        <!--  File Provider intengrity  -->
+            tools:replace="android:value" /> <!-- File Provider intengrity -->
         <provider
             android:name=".Common.GenericFileProvider"
             android:authorities="${applicationId}.provider"
@@ -206,15 +200,11 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
-        </provider>
-
-        <!--  admin sponsorship monitor -->
+        </provider> <!-- admin sponsorship monitor -->
         <service
             android:name=".Services.AdminMonitorService"
             android:enabled="true"
-            android:exported="true" />
-
-        <!--  firebase messaging  -->
+            android:exported="true" /> <!-- firebase messaging -->
         <service
             android:name=".Notification.MyFirebaseMessaging"
             android:enabled="true"
@@ -223,7 +213,6 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
     </application>
 
 </manifest>

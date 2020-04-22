@@ -34,6 +34,7 @@ import android.widget.Toast;
 
 import com.blackviking.menorahfarms.Common.CheckInternet;
 import com.blackviking.menorahfarms.Common.Common;
+import com.blackviking.menorahfarms.DashboardMenu.SponsoredFarms;
 import com.blackviking.menorahfarms.Models.CartModel;
 import com.blackviking.menorahfarms.Models.FarmModel;
 import com.blackviking.menorahfarms.Models.MenorahDetailsModel;
@@ -414,6 +415,8 @@ public class Cart extends AppCompatActivity {
     }
 
 
+
+
     //show choice dialog
     private void showPaymentDialog(final String theCartKey, final String theFarmType, final String theFarmROI,
                                    final String theFarmUnitPrice, final String theFarmSponsorDuration, final long totalPayout,
@@ -452,9 +455,6 @@ public class Cart extends AppCompatActivity {
 
         alertDialog.show();
     }
-
-
-
 
     //uploading transfer sturv
     private void openTransferDialog(String theCartKey, String theFarmType, String theFarmROI,
@@ -1061,6 +1061,12 @@ public class Cart extends AppCompatActivity {
                             //dialog
                             alertDialog2.dismiss();
 
+                            //go to sponsored farms
+                            Intent sponsoredIntent = new Intent(Cart.this, SponsoredFarms.class);
+                            startActivity(sponsoredIntent);
+                            finish();
+                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
 
                         } else {
 
@@ -1074,6 +1080,12 @@ public class Cart extends AppCompatActivity {
 
                             //dialog
                             alertDialog2.dismiss();
+
+                            //go to sponsored farms
+                            Intent sponsoredIntent = new Intent(Cart.this, SponsoredFarms.class);
+                            startActivity(sponsoredIntent);
+                            finish();
+                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
                         }
                     });
@@ -1249,6 +1261,12 @@ public class Cart extends AppCompatActivity {
 
                         //dismiss loading
                         loadingDialog.dismiss();
+
+                        //go to sponsored farms
+                        Intent sponsoredIntent = new Intent(Cart.this, SponsoredFarms.class);
+                        startActivity(sponsoredIntent);
+                        finish();
+                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
                     } else {
 

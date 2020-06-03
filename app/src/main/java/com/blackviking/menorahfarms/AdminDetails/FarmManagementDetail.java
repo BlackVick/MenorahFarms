@@ -10,7 +10,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -29,6 +31,9 @@ import com.blackviking.menorahfarms.Common.Common;
 import com.blackviking.menorahfarms.Models.FarmModel;
 import com.blackviking.menorahfarms.Models.RunningCycleModel;
 import com.blackviking.menorahfarms.Models.SponsorshipDetailsModel;
+import com.blackviking.menorahfarms.Notification.APIService;
+import com.blackviking.menorahfarms.Notification.DataMessage;
+import com.blackviking.menorahfarms.Notification.MyResponse;
 import com.blackviking.menorahfarms.R;
 import com.blackviking.menorahfarms.Services.AdminMonitorService;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -37,16 +42,22 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.FirebaseFunctionsException;
 import com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import io.paperdb.Paper;
+import retrofit2.Call;
+import retrofit2.Response;
 
 public class FarmManagementDetail extends AppCompatActivity {
 
@@ -62,7 +73,7 @@ public class FarmManagementDetail extends AppCompatActivity {
 
     //firebase
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference farmRef, runningCycleRef, sponsorshipDetailRef;
+    private DatabaseReference farmRef, runningCycleRef, sponsorshipDetailRef, dueSponsorshipRef, sponsoredFarmRef, notificationsRef;
     private FirebaseFunctions mFunctions = FirebaseFunctions.getInstance();
 
     //values
@@ -77,6 +88,9 @@ public class FarmManagementDetail extends AppCompatActivity {
     private boolean isDisplayingDialog = false;
     private boolean isEditing = false;
 
+    //notification
+    private APIService mService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,10 +101,17 @@ public class FarmManagementDetail extends AppCompatActivity {
         farmId = getIntent().getStringExtra("FarmId");
 
 
+        /*---   FCM   ---*/
+        mService = Common.getFCMService();
+
+
         //Firebase
         farmRef = db.getReference(Common.FARM_NODE);
         runningCycleRef = db.getReference(Common.RUNNING_CYCLE_NODE);
         sponsorshipDetailRef = db.getReference(Common.SPONSORSHIP_DETAILS_NODE);
+        dueSponsorshipRef = db.getReference(Common.DUE_SPONSORSHIPS_NODE);
+        sponsoredFarmRef = db.getReference(Common.SPONSORED_FARMS_NODE);
+        notificationsRef = db.getReference(Common.NOTIFICATIONS_NODE);
 
 
         //check service run
@@ -220,33 +241,14 @@ public class FarmManagementDetail extends AppCompatActivity {
                                             //show dialog
                                             showLoadingDialog("Ending sponsorships . . .");
 
-                                            endSponsorship(currentFarm.getFarmNotiId())
-                                                    .addOnCompleteListener(task -> {
+                                            //call async task to end all
+                                            new EndSponsorshipAsyncCaller().execute(currentFarm.getFarmNotiId());
 
-                                                        if (!task.isSuccessful()) {
-
-                                                            Exception e = task.getException();
-                                                            if (e instanceof FirebaseFunctionsException) {
-                                                                FirebaseFunctionsException ffe = (FirebaseFunctionsException) e;
-                                                                FirebaseFunctionsException.Code code = ffe.getCode();
-                                                                Object details = ffe.getDetails();
-
-                                                            }
-
-                                                            //close dialog
-                                                            alertDialog.dismiss();
-
-                                                        } else {
-
-                                                            //close dialog
-                                                            alertDialog.dismiss();
-
-                                                            //close activity
-                                                            finish();
-
-                                                        }
-
-                                                    });
+                                            //close dialog
+                                            new Handler().postDelayed(() -> {
+                                                //close dialog
+                                                alertDialog.dismiss();
+                                            }, 3000);
                                         })
                                         .setIcon(R.drawable.dash_sponsored_farms)
                                         .setOnCancelListener(dialogInterface -> isDisplayingDialog = false)
@@ -448,6 +450,142 @@ public class FarmManagementDetail extends AppCompatActivity {
 
     }
 
+    private class EndSponsorshipAsyncCaller extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+
+
+            String theFarm = strings[0];
+
+            //get user list from user node
+            runningCycleRef.child(theFarm).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                    //create date string
+                    final Date todayDate = Calendar.getInstance().getTime();
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy  hh:mm");
+                    String todayString = formatter.format(todayDate);
+
+                    //noti data
+                    String theTopic = "Sponsorship End";
+                    String theMessage = "Congratulations! You have reached the end of a sponsorship cycle. Your full return payment will be made into your provided bank account at the end of the month as stated in the terms and conditions.";
+
+                    for (DataSnapshot snap : dataSnapshot.getChildren()){
+
+                        //get each user id
+                        String sponsorshipKey = snap.getKey();
+                        String userId = snap.child("userId").getValue().toString();
+
+                        //create notification map
+                        final Map<String, Object> notificationMap = new HashMap<>();
+                        notificationMap.put("topic", theTopic);
+                        notificationMap.put("message", theMessage);
+                        notificationMap.put("time", todayString);
+
+                        //create due status
+                        final Map<String, Object> dueMap = new HashMap<>();
+                        dueMap.put("user", userId);
+                        dueMap.put("sponsorshipId", sponsorshipKey);
+                        dueMap.put("timeDue", ServerValue.TIMESTAMP);
+
+                        //add to due sponsorship
+                        dueSponsorshipRef
+                                .push()
+                                .setValue(dueMap)
+                                .addOnCompleteListener(task -> {
+
+                                    if (task.isSuccessful()){
+
+                                        //remove from running cucle
+                                        runningCycleRef
+                                                .child(theFarm)
+                                                .child(sponsorshipKey)
+                                                .removeValue()
+                                                .addOnCompleteListener(task1 -> {
+
+                                                    if (task1.isSuccessful()){
+
+                                                        //update user sponsorship status
+                                                        sponsoredFarmRef.child(userId)
+                                                                .child(sponsorshipKey)
+                                                                .child("status")
+                                                                .setValue("processing")
+                                                                .addOnCompleteListener(task2 -> {
+
+                                                                    if (task2.isSuccessful()){
+
+                                                                        //set to local notification
+                                                                        notificationsRef.child(userId)
+                                                                                .push()
+                                                                                .setValue(notificationMap)
+                                                                                .addOnCompleteListener(task3 -> {
+
+                                                                                    if (task3.isSuccessful()){
+
+                                                                                        Map<String, String> dataSend = new HashMap<>();
+                                                                                        dataSend.put("title", theTopic);
+                                                                                        dataSend.put("message", theMessage);
+                                                                                        DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/")
+                                                                                                .append(userId).toString(), dataSend);
+
+                                                                                        mService.sendNotification(dataMessage)
+                                                                                                .enqueue(new retrofit2.Callback<MyResponse>() {
+                                                                                                    @Override
+                                                                                                    public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+
+
+                                                                                                    }
+
+                                                                                                    @Override
+                                                                                                    public void onFailure(Call<MyResponse> call, Throwable t) {
+                                                                                                    }
+                                                                                                });
+
+                                                                                    }
+
+                                                                                });
+
+                                                                    }
+
+                                                                });
+
+                                                    }
+                                                });
+                                    }
+                                });
+
+
+                    }
+
+
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+        }
+
+    }
+
     private void updateStatus(final String farmNotiId, final String newStatus) {
 
         //show loading
@@ -526,25 +664,6 @@ public class FarmManagementDetail extends AppCompatActivity {
 
     }
 
-    private Task<String> endSponsorship(final String farmNotiId) {
-
-        // Create the arguments to the callable function.
-        Map<String, Object> data = new HashMap<>();
-        data.put("farm", farmNotiId);
-
-        return mFunctions
-                .getHttpsCallable("endSponsorships")
-                .call(data)
-                .continueWith(task -> {
-                    // This continuation runs on either success or failure, but if the task
-                    // has failed then getResult() will throw an Exception which will be
-                    // propagated down.
-                    String result = (String) task.getResult().getData();
-                    Log.e("EndSponsExep", result);
-
-                    return result;
-                });
-    }
 
     private void deactivateTheFarm(FarmModel currentFarm) {
 

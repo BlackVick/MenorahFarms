@@ -242,30 +242,24 @@ public class AdminNotify extends Fragment {
                 //check all cases
                 if (output == 1){
 
-                    sendNotificationToFollowedFarms(selectedFollowedGroup, theTopic, theMessage)
-                            .addOnCompleteListener(task -> {
+                    //run in background
+                    new FollowedAsyncCaller().execute(theTopic, theMessage, selectedFollowedGroup);
 
-                                if (!task.isSuccessful()) {
+                    //wait 5 seconds then stop loading
+                    new Handler().postDelayed(() -> {
 
-                                    Exception e = task.getException();
-                                    if (e instanceof FirebaseFunctionsException) {
-                                        FirebaseFunctionsException ffe = (FirebaseFunctionsException) e;
-                                        FirebaseFunctionsException.Code code = ffe.getCode();
-                                        Object details = ffe.getDetails();
+                        //stop loading
+                        sendFollowedNotiBtn.setEnabled(true);
+                        sendProgress.setVisibility(View.GONE);
 
-                                    }
+                        Toast.makeText(getContext(), "DONE", Toast.LENGTH_SHORT).show();
+                        followedTopic.setText("");
+                        followedMessage.setText("");
 
-                                }
+                        //set layout
+                        Toast.makeText(getContext(), "STARTED", Toast.LENGTH_SHORT).show();
 
-                                //stop loading
-                                sendFollowedNotiBtn.setEnabled(true);
-                                sendProgress.setVisibility(View.GONE);
-
-                                Toast.makeText(getContext(), "DONE", Toast.LENGTH_SHORT).show();
-                                followedTopic.setText("");
-                                followedMessage.setText("");
-
-                            });
+                    }, 5000);
 
                 } else
 
@@ -297,32 +291,96 @@ public class AdminNotify extends Fragment {
 
     }
 
-    private Task<String> sendNotificationToFollowedFarms(final String theFarm, final String theTopic, final String theMessage) {
+    private class FollowedAsyncCaller extends AsyncTask<String, Void, String> {
 
-        //get today String
-        final Date todayDate = Calendar.getInstance().getTime();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-        String todayString = formatter.format(todayDate);
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
 
-        // Create the arguments to the callable function.
-        Map<String, Object> data = new HashMap<>();
-        data.put("farm", theFarm);
-        data.put("topic", theTopic);
-        data.put("message", theMessage);
-        data.put("time", todayString);
+        }
 
-        return mFunctions
-                .getHttpsCallable("sendNotificationToFollowedFarms")
-                .call(data)
-                .continueWith(task -> {
-                    // This continuation runs on either success or failure, but if the task
-                    // has failed then getResult() will throw an Exception which will be
-                    // propagated down.
-                    String result = (String) task.getResult().getData();
-                    Log.e("SendFollowedNoti", result);
+        @Override
+        protected String doInBackground(String... strings) {
 
-                    return result;
-                });
+
+            String theTopic = strings[0];
+            String theMessage = strings[1];
+            String theGroup = strings[2];
+
+            //get user list from user node
+            followedFarmNotiRef.child(theGroup).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                    //create date string
+                    final Date todayDate = Calendar.getInstance().getTime();
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy  hh:mm");
+                    String todayString = formatter.format(todayDate);
+
+                    for (DataSnapshot snap : dataSnapshot.getChildren()){
+
+                        //get each user id
+                        String userId = snap.getKey();
+
+                        //create notification map
+                        final Map<String, Object> notificationMap = new HashMap<>();
+                        notificationMap.put("topic", theTopic);
+                        notificationMap.put("message", theMessage);
+                        notificationMap.put("time", todayString);
+
+                        //push to database
+                        notificationRef.child(userId)
+                                .push()
+                                .setValue(notificationMap)
+                                .addOnCompleteListener(task -> {
+
+                                    if (task.isSuccessful()){
+                                        //send broadcast notification
+                                        Map<String, String> dataSend = new HashMap<>();
+                                        dataSend.put("title", "Menorah Farms");
+                                        dataSend.put("message", theTopic);
+                                        DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/")
+                                                .append(userId).toString(), dataSend);
+
+                                        mService.sendNotification(dataMessage)
+                                                .enqueue(new retrofit2.Callback<MyResponse>() {
+                                                    @Override
+                                                    public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+
+
+                                                    }
+
+                                                    @Override
+                                                    public void onFailure(Call<MyResponse> call, Throwable t) {
+                                                    }
+                                                });
+                                    }
+
+                                });
+
+
+
+                    }
+
+
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+        }
+
     }
 
 
@@ -430,30 +488,24 @@ public class AdminNotify extends Fragment {
                 //check all cases
                 if (output == 1){
 
-                    sendNotificationToFarmSponsors(selectedSponsoredGroup, theTopic, theMessage)
-                            .addOnCompleteListener(task -> {
+                    //run in background
+                    new SponsoredAsyncCaller().execute(theTopic, theMessage, selectedSponsoredGroup);
 
-                                if (!task.isSuccessful()) {
+                    //wait 5 seconds then stop loading
+                    new Handler().postDelayed(() -> {
 
-                                    Exception e = task.getException();
-                                    if (e instanceof FirebaseFunctionsException) {
-                                        FirebaseFunctionsException ffe = (FirebaseFunctionsException) e;
-                                        FirebaseFunctionsException.Code code = ffe.getCode();
-                                        Object details = ffe.getDetails();
+                        //stop loading
+                        sendSponsoredNotiBtn.setEnabled(true);
+                        sendProgress.setVisibility(View.GONE);
 
-                                    }
+                        Toast.makeText(getContext(), "DONE", Toast.LENGTH_SHORT).show();
+                        sponsoredTopic.setText("");
+                        sponsoredMessage.setText("");
 
-                                }
+                        //set layout
+                        Toast.makeText(getContext(), "STARTED", Toast.LENGTH_SHORT).show();
 
-                                //stop loading
-                                sendSponsoredNotiBtn.setEnabled(true);
-                                sendProgress.setVisibility(View.GONE);
-
-                                Toast.makeText(getContext(), "DONE", Toast.LENGTH_SHORT).show();
-                                sponsoredTopic.setText("");
-                                sponsoredMessage.setText("");
-
-                            });
+                    }, 5000);
 
                 } else
 
@@ -485,32 +537,96 @@ public class AdminNotify extends Fragment {
 
     }
 
-    private Task<String> sendNotificationToFarmSponsors(final String theFarm, final String theTopic, final String theMessage) {
+    private class SponsoredAsyncCaller extends AsyncTask<String, Void, String> {
 
-        //get today String
-        final Date todayDate = Calendar.getInstance().getTime();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-        String todayString = formatter.format(todayDate);
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
 
-        // Create the arguments to the callable function.
-        Map<String, Object> data = new HashMap<>();
-        data.put("farm", theFarm);
-        data.put("topic", theTopic);
-        data.put("message", theMessage);
-        data.put("time", todayString);
+        }
 
-        return mFunctions
-                .getHttpsCallable("sendNotificationToFarmSponsors")
-                .call(data)
-                .continueWith(task -> {
-                    // This continuation runs on either success or failure, but if the task
-                    // has failed then getResult() will throw an Exception which will be
-                    // propagated down.
-                    String result = (String) task.getResult().getData();
-                    Log.e("SendSponsoredNoti", result);
+        @Override
+        protected String doInBackground(String... strings) {
 
-                    return result;
-                });
+
+            String theTopic = strings[0];
+            String theMessage = strings[1];
+            String theGroup = strings[2];
+
+            //get user list from user node
+            sponsoredFarmNotiRef.child(theGroup).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                    //create date string
+                    final Date todayDate = Calendar.getInstance().getTime();
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy  hh:mm");
+                    String todayString = formatter.format(todayDate);
+
+                    for (DataSnapshot snap : dataSnapshot.getChildren()){
+
+                        //get each user id
+                        String userId = snap.getKey();
+
+                        //create notification map
+                        final Map<String, Object> notificationMap = new HashMap<>();
+                        notificationMap.put("topic", theTopic);
+                        notificationMap.put("message", theMessage);
+                        notificationMap.put("time", todayString);
+
+                        //push to database
+                        notificationRef.child(userId)
+                                .push()
+                                .setValue(notificationMap)
+                                .addOnCompleteListener(task -> {
+
+                                    if (task.isSuccessful()){
+                                        //send broadcast notification
+                                        Map<String, String> dataSend = new HashMap<>();
+                                        dataSend.put("title", "Menorah Farms");
+                                        dataSend.put("message", theTopic);
+                                        DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/")
+                                                .append(userId).toString(), dataSend);
+
+                                        mService.sendNotification(dataMessage)
+                                                .enqueue(new retrofit2.Callback<MyResponse>() {
+                                                    @Override
+                                                    public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+
+
+                                                    }
+
+                                                    @Override
+                                                    public void onFailure(Call<MyResponse> call, Throwable t) {
+                                                    }
+                                                });
+                                    }
+
+                                });
+
+
+
+                    }
+
+
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+        }
+
     }
 
 

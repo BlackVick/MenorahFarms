@@ -8,6 +8,11 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
+
+import com.blackviking.menorahfarms.Models.DueSponsorshipModel;
+import com.blackviking.menorahfarms.Models.FarmModel;
+import com.blackviking.menorahfarms.Models.RunningCycleModel;
+import com.blackviking.menorahfarms.Models.SponsoredFarmModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.fragment.app.Fragment;
 
@@ -38,6 +43,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.FirebaseFunctionsException;
@@ -61,13 +67,13 @@ public class AdminNotify extends Fragment {
     //widgets
     private EditText followedTopic, followedMessage, sponsoredTopic, sponsoredMessage;
     private Button sendFollowedNotiBtn, sendSponsoredNotiBtn;
-    private FloatingActionButton broadcastToAllFab;
+    private FloatingActionButton broadcastToAllFab, manualActionFab;
     private RelativeLayout directionLayout, followedFarmLayout, sponsoredFarmLayout;
     private ProgressBar sendProgress;
 
     //firebase
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference notificationRef, userRef, farmRef, followedFarmNotiRef, sponsoredFarmNotiRef;
+    private DatabaseReference notificationRef, userRef, farmRef, followedFarmNotiRef, sponsoredFarmNotiRef, dueSponsorshipsRef, sponsoredFarmRef, runningCycleRef;
     private FirebaseFunctions mFunctions = FirebaseFunctions.getInstance();
     private APIService mService;
 
@@ -93,6 +99,9 @@ public class AdminNotify extends Fragment {
         farmRef = db.getReference(Common.FARM_NODE);
         followedFarmNotiRef = db.getReference(Common.FOLLOWED_FARMS_NOTIFICATION_NODE);
         sponsoredFarmNotiRef = db.getReference(Common.SPONSORED_FARMS_NOTIFICATION_NODE);
+        dueSponsorshipsRef = db.getReference(Common.DUE_SPONSORSHIPS_NODE);
+        sponsoredFarmRef = db.getReference(Common.SPONSORED_FARMS_NODE);
+        runningCycleRef = db.getReference(Common.RUNNING_CYCLE_NODE);
 
 
         /*---   FCM   ---*/
@@ -114,6 +123,8 @@ public class AdminNotify extends Fragment {
         followedFarmLayout = v.findViewById(R.id.followedFarmLayout);
         sponsoredFarmLayout = v.findViewById(R.id.sponsoredFarmLayout);
         sendProgress = v.findViewById(R.id.sendProgress);
+        manualActionFab = v.findViewById(R.id.manualActionFab);
+        manualActionFab.hide();
 
 
         //notification style
@@ -133,9 +144,171 @@ public class AdminNotify extends Fragment {
 
 
         broadcastToAllFab.setOnClickListener(v1 -> openBroadcastDialog());
+
+
+        //manual action fab
+        manualActionFab.setOnClickListener(v12 -> {
+            runManualOperation();
+        });
         
         return v;
     }
+
+
+
+    //manual operation
+    private void runManualOperation() {
+
+        //convert due sponsorships to stuff
+        //new ManualAsyncCallerDue().execute();
+
+        //convert running cycle to stuff
+        new ManualAsyncCallerRun().execute();
+
+    }
+
+    private class ManualAsyncCallerDue extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+
+            dueSponsorshipsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                    for (DataSnapshot snap : dataSnapshot.getChildren()){
+
+                        DueSponsorshipModel dueObj = snap.getValue(DueSponsorshipModel.class);
+
+                        sponsoredFarmRef.child(dueObj.getUser())
+                                .child(dueObj.getSponsorshipId())
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                SponsoredFarmModel sponsoredObj = dataSnapshot.getValue(SponsoredFarmModel.class);
+
+                                Map<String, Object> notMap = new HashMap<>();
+                                notMap.put("timestamp", ServerValue.TIMESTAMP);
+
+                                farmRef.child(sponsoredObj.getFarmId())
+                                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                                FarmModel farmObj = dataSnapshot.getValue(FarmModel.class);
+
+                                                sponsoredFarmNotiRef
+                                                        .child(farmObj.getFarmNotiId())
+                                                        .child(dueObj.getUser())
+                                                        .setValue(notMap);
+
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
+
+
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+
+                    }
+
+                    Toast.makeText(getContext(), "Done", Toast.LENGTH_SHORT).show();
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+        }
+
+    }
+
+    private class ManualAsyncCallerRun extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+
+            runningCycleRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                    for (DataSnapshot snap : dataSnapshot.getChildren()){
+
+                        String cycleNotiId = snap.getKey();
+
+                        for (DataSnapshot childSnap : snap.getChildren()){
+
+                            RunningCycleModel runObj = childSnap.getValue(RunningCycleModel.class);
+
+                            Map<String, Object> notMap = new HashMap<>();
+                            notMap.put("timestamp", ServerValue.TIMESTAMP);
+
+                            sponsoredFarmNotiRef
+                                    .child(cycleNotiId)
+                                    .child(runObj.getUserId())
+                                    .setValue(notMap);
+
+                        }
+
+                    }
+
+                    Toast.makeText(getContext(), "Done", Toast.LENGTH_SHORT).show();
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+        }
+
+    }
+
+
+
+
 
     //FOLLOWED FARMS
     private void loadFollowedFarms() {

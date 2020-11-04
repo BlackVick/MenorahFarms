@@ -244,6 +244,16 @@
         app:backgroundTint="@color/colorAccent"
         android:id="@+id/broadcastToAllFab"/>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="8dp"
+        android:src="@drawable/ic_broadcast_to_all"
+        app:backgroundTint="@color/colorAccent"
+        android:id="@+id/manualActionFab"/>
+
     <ProgressBar
         android:layout_width="60dp"
         android:layout_height="60dp"
